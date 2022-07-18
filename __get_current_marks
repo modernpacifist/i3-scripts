@@ -1,0 +1,14 @@
+#!/bin/env bash
+
+set -e
+
+get_current_marks() {
+    echo -n marks:$(i3-msg -t get_marks | jq -r 'join("\n")' | sort | tr "\n" '|' | head -c -1)
+}
+
+while :
+do
+    read line
+    block="{\"full_text\":\"$(get_current_marks)\"}"
+    echo "${line/\[\{/\[$block,\{}" || exit 1
+done

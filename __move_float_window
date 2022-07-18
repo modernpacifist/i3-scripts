@@ -1,0 +1,44 @@
+#!/bin/env bash
+if [[ -z $1 ]]; then
+    echo '$1 argument was not specified'
+    exit 1
+fi
+
+CONFIGFILE=$HOME/.__move_float_window.json
+if [[ ! -f $CONFIGFILE ]]; then
+    echo 'No config file found'
+    exit 1
+fi
+
+window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
+status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
+status_bar_position=$(grep -oP '(?<="StatusBarPosition": ")[^"]*' $CONFIGFILE | tr -d ',')
+
+case $status_bar_position in 
+    "top") top_offset=0;;
+    "bottom") top_offset=$((- $status_bar_width / 2 - 4));;
+    *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
+esac
+
+echo $status_bar_width
+
+{ read max_x max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
+{ read window_id ; } < <(xdotool getactivewindow)
+{ read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+
+case $1 in
+    '1') new_pos="$(($window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '2') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '3') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
+
+    '4') new_pos="$(($window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '5') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '6') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+
+    '7') new_pos="$window_border_width $(($status_bar_width + $window_border_width + $top_offset))";;
+    '8') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    '9') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    *) echo 'Invalid value in $1 argument, must be 1-9' >&2; exit 2;;
+esac
+
+xdotool windowmove $window_id $new_pos

@@ -1,0 +1,19 @@
+#!/bin/env bash
+
+set -e
+
+get_current_music() {
+    artist=$(playerctl metadata --format '{{artist}}' | sed 's/\ -\ Topic//')
+    track=$(playerctl metadata --format '{{title}}')
+    status=$(playerctl metadata --format '{{status}}')
+    if [[ $artist && $track && $status == "Playing" ]]; then
+        echo "$artist - $track" | tr -d '"\\\t'
+    fi
+}
+
+while :
+do
+    read line 
+    block="{\"full_text\":\"$(get_current_music)\"}"
+    echo "${line/\[\{/\[$block,\{}" || exit 1
+done
