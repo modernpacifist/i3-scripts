@@ -1,0 +1,11 @@
+#!/bin/bash
+
+focused_workspace=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
+usr_input=$(i3-input -P "Append title: ")
+stripped_usr_input=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
+if [[ $stripped_usr_input == "" ]]; then
+    i3-msg "rename workspace to "${focused_workspace}""
+else 
+    i3-msg "rename workspace to "${focused_workspace}:${stripped_usr_input}""
+fi

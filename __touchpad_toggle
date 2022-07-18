@@ -1,0 +1,7 @@
+#!/bin/env bash
+for dev in $(xinput list | grep -Po 'id=\K\d+(?=.*slave\s*pointer)' | xargs -P0 -n1 echo); do
+    case $(xinput list-props ${dev} | rg 'Device Enabled' | rg -o '[01]$') in
+        '0') xinput enable ${dev} 2> /dev/null;;
+        '1') xinput disable ${dev} 2> /dev/null;;
+    esac
+done
