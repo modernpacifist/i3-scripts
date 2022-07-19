@@ -10,3 +10,6 @@ fi
 
 # move focused workspace to buffer workspace
 i3-msg "rename workspace $FOCUSED_WORKSPACE_NUM to "buffer_ws"; rename workspace $STRIPPED_USR_INPUT to $FOCUSED_WORKSPACE_NUM; rename workspace "buffer_ws" to $STRIPPED_USR_INPUT"
+
+# TODO: swap workspaces on different monitors <19-07-22, modernpacifist> #
+# TODO: swap with additional information of ws's titles <19-07-22, modernpacifist> #
