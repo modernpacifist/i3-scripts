@@ -1,26 +1,12 @@
 #!/usr/bin/env bash
-DISPLAY_CONFIG=($(i3-msg -t get_outputs | jq -r '.[]|"\(.name):\(.current_workspace)"'))
+
 FOCUSED_WORKSPACE_NUM=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
-usr_input=$(i3-input -P "Append title: " -l 1)
+usr_input=$(i3-input -P "Swap ws with ws number: " -l 1)
 STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-echo $FOCUSED_WORKSPACE_NUM
-echo $STRIPPED_USR_INPUT
+if [[ $STRIPPED_USR_INPUT == "16" ]]; then
+    exit 0
+fi
 
 # move focused workspace to buffer workspace
-#i3-msg "rename workspace to "buffer_ws""
-
-#i3-msg "rename workspace 1 to temporary; rename workspace 2 to 1; rename workspace temporary to 2"
 i3-msg "rename workspace $FOCUSED_WORKSPACE_NUM to "buffer_ws"; rename workspace $STRIPPED_USR_INPUT to $FOCUSED_WORKSPACE_NUM; rename workspace "buffer_ws" to $STRIPPED_USR_INPUT"
-
-
-#for ROW in "${DISPLAY_CONFIG[@]}"
-#do
-    #IFS=':'
-    #read -ra CONFIG <<< "${ROW}"
-    #if [ "${CONFIG[0]}" != "null" ] && [ "${CONFIG[1]}" != "null" ]; then
-        #echo "moving ${CONFIG[1]} right..."
-        #i3-msg -- workspace --no-auto-back-and-forth "${CONFIG[1]}"
-        #i3-msg -- move workspace to output right	
-    #fi
-#done
