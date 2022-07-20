@@ -1,0 +1,11 @@
+#!/bin/env bash
+
+usr_input=$(i3-input -P 'Mark container with: ' -l 1)
+#STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
+if [[ $STRIPPED_USR_INPUT == "16" ]]; then
+    exit 0
+fi
+
+echo $STRIPPED_USR_INPUT
