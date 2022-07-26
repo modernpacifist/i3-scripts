@@ -21,9 +21,13 @@ Create a shortcut in your ~/.config/i3/config to call the script directly
 This script will prompt the user twice, based on the desired mark.  
 Containers can be marked with numbers [0-9] or with f[0-9] prefix. This is done to access the marked container by making shortcuts to the numbers or function keys directly.  
 User prompt will be unitary if the user inputs single number and the container will be marked.  
+This unitary prompt behavior is shown in the gif below, first the script is called via i3 shortcut, then key '1' is pressed.  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-mark-container-1.gif)  
+Therefore this container is marked with '1' mark identifier.  
 If the user decides to mark the container with function key identifier, then the first input must be symbol 'f', after which prompt will appear again, asking for the number [0-9].  
+This function key mode is shown in the gif below, first the script is called via i3 shortcut, then key 'f' is pressed, which calls another prompt for the number of the function key [0-9].  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-mark-container-f1.gif)  
+Therefore this container is marked with 'f1' mark identifier.  
 I suggest you create a mode or a series of shortcuts to access each marked container directly in your ~/.config/i3/config  
 
 ### \_\_get\_current\_marks
