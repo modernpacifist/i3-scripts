@@ -16,7 +16,7 @@ Run as root:
 #### Description
 This script marks current focused container with user prompt from i3-input  
 #### Usage
-Create a shortcut in your ~/.config/i3/config to call the script directly  
+Create a shortcut in your __~/.config/i3/config__ to call the script directly  
 `bindsym --release $mod+Mod1+m exec __mark_container`  
 User prompt will be unitary if the user inputs a single number and the container will be marked with it.  
 This unitary prompt behavior is shown in the gif below, first the script is executed via i3 shortcut, then key '1' is pressed as a sample.  
@@ -26,10 +26,13 @@ If the user decides to mark the container with function key identifier, then the
 This function key mode is shown in the gif below, first the script is executed via i3 shortcut, then key 'f' is pressed, which calls another prompt for the number of the function key [0-9].  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-mark-container-f1.gif)  
 As a result the focused container is marked with `f1` mark.  
-I suggest you create a mode or a series of shortcuts to access each marked container directly in your ~/.config/i3/config, e.g:  
-`bindsym --release $mod+1 [con_mark="^1$"] focus`
+I suggest you create a mode or a series of shortcuts to access each marked container directly in your __~/.config/i3/config__, e.g:  
+`bindsym --release $mod+1 [con_mark="^1$"] focus`  
 Or, to focus the container with a function key:  
-`bindsym --release $mod+F1 [con_mark="^f1$"] focus`
+`bindsym --release $mod+F1 [con_mark="^f1$"] focus`  
+Overall usage can be simplified into the algorithm:  
+1. ff
+2. aff
 
 ### \_\_get\_current\_marks
 
@@ -37,7 +40,7 @@ Or, to focus the container with a function key:
 This script returns all current mark identifiers of marked containers  
 
 #### Usage
-Append through pipe to `status_command` in your ~/.config/i3/config  
+Append through pipe to `status_command` in your __~/.config/i3/config__  
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_marks`  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-marks-demonstration.png)  
 If a container was marked, its mark will be displayed in the end of your i3status, each mark separated by '|' symbol  
@@ -48,7 +51,7 @@ If a container was marked, its mark will be displayed in the end of your i3statu
 This script returns the artist and a track title of the currently playing composition in i3status. 
 
 #### Usage
-Append through pipe to `status_command` in your ~/.config/i3/config  
+Append through pipe to `status_command` in your __~/.config/i3/config__  
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_track`  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.png)  
 
