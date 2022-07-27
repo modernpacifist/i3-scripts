@@ -24,12 +24,15 @@ This is done to access the marked container by making shortcuts to the numbers o
 User prompt will be unitary if the user inputs a single number and the container will be marked with it.  
 This unitary prompt behavior is shown in the gif below, first the script is called via i3 shortcut, then key '1' is pressed as a sample.  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-mark-container-1.gif)  
-Therefore this container is marked with '1' mark identifier, which can be accessed via i3's `bindsym --release $mod+1 [con_mark="^1$"] focus` for example.  
+Therefore this container is marked with `1` mark identifier.   
 If the user decides to mark the container with function key identifier, then the first input must be symbol 'f', after which the prompt will appear again, asking for the number [0-9].  
 This function key mode is shown in the gif below, first the script is called via i3 shortcut, then key 'f' is pressed, which calls another prompt for the number of the function key [0-9].  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-mark-container-f1.gif)  
-Therefore this container is marked with 'f1' mark identifier.  
-I suggest you create a mode or a series of shortcuts to access each marked container directly in your ~/.config/i3/config  
+Therefore this container is marked with `f1` mark identifier.  
+I suggest you create a mode or a series of shortcuts to access each marked container directly in your ~/.config/i3/config, e.g:  
+`bindsym --release $mod+1 [con_mark="^1$"] focus`
+Or, to focus the container with a function key:  
+`bindsym --release $mod+F1 [con_mark="^f1$"] focus`
 
 ### \_\_get\_current\_marks
 
