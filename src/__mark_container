@@ -17,7 +17,11 @@ if [[ $STRIPPED_USR_INPUT == "f" ]]; then
         exit 0
     fi
 else
-    i3-msg "mark $STRIPPED_USR_INPUT"
+    if (( $STRIPPED_USR_INPUT >= 0 && $STRIPPED_USR_INPUT <= 9 )); then
+        i3-msg "mark $STRIPPED_USR_INPUT"
+    else
+        exit 1
+    fi
 fi
 
 exit 0
