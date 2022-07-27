@@ -1,27 +1,25 @@
 #!/bin/env bash
 
 usr_prompt=$(i3-input -P 'Mark container (press "f" to mark with function keys): ' -l 1)
-STRIPPED_USR_INPUT=$(echo -n $usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
+stripped_usr_input=$(echo -n $usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-if [[ $STRIPPED_USR_INPUT == "16" ]]; then
+if [[ ${stripped_usr_input} == "16" ]]; then
     exit 0
 fi
 
-if [[ $STRIPPED_USR_INPUT == "f" ]]; then
-    usr_prompt1=$(i3-input -P 'Function key chosen, input function index 0-9: ' -l 1)
-    STRIPPED_USR_INPUT1=$(echo -n $usr_prompt1 | rev | cut -f1 -d"=" | rev | tr -d ' ')
+if [[ ${stripped_usr_input} =~ "f" ]]; then
+    f_usr_prompt=$(i3-input -P 'Function key chosen, input function index 1-9: ' -l 1)
+    stripped_f_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-    if (( $STRIPPED_USR_INPUT1 >= 1 && $STRIPPED_USR_INPUT1 <= 9 )); then
-        i3-msg "mark f$STRIPPED_USR_INPUT1"
-    else
-        exit 0
-    fi
-else
-    if (( $STRIPPED_USR_INPUT >= 0 && $STRIPPED_USR_INPUT <= 9 )); then
-        i3-msg "mark $STRIPPED_USR_INPUT"
+    if (( ${stripped_f_usr_input} >= 1 && ${stripped_f_usr_input} <= 9 )); then
+        i3-msg "mark f${stripped_f_usr_input}"
     else
         exit 1
     fi
+elif [[ ${stripped_usr_input} =~ ^[0-9]{1}$ ]]; then
+    i3-msg "mark ${stripped_usr_input}"
+else
+    exit 1
 fi
 
 exit 0
