@@ -31,8 +31,9 @@ I suggest you create a mode or a series of shortcuts to access each marked conta
 Or, to focus the container with a function key:  
 `bindsym --release $mod+F1 [con_mark="^f1$"] focus`  
 Overall usage can be simplified into the algorithm:  
-1. ff
-2. aff
+1. execute the script via i3 shortcut
+2. input number from 0 to 9 or 'f' symbol
+3. if 'f' symbol was pressed, input number from 1 to 9
 
 ### \_\_get\_current\_marks
 
