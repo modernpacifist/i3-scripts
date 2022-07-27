@@ -11,7 +11,9 @@ if [[ $STRIPPED_USR_INPUT == "f" ]]; then
     usr_prompt1=$(i3-input -P 'Function key chosen, input function index: ' -l 1)
     STRIPPED_USR_INPUT1=$(echo -n $usr_prompt1 | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-    i3-msg "mark f$STRIPPED_USR_INPUT1"
+    echo $STRIPPED_USR_INPUT1
+
+    #i3-msg "mark f$STRIPPED_USR_INPUT1"
 else
     i3-msg "mark $STRIPPED_USR_INPUT"
 fi
