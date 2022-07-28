@@ -56,3 +56,13 @@ Append through pipe to `status_command` in your __~/.config/i3/config__
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_track`  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.png)  
 
+### \_\_rename\_i3wm\_workspace
+
+#### Description
+This script appends title to the current focused workspace keeping its current index with user prompt. 
+
+#### Usage
+Append through pipe to `status_command` in your __~/.config/i3/config__  
+`bindsym --release $mod+Shift+r exec __rename_i3wm_workspace`  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.png)  
+
