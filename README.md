@@ -43,7 +43,7 @@ This script returns all current mark identifiers of marked containers
 #### Usage
 Append through pipe to `status_command` in your __~/.config/i3/config__  
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_marks`  
-![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-marks-demonstration.png)  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-marks-demonstration.gif)  
 If a container was marked, its mark will be displayed in the end of your i3status, each mark separated by '|' symbol  
 
 ### \_\_get\_current\_track
@@ -54,7 +54,7 @@ This script returns the artist and a track title of the currently playing compos
 #### Usage
 Append through pipe to `status_command` in your __~/.config/i3/config__  
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_track`  
-![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.png)  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.gif)  
 
 ### \_\_rename\_i3wm\_workspace
 
@@ -64,5 +64,5 @@ This script appends title to the current focused workspace keeping its current i
 #### Usage
 Create a shortcut in your __~/.config/i3/config__ to execute the script directly  
 `bindsym --release $mod+Shift+r exec __rename_i3wm_workspace`
-![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration.png)  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration.gif)  
 
