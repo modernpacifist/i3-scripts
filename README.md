@@ -64,7 +64,8 @@ This script appends title to the current focused workspace keeping its current i
 #### Usage
 Create a shortcut in your __~/.config/i3/config__ to execute the script directly  
 `bindsym --release $mod+Shift+r exec __rename_i3wm_workspace`
+After executing the script user has to input the required title for the workspace, in this case its 'sample', the script will append the title after semicolon symbol:  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration.gif)  
-After executing the script user has to input the required title for the workspace, in this case its 'sample', the script will append the title after semicolon symbol.  
-In case user wants to remove the previously appended title the prompt must be left blank.  
+In case user wants to remove the previously appended title the prompt must be left blank:  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration2.gif)  
 
