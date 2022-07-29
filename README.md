@@ -16,7 +16,7 @@ Run as root:
 #### Description
 This script marks current focused container with user prompt from i3-input  
 #### Usage
-Create a shortcut in your __~/.config/i3/config__ to call the script directly  
+Create a shortcut in your __~/.config/i3/config__ to execute the script directly  
 `bindsym --release $mod+Mod1+m exec __mark_container`  
 User prompt will be unitary if the user inputs a single number and the container will be marked with it.  
 This unitary prompt behavior is shown in the gif below, first the script is executed via i3 shortcut, then key '1' is pressed as a sample.  
@@ -62,7 +62,7 @@ Append through pipe to `status_command` in your __~/.config/i3/config__
 This script appends title to the current focused workspace keeping its current index with user prompt. 
 
 #### Usage
-Append through pipe to `status_command` in your __~/.config/i3/config__  
-`bindsym --release $mod+Shift+r exec __rename_i3wm_workspace`  
-![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.png)  
+Create a shortcut in your __~/.config/i3/config__ to execute the script directly  
+`bindsym --release $mod+Shift+r exec __rename_i3wm_workspace`
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration.png)  
 
