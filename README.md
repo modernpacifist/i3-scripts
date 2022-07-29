@@ -69,3 +69,29 @@ After executing the script user has to input the required title for the workspac
 In case user wants to remove the previously appended title the prompt must be left blank:  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration2.gif)  
 
+### \_\_move\_float\_window
+
+#### Description
+Move a focused floating container in 9 screen positions equally distributed in screen space.  
+
+#### Usage
+Create a mode in your __~/.config/i3/config__ to execute the script directly with command arguments  
+```  
+mode "__move_float_window" {  
+    bindsym --release z exec __move_float_window 1  
+    bindsym --release x exec __move_float_window 2  
+    bindsym --release c exec __move_float_window 3  
+    bindsym --release a exec __move_float_window 4  
+    bindsym --release s exec __move_float_window 5  
+    bindsym --release d exec __move_float_window 6  
+    bindsym --release q exec __move_float_window 7  
+    bindsym --release w exec __move_float_window 8  
+    bindsym --release e exec __move_float_window 9  
+  
+    bindsym Return mode "default"  
+    bindsym Escape mode "default"  
+}  
+  
+bindsym --release $mod+Ctrl+Mod1+m mode "__move_float_window"  
+```
+
