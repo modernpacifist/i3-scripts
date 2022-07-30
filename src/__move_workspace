@@ -1,0 +1,20 @@
+#!/bin/env bash
+if [[ -z $1 ]]; then
+    exit 1
+fi
+
+focused_ws_fullname=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].name")
+
+if [[ $focused_ws_fullname == *:* ]]; then
+    ws_name=$(echo $focused_ws_fullname | cut -d':' -f2)
+else 
+    ws_name=""
+fi
+
+if [[ $ws_name == "" ]]; then
+    i3-msg "rename workspace to $1"
+else
+    i3-msg "rename workspace to $1:$ws_name"
+fi
+
+# TODO: add a check if index exists
