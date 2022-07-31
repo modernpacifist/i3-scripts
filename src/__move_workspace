@@ -4,6 +4,13 @@ if [[ -z $1 ]]; then
 fi
 
 focused_ws_fullname=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].name")
+ws_index=$(echo $focused_ws_fullname | cut -d':' -f1)
+available_indexes=$(i3-msg -t get_workspaces | jq ".[].num")
+
+available_indexes_arr+=($available_indexes)
+if [[ "${available_indexes_arr[*]}" =~ "$1" ]]; then
+    exit 1
+fi
 
 if [[ $focused_ws_fullname == *:* ]]; then
     ws_name=$(echo $focused_ws_fullname | cut -d':' -f2)
@@ -16,5 +23,3 @@ if [[ $ws_name == "" ]]; then
 else
     i3-msg "rename workspace to $1:$ws_name"
 fi
-
-# TODO: add a check if index exists
