@@ -95,3 +95,24 @@ mode "__move_float_window" {
 bindsym --release $mod+Ctrl+Mod1+m mode "__move_float_window"  
 ```
 
+### \_\_move\_workspace
+
+#### Description
+Move a focused floating container in 9 screen positions equally distributed in screen space.  
+Move a focused workspace to a different workspace number.  
+
+#### Usage
+Create series of shortcuts in __~/.config/i3/config__ to execute the script directly with command arguments  
+```
+bindsym --release $mod+Mod1+Shift+asciitilde exec __move_workspace $ws0
+bindsym --release $mod+Mod1+Shift+1 exec __move_workspace $ws1
+bindsym --release $mod+Mod1+Shift+2 exec __move_workspace $ws2
+bindsym --release $mod+Mod1+Shift+3 exec __move_workspace $ws3
+bindsym --release $mod+Mod1+Shift+4 exec __move_workspace $ws4
+bindsym --release $mod+Mod1+Shift+5 exec __move_workspace $ws5
+bindsym --release $mod+Mod1+Shift+6 exec __move_workspace $ws6
+bindsym --release $mod+Mod1+Shift+7 exec __move_workspace $ws7
+bindsym --release $mod+Mod1+Shift+8 exec __move_workspace $ws8
+bindsym --release $mod+Mod1+Shift+9 exec __move_workspace $ws9
+bindsym --release $mod+Mod1+Shift+0 exec __move_workspace $ws10
+```
