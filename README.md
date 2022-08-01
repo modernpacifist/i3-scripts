@@ -132,4 +132,4 @@ bindsym --release $mod+Mod1+Shift+9 exec __change_workspace_index $ws9
 bindsym --release $mod+Mod1+Shift+0 exec __change_workspace_index $ws10
 ```  
 Execution demonstration:  
-![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration2.gif)  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-change-workspace-index-demonstration.gif)  
