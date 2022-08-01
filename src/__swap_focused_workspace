@@ -2,9 +2,10 @@
 
 FOCUSED_WORKSPACE_NUM=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
 usr_input=$(i3-input -P "Swap ws with ws number: " -l 1)
+USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
 STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-if [[ $STRIPPED_USR_INPUT == "16" ]]; then
+if [[ $USR_INPUT_KEYCODE == "66" ]]; then
     exit 0
 fi
 
