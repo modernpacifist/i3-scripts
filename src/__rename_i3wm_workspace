@@ -2,7 +2,6 @@
 
 FOCUSED_WORKSPACE=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
 usr_input=$(i3-input -P "Append title: ")
-NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
 USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
 
 # exit if user presses escape
@@ -13,5 +12,8 @@ fi
 if [[ $USR_INPUT_KEYCODE == "36" ]]; then
     i3-msg "rename workspace to "${FOCUSED_WORKSPACE}""
 else 
-    i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE}""
+    NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+    if [[ $NEW_WS_TITLE != "" ]]; then
+        i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE}""
+    fi
 fi
