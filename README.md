@@ -95,24 +95,41 @@ mode "__move_float_window" {
 bindsym --release $mod+Ctrl+Mod1+m mode "__move_float_window"  
 ```
 
-### \_\_move\_workspace
+### __change_workspace_index
 
 #### Description
-Move a focused floating container in 9 screen positions equally distributed in screen space.  
-Move a focused workspace to a different workspace number.  
+Change focused workspace index.  
 
 #### Usage
-Create series of shortcuts in __~/.config/i3/config__ to execute the script directly with command arguments  
+Create series of shortcuts in __~/.config/i3/config__ to execute the script directly with command arguments.  
+Current arguments for this script can differ based on your `$ws` variables, if they exist at all.  
+I.E. my example:  
 ```
-bindsym --release $mod+Mod1+Shift+asciitilde exec __move_workspace $ws0
-bindsym --release $mod+Mod1+Shift+1 exec __move_workspace $ws1
-bindsym --release $mod+Mod1+Shift+2 exec __move_workspace $ws2
-bindsym --release $mod+Mod1+Shift+3 exec __move_workspace $ws3
-bindsym --release $mod+Mod1+Shift+4 exec __move_workspace $ws4
-bindsym --release $mod+Mod1+Shift+5 exec __move_workspace $ws5
-bindsym --release $mod+Mod1+Shift+6 exec __move_workspace $ws6
-bindsym --release $mod+Mod1+Shift+7 exec __move_workspace $ws7
-bindsym --release $mod+Mod1+Shift+8 exec __move_workspace $ws8
-bindsym --release $mod+Mod1+Shift+9 exec __move_workspace $ws9
-bindsym --release $mod+Mod1+Shift+0 exec __move_workspace $ws10
+set $ws0 "0"  
+set $ws1 "1"  
+set $ws2 "2"  
+set $ws3 "3"  
+set $ws4 "4"  
+set $ws5 "5"  
+set $ws6 "6"  
+set $ws7 "7"  
+set $ws8 "8"  
+set $ws9 "9"  
+set $ws10 "10"  
 ```
+Therefore shortcuts for the script execution in this situation can be:  
+```
+bindsym --release $mod+Mod1+Shift+asciitilde exec __change_workspace_index $ws0
+bindsym --release $mod+Mod1+Shift+1 exec __change_workspace_index $ws1
+bindsym --release $mod+Mod1+Shift+2 exec __change_workspace_index $ws2
+bindsym --release $mod+Mod1+Shift+3 exec __change_workspace_index $ws3
+bindsym --release $mod+Mod1+Shift+4 exec __change_workspace_index $ws4
+bindsym --release $mod+Mod1+Shift+5 exec __change_workspace_index $ws5
+bindsym --release $mod+Mod1+Shift+6 exec __change_workspace_index $ws6
+bindsym --release $mod+Mod1+Shift+7 exec __change_workspace_index $ws7
+bindsym --release $mod+Mod1+Shift+8 exec __change_workspace_index $ws8
+bindsym --release $mod+Mod1+Shift+9 exec __change_workspace_index $ws9
+bindsym --release $mod+Mod1+Shift+0 exec __change_workspace_index $ws10
+```  
+Execution demonstration:  
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration2.gif)  
