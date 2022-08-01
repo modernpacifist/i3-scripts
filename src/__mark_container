@@ -1,9 +1,10 @@
 #!/bin/env bash
 
 usr_prompt=$(i3-input -P 'Mark container (press "f" to mark with function keys): ' -l 1)
+USR_INPUT_KEYCODE=$(echo $usr_prompt | grep -oP "Keypress\s+\K\w+")
 stripped_usr_input=$(echo -n $usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-if [[ ${stripped_usr_input} == "16" ]]; then
+if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
     exit 0
 fi
 
