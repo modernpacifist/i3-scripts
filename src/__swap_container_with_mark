@@ -1,26 +1,26 @@
 #!/bin/env bash
 
-usr_input=$(i3-input -P 'Mark container (press "f" to mark with function keys): ' -l 1)
+usr_input=$(i3-input -P 'Swap container with mark (press "f" to mark with function keys): ' -l 1)
 USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
 
+# exit if user presses escape
 if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
     exit 0
 fi
 
 stripped_usr_input=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
 if [[ ${stripped_usr_input} =~ "f" ]]; then
-    f_usr_prompt=$(i3-input -P 'Function key chosen, input function index 1-9: ' -l 1)
+    f_usr_prompt=$(i3-input -P '"f" prefix chosen, input function index 1-9: ' -l 1)
     stripped_f_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
     if (( ${stripped_f_usr_input} >= 1 && ${stripped_f_usr_input} <= 9 )); then
-        i3-msg "mark f${stripped_f_usr_input}"
+        i3-msg "swap container with mark f${stripped_f_usr_input}"
     else
         exit 1
     fi
 elif [[ ${stripped_usr_input} =~ ^[0-9]{1}$ ]]; then
-    i3-msg "mark ${stripped_usr_input}"
+    i3-msg "swap container with mark ${stripped_usr_input}"
 else
     exit 1
 fi
-
-exit 0
