@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 
-#FOCUSED_WORKSPACE_NUM=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
-FOCUSED_WORKSPACE_NUM=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].name")
+FOCUSED_WORKSPACE_NAME=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].name")
 usr_input=$(i3-input -P "Swap ws with ws number: " -l 1)
 USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
-STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
-if [[ $USR_INPUT_KEYCODE == "66" ]]; then
+if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
     exit 0
 fi
 
+STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+# 
+WS_TO_SWAP_NAME=$(i3-msg -t get_workspaces | jq "map(select(.num==${STRIPPED_USR_INPUT}))[0] | .name")
+
 # move focused workspace to buffer workspace
-#i3-msg "rename workspace $FOCUSED_WORKSPACE_NUM to "buffer_ws"; rename workspace $STRIPPED_USR_INPUT to $FOCUSED_WORKSPACE_NUM; rename workspace "buffer_ws" to $STRIPPED_USR_INPUT"
-i3-msg "rename workspace $FOCUSED_WORKSPACE_NUM to "buffer_ws""
-i3-msg "rename workspace $STRIPPED_USR_INPUT to $FOCUSED_WORKSPACE_NUM"
-i3-msg "rename workspace "buffer_ws" to $STRIPPED_USR_INPUT"
+i3-msg "rename workspace $FOCUSED_WORKSPACE_NAME to "buffer_ws""
+i3-msg "rename workspace $WS_TO_SWAP_NAME to $FOCUSED_WORKSPACE_NAME"
+i3-msg "rename workspace "buffer_ws" to $WS_TO_SWAP_NAME"
 
 # TODO: swap workspaces on different monitors <19-07-22, modernpacifist> #
-# TODO: swap with additional information of ws's titles <19-07-22, modernpacifist> #
