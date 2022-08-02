@@ -13,8 +13,10 @@ Run as root:
 ## Scripts breakdown
 
 ### \_\_mark\_container
+
 #### Description
 This script marks current focused container with user prompt from i3-input  
+
 #### Usage
 Create a shortcut in your __~/.config/i3/config__ to execute the script directly  
 `bindsym --release $mod+Mod1+m exec __mark_container`  
@@ -76,6 +78,7 @@ Move a focused floating container in 9 screen positions equally distributed in s
 
 #### Usage
 Create a mode in your __~/.config/i3/config__ to execute the script directly with command arguments  
+E.G. my example:  
 ```  
 mode "__move_float_window" {  
     bindsym --release z exec __move_float_window 1  
@@ -95,7 +98,7 @@ mode "__move_float_window" {
 bindsym --release $mod+Ctrl+Mod1+m mode "__move_float_window"  
 ```
 
-### __change_workspace_index
+### \_\_change\_workspace\_index
 
 #### Description
 Change focused workspace index.  
@@ -103,7 +106,7 @@ Change focused workspace index.
 #### Usage
 Create series of shortcuts in __~/.config/i3/config__ to execute the script directly with command arguments.  
 Current arguments for this script can differ based on your `$ws` variables, if they exist at all.  
-I.E. my example:  
+E.G. my example:  
 ```
 set $ws0 "0"  
 set $ws1 "1"  
@@ -131,5 +134,20 @@ bindsym --release $mod+Mod1+Shift+8 exec __change_workspace_index $ws8
 bindsym --release $mod+Mod1+Shift+9 exec __change_workspace_index $ws9
 bindsym --release $mod+Mod1+Shift+0 exec __change_workspace_index $ws10
 ```  
-Execution demonstration:  
+
+#### Execution demonstration:  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-change-workspace-index-demonstration.gif)  
+
+### \_\_swap\_workspaces
+
+#### Description
+Current script swaps all containers in between two existing workspaces.  
+
+#### Usage
+Create shortcut in __~/.config/i3/config__ to execute the script directly.  
+E.G. my example:  
+```
+bindsym --release $mod+Mod1+Ctrl+s exec __swap_workspaces  
+```
+#### Execution demonstration:
+![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-swap-workspaces-demonstration.gif)  
