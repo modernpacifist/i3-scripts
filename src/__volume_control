@@ -17,7 +17,7 @@ fi
 
 MAX_VOLUME=$2
 if [[ -z $2 ]]; then
-    MAX_VOLUME=60
+    MAX_VOLUME=100
 fi
 
 stripped_usr_input=$(echo $1 | tr -d '\+\-')
