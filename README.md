@@ -122,17 +122,17 @@ set $ws10 "10"
 ```
 Therefore shortcuts for the script execution in this situation can be:  
 ```
-bindsym --release $mod+Mod1+Shift+asciitilde exec __change_workspace_index $ws0
-bindsym --release $mod+Mod1+Shift+1 exec __change_workspace_index $ws1
-bindsym --release $mod+Mod1+Shift+2 exec __change_workspace_index $ws2
-bindsym --release $mod+Mod1+Shift+3 exec __change_workspace_index $ws3
-bindsym --release $mod+Mod1+Shift+4 exec __change_workspace_index $ws4
-bindsym --release $mod+Mod1+Shift+5 exec __change_workspace_index $ws5
-bindsym --release $mod+Mod1+Shift+6 exec __change_workspace_index $ws6
-bindsym --release $mod+Mod1+Shift+7 exec __change_workspace_index $ws7
-bindsym --release $mod+Mod1+Shift+8 exec __change_workspace_index $ws8
-bindsym --release $mod+Mod1+Shift+9 exec __change_workspace_index $ws9
-bindsym --release $mod+Mod1+Shift+0 exec __change_workspace_index $ws10
+bindsym --release $mod+Ctrl+Shift+asciitilde exec __change_workspace_index $ws0
+bindsym --release $mod+Ctrl+Shift+1 exec __change_workspace_index $ws1
+bindsym --release $mod+Ctrl+Shift+2 exec __change_workspace_index $ws2
+bindsym --release $mod+Ctrl+Shift+3 exec __change_workspace_index $ws3
+bindsym --release $mod+Ctrl+Shift+4 exec __change_workspace_index $ws4
+bindsym --release $mod+Ctrl+Shift+5 exec __change_workspace_index $ws5
+bindsym --release $mod+Ctrl+Shift+6 exec __change_workspace_index $ws6
+bindsym --release $mod+Ctrl+Shift+7 exec __change_workspace_index $ws7
+bindsym --release $mod+Ctrl+Shift+8 exec __change_workspace_index $ws8
+bindsym --release $mod+Ctrl+Shift+9 exec __change_workspace_index $ws9
+bindsym --release $mod+Ctrl+Shift+0 exec __change_workspace_index $ws10
 ```  
 
 #### Execution demonstration:  
