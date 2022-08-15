@@ -1,0 +1,36 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    echo 'No sound value was specified'
+    exit 1
+fi
+
+if [[ $1 == "toggle" ]]; then
+    pactl set-sink-mute @DEFAULT_SINK@ toggle
+    exit 0
+fi
+
+if [[ ! $1 =~ ^[\+\-]{1}[0-9]{1,}$ ]]; then
+    echo '$1 argument does not match format'
+    exit 1
+fi
+
+MAX_VOLUME=$2
+if [[ -z $2 ]]; then
+    MAX_VOLUME=60
+fi
+
+stripped_usr_input=$(echo $1 | tr -d '\+\-')
+current_volume=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
+
+usr_input_sign=${1:0:1}
+wanted_volume_value=$(($current_volume $usr_input_sign $stripped_usr_input))
+
+if (( $wanted_volume_value > $MAX_VOLUME )); then
+    echo 'Wanted volume value exceeds max volume value'
+    pactl set-sink-volume @DEFAULT_SINK@ ${MAX_VOLUME}%
+    exit 0
+fi
+
+pactl set-sink-volume @DEFAULT_SINK@ ${1}%
+exit 0
