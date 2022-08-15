@@ -12,6 +12,7 @@ Run as root:
 
 ## Scripts breakdown
 
+
 ### \_\_mark\_container
 
 #### Description
@@ -37,6 +38,7 @@ Overall usage can be simplified into the algorithm:
 2. input number from 0 to 9 or 'f' symbol
 3. if 'f' symbol was pressed, input number from 1 to 9
 
+
 ### \_\_get\_current\_marks
 
 #### Description
@@ -48,6 +50,7 @@ Append through pipe to `status_command` in your __~/.config/i3/config__
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-marks-demonstration.gif)  
 If a container was marked, its mark will be displayed in the end of your i3status, each mark separated by '|' symbol  
 
+
 ### \_\_get\_current\_track
 
 #### Description
@@ -57,6 +60,7 @@ This script returns the artist and a track title of the currently playing compos
 Append through pipe to `status_command` in your __~/.config/i3/config__  
 `status_command i3status --config $HOME/.config/i3/i3status.conf | __get_current_track`  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-get-current-track-demonstration.gif)  
+
 
 ### \_\_rename\_i3wm\_workspace
 
@@ -70,6 +74,7 @@ After executing the script user has to input the required title for the workspac
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration.gif)  
 In case user wants to remove the previously appended title the prompt must be left blank:  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-rename-i3wm-workspace-demonstration2.gif)  
+
 
 ### \_\_move\_float\_window
 
@@ -97,6 +102,7 @@ mode "__move_float_window" {
   
 bindsym --release $mod+Ctrl+Mod1+m mode "__move_float_window"  
 ```
+
 
 ### \_\_change\_workspace\_index
 
@@ -138,6 +144,7 @@ bindsym --release $mod+Ctrl+Shift+0 exec __change_workspace_index $ws10
 #### Execution demonstration:  
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-change-workspace-index-demonstration.gif)  
 
+
 ### \_\_swap\_workspaces
 
 #### Description
@@ -151,3 +158,31 @@ bindsym --release $mod+Mod1+Ctrl+s exec __swap_workspaces
 ```
 #### Execution demonstration:
 ![alt text](https://github.com/modernpacifist/i3-scripts/blob/master/img/i3-swap-workspaces-demonstration.gif)  
+
+
+### \_\_volume\_control
+
+#### Description
+Current script creates a software limit to max volume value.  
+
+#### Usage
+Create shortcuts in __~/.config/i3/config__ to execute the script directly.  
+I also suggest you create a variable to set maximum value for volume in your system, e.g. `$max_volume` in my case.  
+Specifying the max volume value is fully optional, its default value equals to 100.  
+E.G. my example:  
+```
+# variable for volume limit(default is 100)
+set $max_volume 100
+
+# Use pactl to adjust volume in PulseAudio.
+bindsym --release XF86AudioRaiseVolume exec --no-startup-id __volume_control +2 $max_volume
+bindsym --release XF86AudioLowerVolume exec --no-startup-id __volume_control -2 $max_volume
+bindsym --release XF86AudioMute exec --no-startup-id __volume_control toggle
+
+bindsym --release Mod1+F10 exec --no-startup-id __volume_control toggle
+bindsym --release Mod1+F11 exec --no-startup-id __volume_control -2 $max_volume
+bindsym --release Mod1+F12 exec --no-startup-id __volume_control +2 $max_volume
+bindsym --release Mod1+Shift+F11 exec --no-startup-id __volume_control -10 $max_volume
+bindsym --release Mod1+Shift+F12 exec --no-startup-id __volume_control +10 $max_volume
+
+```
