@@ -8,7 +8,8 @@ ws_index=$(echo $focused_ws_fullname | cut -d':' -f1)
 available_indexes=$(i3-msg -t get_workspaces | jq ".[].num")
 
 available_indexes_arr+=($available_indexes)
-if [[ "${available_indexes_arr[*]}" =~ "$1" ]]; then
+
+if [[ "${available_indexes_arr[*]}" =~ "^$1$" ]]; then
     exit 1
 fi
 
