@@ -12,10 +12,8 @@ fi
 if [[ $USR_INPUT_KEYCODE == "36" ]]; then
     i3-msg "rename workspace to "${FOCUSED_WORKSPACE}""
 else 
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/ /_/g')
-    NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/^[^[:alnum:]]*//g')
+    NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/ /_/g' | sed -e 's/^[^[:alnum:]]*//g')
     if [[ $NEW_WS_TITLE != "" ]]; then
-        #i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE:1}""
         i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE}""
     fi
 fi
