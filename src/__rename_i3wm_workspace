@@ -1,7 +1,6 @@
 #!/bin/env bash
 
 FOCUSED_WORKSPACE=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0].num")
-#usr_input=$(i3-input -P "Append title: " | sed -e 's/ /_/g')
 usr_input=$(i3-input -P "Append title: ")
 USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
 
@@ -13,14 +12,8 @@ fi
 if [[ $USR_INPUT_KEYCODE == "36" ]]; then
     i3-msg "rename workspace to "${FOCUSED_WORKSPACE}""
 else 
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/ /_/g')
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/^[[:space:]]([\w])//g')
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/ /_/g')
-    NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed 's/^[^[:alpha:]]*//')
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -zE 's/[[:space:]]([w])/\1/g' | sed -e 's/ /_/g')
-    #NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+    NEW_WS_TITLE=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | sed -e 's/ /_/g')
     if [[ $NEW_WS_TITLE != "" ]]; then
-        #i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE:1}""
-        i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE}""
+        i3-msg "rename workspace to "${FOCUSED_WORKSPACE}:${NEW_WS_TITLE:1}""
     fi
 fi
