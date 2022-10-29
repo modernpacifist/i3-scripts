@@ -7,6 +7,7 @@ focused_ws_fullname=$(i3-msg -t get_workspaces | jq -r "map(select(.focused))[0]
 ws_index=$(echo $focused_ws_fullname | cut -d':' -f1)
 available_indexes=$(i3-msg -t get_workspaces | jq ".[].num")
 
+# conversion to array
 available_indexes_arr+=($available_indexes)
 
 if [[ "${available_indexes_arr[*]}" =~ "^$1$" ]]; then
