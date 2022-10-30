@@ -10,9 +10,11 @@ available_indexes=$(i3-msg -t get_workspaces | jq ".[].num")
 # conversion to array
 available_indexes_arr+=($available_indexes)
 
-if [[ "${available_indexes_arr[*]}" =~ "^$1$" ]]; then
-    exit 1
-fi
+for index in ${available_indexes_arr[*]}; do
+    if [[ ${index} -eq "${1}" ]]; then
+        exit 1
+    fi
+done
 
 if [[ $focused_ws_fullname == *:* ]]; then
     ws_name=$(echo $focused_ws_fullname | cut -d':' -f2)
