@@ -4,7 +4,7 @@ set -e
 
 get_current_music() {
     artist=$(playerctl metadata --format '{{artist}}' | sed 's/\ -\ Topic//')
-    track=$(playerctl metadata --format '{{title}}')
+    track=$(playerctl metadata --format '{{title}}' | sed 's/\ -\ YouTube//')
     status=$(playerctl metadata --format '{{status}}')
     if [[ -z $artist && $track && $status == "Playing" ]]; then
         echo "$track"  | tr -d '"\\\t'
