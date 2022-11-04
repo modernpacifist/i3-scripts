@@ -9,8 +9,13 @@ if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
 fi
 
 STRIPPED_USR_INPUT=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
-# 
+
+# if workspace does not exist then exit
 WS_TO_SWAP_NAME=$(i3-msg -t get_workspaces | jq "map(select(.num==${STRIPPED_USR_INPUT}))[0] | .name")
+if [[ ${WS_TO_SWAP_NAME} == "null" ]]; then
+    notify-send -i $HOME/Pictures/warning.png -u low -t 5000 -- "You can't swap workspace that does not exist"
+    exit 0
+fi
 
 # move focused workspace to buffer workspace
 i3-msg "rename workspace $FOCUSED_WORKSPACE_NAME to "buffer_ws""
