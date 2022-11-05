@@ -1,0 +1,8 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    echo 'no $1'
+    exit 1
+fi
+
+i3-msg 'sticky disable, mark "1", move scratchpad, [con_mark="^1$"] scratchpad show'
