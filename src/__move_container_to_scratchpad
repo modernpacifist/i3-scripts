@@ -5,4 +5,10 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-i3-msg 'sticky disable, mark "1", move scratchpad, [con_mark="^1$"] scratchpad show'
+focused_window_id=$(xdotool getwindowfocus)
+container_pos_and_geom=$(xdotool getwindowgeometry ${focused_window_id})
+
+echo $container_pos_and_geom
+
+#i3-msg "sticky disable, mark \"${1}\", move scratchpad, [con_mark=\"^${1}$\"] scratchpad show"
+#i3-msg "sticky disable, mark ${1}"

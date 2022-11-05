@@ -3,9 +3,9 @@
 focused_window_id=$(xdotool getwindowfocus)
 
 # parse coordinates and geometry from here
-pos_and_geom=$(xdotool getwindowgeometry ${focused_window_id})
+container_pos_and_geom=$(xdotool getwindowgeometry ${focused_window_id})
 
-echo $pos_and_geom
+echo $container_pos_and_geom
 
 ws=$(i3-msg -t get_workspaces | jq '.[] | select(.focused).num')
 marks=$(i3-msg -t get_tree | jq -e -r '(.nodes[].nodes[].nodes[]) | select(.num == '"$ws"').nodes[] | select(.focused == true).marks[]' )
