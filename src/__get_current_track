@@ -10,7 +10,7 @@ get_current_music() {
         echo "$track"  | tr -d '"\\\t'
     fi
     if [[ $artist && $track && $status == "Playing" ]]; then
-        echo "$artist - $track" | tr -d '"\\\t'
+        echo " $artist - $track " | tr -d '"\\\t'
     fi
 }
 
