@@ -8,6 +8,7 @@ if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
 fi
 
 stripped_usr_input=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
 if [[ ${stripped_usr_input} =~ "f" ]]; then
     f_usr_prompt=$(i3-input -P 'Function key chosen, input function index 1-9: ' -l 1)
     stripped_f_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
@@ -17,7 +18,9 @@ if [[ ${stripped_usr_input} =~ "f" ]]; then
     else
         exit 1
     fi
-elif [[ ${stripped_usr_input} =~ ^[0-9]{1}$ ]]; then
+fi
+
+if [[ ${stripped_usr_input} =~ ^[0-9]{1}$ ]]; then
     i3-msg "mark ${stripped_usr_input}"
 else
     exit 1

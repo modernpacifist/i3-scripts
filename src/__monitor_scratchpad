@@ -1,0 +1,18 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    exit 1
+fi
+
+if [[ $1 =~ "mark" ]]; then
+#if [[ ${stripped_usr_input} =~ "m" ]]; then
+    f_usr_prompt=$(i3-input -P 'Monitor mark mode chosen, input monitor index 1-9: ' -l 1)
+    stripped_m_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
+    if (( ${stripped_m_usr_input} >= 1 && ${stripped_m_usr_input} <= 9 )); then
+        i3-msg "mark monitor${stripped_m_usr_input}, move scratchpad"
+    else
+        exit 1
+    fi
+fi
+
