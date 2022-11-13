@@ -36,8 +36,8 @@ if [[ ${1} =~ ^mark$ ]]; then
 fi
 
 if [[ ${1} =~ ^show$ ]]; then
-    i3-msg "[con_mark=\"^monitor1$\"] scratchpad show, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"
-    i3-msg "[con_mark=\"^monitor2$\"] scratchpad show, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"
+    i3-msg "[con_mark=\"^monitor1$\"] focus, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"
+    i3-msg "[con_mark=\"^monitor2$\"] focus, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"
 fi
 
 if [[ ${1} =~ ^hide$ ]]; then
