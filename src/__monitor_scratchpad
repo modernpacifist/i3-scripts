@@ -41,5 +41,5 @@ if [[ ${1} =~ ^show$ ]]; then
 fi
 
 if [[ ${1} =~ ^hide$ ]]; then
-    i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'
+    i3-msg '[con_mark="^monitor[0-9]$"] scratchpad show'
 fi
