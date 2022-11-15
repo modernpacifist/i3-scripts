@@ -11,6 +11,9 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+#max_x=$(jq '.primary_x' $HOME/.monitor_dimensions.json)
+#max_y=$(jq '.primary_y' $HOME/.monitor_dimensions.json)
+
 window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
 status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
 status_bar_position=$(grep -oP '(?<="StatusBarPosition": ")[^"]*' $CONFIGFILE | tr -d ',')
