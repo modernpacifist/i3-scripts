@@ -20,8 +20,6 @@ case $status_bar_position in
     *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
 esac
 
-echo $status_bar_width
-
 { read max_x max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
 { read window_id ; } < <(xdotool getactivewindow)
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
