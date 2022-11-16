@@ -14,6 +14,11 @@ monitor2_abs_pos_y=1028
 monitor2_size_x=914
 monitor2_size_y=772
 
+monitor3_abs_pos_x=4754
+monitor3_abs_pos_y=0
+monitor3_size_x=1966
+monitor3_size_y=1800
+
 if [[ ${1} =~ ^mark$ ]]; then
     f_usr_prompt=$(i3-input -P 'Monitor scratchpad mark mode chosen, input monitor index 1-9: ' -l 1)
     stripped_m_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
@@ -28,7 +33,12 @@ if [[ ${1} =~ ^mark$ ]]; then
         exit 0
     fi
 
-    if (( ${stripped_m_usr_input} >= 3 && ${stripped_m_usr_input} <= 9 )); then
+    if (( ${stripped_m_usr_input} == 3 )); then
+        i3-msg "mark monitor3, move scratchpad, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}"
+        exit 0
+    fi
+
+    if (( ${stripped_m_usr_input} >= 4 && ${stripped_m_usr_input} <= 9 )); then
         i3-msg "mark monitor${stripped_m_usr_input}, move scratchpad"
     else
         exit 1
@@ -38,6 +48,7 @@ fi
 if [[ ${1} =~ ^show$ ]]; then
     i3-msg "[con_mark=\"^monitor1$\"] focus, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"
     i3-msg "[con_mark=\"^monitor2$\"] focus, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"
+    i3-msg "[con_mark=\"^monitor3$\"] focus, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}"
 fi
 
 if [[ ${1} =~ ^hide$ ]]; then
