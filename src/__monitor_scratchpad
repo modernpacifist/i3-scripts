@@ -14,9 +14,9 @@ monitor2_abs_pos_y=1028
 monitor2_size_x=914
 monitor2_size_y=772
 
-monitor3_abs_pos_x=4754
+monitor3_abs_pos_x=5154
 monitor3_abs_pos_y=0
-monitor3_size_x=1966
+monitor3_size_x=1566
 monitor3_size_y=1800
 
 if [[ ${1} =~ ^mark$ ]]; then
