@@ -1,6 +1,7 @@
 #!/bin/env bash
 
 # TODO: make a flag to check if monitor exists <23-11-22, modernpacifist> #
+JSON_FILE=$HOME/.monitor_scratchpad.json
 
 if [[ -z $1 ]]; then
     exit 1
@@ -47,11 +48,29 @@ if [[ ${1} =~ ^mark$ ]]; then
     fi
 fi
 
+
 if [[ ${1} =~ ^show$ ]]; then
-    i3-msg "[con_mark=\"^monitor1$\"] focus, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"
-    i3-msg "[con_mark=\"^monitor2$\"] focus, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"
-    i3-msg "[con_mark=\"^monitor3$\"] focus, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}"
+    #success_qty=$(cat $JSON_FILE | jq '.[] .success' | rg -c 'true' )
+    #if (( $success_qty == 3 )); then
+        #echo "hehe"
+        #exit 0
+    #fi
+    if [[ ]]
+
+    show_flag=$(i3-msg "[con_mark=\"^monitor1$\"] scratchpad show, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}")
+    show_flag+=$(i3-msg "[con_mark=\"^monitor2$\"] scratchpad show, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}")
+    show_flag+=$(i3-msg "[con_mark=\"^monitor3$\"] scratchpad show, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}")
+
+    echo $show_flag
+
+    success_qty=$(echo $show_flag | jq '.[] .success' | rg -c 'true')
+    echo $success_qty
+
+    if (( success_qty == 9 )); then
+        echo '{"shown":true}' | jq . > $JSON_FILE
+    fi
 fi
+
 
 if [[ ${1} =~ ^hide$ ]]; then
     i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'
