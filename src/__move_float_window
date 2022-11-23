@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-if [[ -z $1 ]]; then
+if [[ -z ${1} ]]; then
     echo '$1 argument was not specified'
     exit 1
 fi
@@ -11,8 +11,9 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
-function save_latest_position() {
-    
+function save_preset() {
+    updated_json=$(jq ".Preset = $1" $CONFIGFILE)
+    echo $updated_json | jq . > $CONFIGFILE
 }
 
 #max_x=$(jq '.primary_x' $HOME/.monitor_dimensions.json)
@@ -29,10 +30,19 @@ case $status_bar_position in
 esac
 
 { read max_x max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
-{ read window_id ; } < <(xdotool getactivewindow)
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 
-case $1 in
+pos=${1}
+
+if [[ $pos =~ ^preset$ ]]; then
+    pos=$(jq '.Preset' ~/.__move_float_window.json)
+    # setting default
+    if [[ $pos == null ]]; then
+        pos=3
+    fi
+fi
+
+case $pos in
     '1') new_pos="$(($window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
     '2') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
     '3') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
@@ -47,4 +57,8 @@ case $1 in
     *) echo 'Invalid value in $1 argument, must be 1-9' >&2; exit 2;;
 esac
 
-xdotool windowmove $window_id $new_pos
+if [[ $2 =~ ^save$ ]]; then
+    save_preset $pos
+fi
+
+xdotool windowmove $(xdotool getactivewindow) $new_pos
