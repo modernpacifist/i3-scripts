@@ -4,9 +4,9 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-JSON_FILE=$HOME/.monitor_scratchpad.json
-if [[ ! -f $JSON_FILE ]]; then
-    echo '{"shown":false}' | jq . > $JSON_FILE
+CONFIG_FILE=$HOME/.monitor_scratchpad.json
+if [[ ! -f $CONFIG_FILE ]]; then
+    echo '{"shown":false}' | jq . > $CONFIG_FILE
 fi
 
 monitor1_abs_pos_x=3840
@@ -55,7 +55,7 @@ if [[ ${1} =~ ^toggle$ ]]; then
     shown_flag=$(cat .monitor_scratchpad.json | jq '.shown')
     if [[ $shown_flag == "true" ]]; then
         i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'
-        echo '{"shown":false}' | jq . > $JSON_FILE
+        echo '{"shown":false}' | jq . > $CONFIG_FILE
         exit 0
     fi
 
@@ -68,6 +68,6 @@ if [[ ${1} =~ ^toggle$ ]]; then
 
     # this value must be manually changed with each unique monitor added
     if (( success_counter == 9 )); then
-        echo '{"shown":true}' | jq . > $JSON_FILE
+        echo '{"shown":true}' | jq . > $CONFIG_FILE
     fi
 fi
