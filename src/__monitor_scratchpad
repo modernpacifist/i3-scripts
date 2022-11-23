@@ -1,9 +1,12 @@
 #!/bin/env bash
 
-JSON_FILE=$HOME/.monitor_scratchpad.json
-
 if [[ -z $1 ]]; then
     exit 1
+fi
+
+JSON_FILE=$HOME/.monitor_scratchpad.json
+if [[ ! -f $JSON_FILE ]]; then
+    echo '{"shown":false}' | jq . > $JSON_FILE
 fi
 
 monitor1_abs_pos_x=3840
@@ -63,6 +66,7 @@ if [[ ${1} =~ ^toggle$ ]]; then
 
     success_counter=$(echo $success_flag | jq '.[] .success' | rg -c 'true')
 
+    # this value must be manually changed with each unique monitor added
     if (( success_counter == 9 )); then
         echo '{"shown":true}' | jq . > $JSON_FILE
     fi
