@@ -11,6 +11,10 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+function save_latest_position() {
+    
+}
+
 #max_x=$(jq '.primary_x' $HOME/.monitor_dimensions.json)
 #max_y=$(jq '.primary_y' $HOME/.monitor_dimensions.json)
 
