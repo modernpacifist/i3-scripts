@@ -27,7 +27,6 @@ monitor3_size_y=1800
 function dump_monitor_shown_flag() {
     #updated_json=$(jq ".Preset = $1" $CONFIGFILE)
     #echo $updated_json | jq . > $CONFIGFILE
-
     echo ""
 }
 
