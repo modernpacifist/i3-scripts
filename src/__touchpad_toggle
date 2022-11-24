@@ -1,35 +1,37 @@
 #!/bin/env bash
 
-current_pointers=$(xinput list | grep -Po 'id=\K\d+(?=.*slave\s*pointer)' | xargs -P0 -n1 echo)
-pointers_working_state=$(xinput list-props ${dev} | rg 'Device Enabled' | rg -o '[01]$')
+function get_pointer_state() {
+    current_pointers=$(xinput list | grep -Po 'id=\K\d+(?=.*slave\s*pointer)' | xargs -P0 -n1 echo)
 
-# conversion to an array
-current_pointers_arr+=($current_pointers)
+    # conversion to an array
+    current_pointers_arr+=($current_pointers)
+
+    case $(xinput list-props ${current_pointers_arr[1]} | rg 'Device Enabled' | rg -o '[01]$') in
+        '0') echo -n " Pointer:DISABLED " 2> /dev/null;;
+        '1') echo -n " Pointer:ENABLED " 2> /dev/null;;
+    esac
+}
 
 function i3status() {
     while :
     do
         read line
-        block="{\"full_text\":\"sample_text\"}"
+        block="{\"full_text\":\"$(get_pointer_state)\"}"
         echo "${line/\[\{/\[$block,\{}" || exit 1
     done
 }
 
 function toggle() {
-    for dev in ${current_pointers_arr[@]}; do
-        case $pointers_working_state in
+    for dev in $(xinput list | grep -Po 'id=\K\d+(?=.*slave\s*pointer)' | xargs -P0 -n1 echo); do
+        case $(xinput list-props ${dev} | rg 'Device Enabled' | rg -o '[01]$') in
             '0') xinput enable ${dev} 2> /dev/null;;
             '1') xinput disable ${dev} 2> /dev/null;;
         esac
     done
 }
 
-case ${1} in
-    "i3status") i3status;;
-    "toggle") toggle;;
-    *) exit 0;
+case $1 in
+    toggle) toggle ;;
+    i3status) i3status ;;
+    *) exit 0 ;;
 esac
-
-if [[ -z ${1} ]]; then
-    echo 'No cli arg supplied'
-fi
