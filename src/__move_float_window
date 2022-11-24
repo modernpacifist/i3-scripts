@@ -11,13 +11,28 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
+if [[ ! -z $MONITOR_DIMENSIONS_FILE ]]; then
+    # TODO: generate a json 
+    :
+fi
+
 function save_preset() {
     updated_json=$(jq ".Preset = $1" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
 
-#max_x=$(jq '.primary_x' $HOME/.monitor_dimensions.json)
-#max_y=$(jq '.primary_y' $HOME/.monitor_dimensions.json)
+# primary monitor resolution
+#primary_max_x=$(jq '.primary_x' $MONITOR_DIMENSIONS_FILE)
+#primary_max_y=$(jq '.primary_y' $MONITOR_DIMENSIONS_FILE)
+#primary_max_x=3840
+#primary_max_y=2160
+
+# secondary monitor resolution
+#secondary_max_x=$(jq '.secondary_x' $MONITOR_DIMENSIONS_FILE)
+#secondary_max_y=$(jq '.secondary_y' $MONITOR_DIMENSIONS_FILE)
+#secondary_max_x=2880
+#secondary_max_y=1800
 
 window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
 status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
@@ -29,7 +44,7 @@ case $status_bar_position in
     *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
 esac
 
-{ read max_x max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
+{ read primary_max_x primary_max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 
 pos=${1}
@@ -43,17 +58,17 @@ if [[ $pos =~ ^preset$ ]]; then
 fi
 
 case $pos in
-    '1') new_pos="$(($window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
-    '2') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
-    '3') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '1') new_pos="$(($window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '2') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '3') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
 
-    '4') new_pos="$(($window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
-    '5') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
-    '6') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '4') new_pos="$(($window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '5') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '6') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
 
     '7') new_pos="$window_border_width $(($status_bar_width + $window_border_width + $top_offset))";;
-    '8') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
-    '9') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    '8') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    '9') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
     *) echo 'Invalid value in $1 argument, must be 1-9' >&2; exit 2;;
 esac
 
