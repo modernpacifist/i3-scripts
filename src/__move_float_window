@@ -11,28 +11,24 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
-MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
-if [[ ! -z $MONITOR_DIMENSIONS_FILE ]]; then
-    # TODO: generate a json 
-    :
-fi
-
 function save_preset() {
     updated_json=$(jq ".Preset = $1" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
 
+MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
+if [[ ! -f $MONITOR_DIMENSIONS_FILE ]]; then
+    { read primary_max_x primary_max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
+    echo "{\"primary_x\": ${primary_max_x}, \"primary_y\": ${primary_max_y}, \"secondary_x\": 2880, \"secondary_y\": 1800}" | jq . > $MONITOR_DIMENSIONS_FILE
+fi
+
 # primary monitor resolution
-#primary_max_x=$(jq '.primary_x' $MONITOR_DIMENSIONS_FILE)
-#primary_max_y=$(jq '.primary_y' $MONITOR_DIMENSIONS_FILE)
-#primary_max_x=3840
-#primary_max_y=2160
+primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
 
 # secondary monitor resolution
-#secondary_max_x=$(jq '.secondary_x' $MONITOR_DIMENSIONS_FILE)
-#secondary_max_y=$(jq '.secondary_y' $MONITOR_DIMENSIONS_FILE)
-#secondary_max_x=2880
-#secondary_max_y=1800
+secondary_max_x=$(grep '"secondary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+secondary_max_y=$(grep '"secondary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
 
 window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
 status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
@@ -44,7 +40,6 @@ case $status_bar_position in
     *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
 esac
 
-{ read primary_max_x primary_max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 
 pos=${1}
