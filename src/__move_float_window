@@ -1,14 +1,35 @@
 #!/bin/env bash
-if [[ -z $1 ]]; then
+
+if [[ -z ${1} ]]; then
     echo '$1 argument was not specified'
     exit 1
 fi
 
-CONFIGFILE=$HOME/.__move_float_window.json
+CONFIGFILE=$HOME/.move_float_window.json
 if [[ ! -f $CONFIGFILE ]]; then
     echo 'No config file found'
     exit 1
 fi
+
+function save_preset() {
+    updated_json=$(jq ".Preset = $1" $CONFIGFILE)
+    echo $updated_json | jq . > $CONFIGFILE
+}
+
+MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
+if [[ ! -f $MONITOR_DIMENSIONS_FILE ]]; then
+    { read primary_max_x primary_max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
+    # TODO: hardcoded default values, fix later <25-11-22, modernpacifist> #
+    echo "{\"primary_x\": ${primary_max_x}, \"primary_y\": ${primary_max_y}, \"secondary_x\": 2880, \"secondary_y\": 1800}" | jq . > $MONITOR_DIMENSIONS_FILE
+fi
+
+# primary monitor resolution
+primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+
+# secondary monitor resolution
+secondary_max_x=$(grep '"secondary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+secondary_max_y=$(grep '"secondary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
 
 window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
 status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
@@ -20,25 +41,35 @@ case $status_bar_position in
     *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
 esac
 
-echo $status_bar_width
-
-{ read max_x max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
-{ read window_id ; } < <(xdotool getactivewindow)
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 
-case $1 in
-    '1') new_pos="$(($window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
-    '2') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
-    '3') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y - $window_g_y - $window_border_width + $top_offset))";;
+pos=${1}
 
-    '4') new_pos="$(($window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
-    '5') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
-    '6') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+if [[ $pos =~ ^preset$ ]]; then
+    pos=$(jq '.Preset' $CONFIGFILE)
+    # setting default
+    if [[ $pos == null ]]; then
+        pos=3
+    fi
+fi
+
+case $pos in
+    '1') new_pos="$(($window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '2') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    '3') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+
+    '4') new_pos="$(($window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '5') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    '6') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
 
     '7') new_pos="$window_border_width $(($status_bar_width + $window_border_width + $top_offset))";;
-    '8') new_pos="$(($max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
-    '9') new_pos="$(($max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    '8') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    '9') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
     *) echo 'Invalid value in $1 argument, must be 1-9' >&2; exit 2;;
 esac
 
-xdotool windowmove $window_id $new_pos
+if [[ $2 =~ ^save$ ]]; then
+    save_preset $pos
+fi
+
+xdotool windowmove $(xdotool getactivewindow) $new_pos

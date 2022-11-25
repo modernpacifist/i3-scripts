@@ -1,0 +1,77 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    exit 1
+fi
+
+CONFIG_FILE=$HOME/.monitor_scratchpad.json
+if [[ ! -f $CONFIG_FILE ]]; then
+    echo '{"shown":false}' | jq . > $CONFIG_FILE
+fi
+
+monitor1_abs_pos_x=3840
+monitor1_abs_pos_y=0
+monitor1_size_x=914
+monitor1_size_y=1028
+
+monitor2_abs_pos_x=3840
+monitor2_abs_pos_y=1028
+monitor2_size_x=914
+monitor2_size_y=772
+
+monitor3_abs_pos_x=5154
+monitor3_abs_pos_y=0
+monitor3_size_x=1566
+monitor3_size_y=1800
+
+function dump_monitor_shown_flag() {
+    #updated_json=$(jq ".Preset = $1" $CONFIGFILE)
+    #echo $updated_json | jq . > $CONFIGFILE
+    echo ""
+}
+
+if [[ ${1} =~ ^mark$ ]]; then
+    f_usr_prompt=$(i3-input -P 'Monitor scratchpad mark mode chosen, input monitor index 1-9: ' -l 1)
+    stripped_m_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
+
+    # maybe add a string to config if scratchpad was created
+    case ${stripped_m_usr_input} in
+        1) i3-msg "mark monitor1, move scratchpad, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"; exit 0;;
+        2) i3-msg "mark monitor2, move scratchpad, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"; exit 0;;
+        3) i3-msg "mark monitor3, move scratchpad, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}"; exit 0;;
+        # pass equivalent
+        *) :;;
+    esac
+
+    #if (( ${stripped_m_usr_input} >= 4 && ${stripped_m_usr_input} <= 9 )); then
+        #i3-msg "mark monitor${stripped_m_usr_input}, move scratchpad"
+    #else
+        #exit 1
+    #fi
+    exit 0
+fi
+
+
+if [[ ${1} =~ ^toggle$ ]]; then
+    # make this flag individual per monitor
+    shown_flag=$(jq '.shown' $CONFIG_FILE)
+    if [[ $shown_flag == "true" ]]; then
+        i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'
+        echo '{"shown":false}' | jq . > $CONFIG_FILE
+        exit 0
+    fi
+
+    # too hardcoded, fix later/bug: if all containers with monitor[1-3] do not exist the script breaks
+    success_flag=$(i3-msg "[con_mark=\"^monitor1$\"] scratchpad show, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}")
+    success_flag+=$(i3-msg "[con_mark=\"^monitor2$\"] scratchpad show, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}")
+    success_flag+=$(i3-msg "[con_mark=\"^monitor3$\"] scratchpad show, move absolute position ${monitor3_abs_pos_x} ${monitor3_abs_pos_y}, resize set ${monitor3_size_x} ${monitor3_size_y}")
+
+    success_counter=$(echo $success_flag | jq '.[] .success' | rg -c 'true')
+
+    echo $success_flag
+
+    # this value must be manually changed with each unique monitor exist
+    if (( success_counter == 9 )); then
+        echo '{"shown":true}' | jq . > $CONFIG_FILE
+    fi
+fi

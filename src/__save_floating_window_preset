@@ -1,0 +1,28 @@
+#!/bin/env bash
+
+# TODO: temp solution use user prompt to take mark <09-11-22, modernpacifist> #
+usr_input=$(i3-input -P 'Mark container (press "f" to mark with function keys): ' -l 1)
+USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
+
+if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
+    exit 0
+fi
+
+stripped_usr_input=$(echo -n $usr_input | rev | cut -f1 -d"=" | rev | tr -d ' ')
+echo $stripped_usr_input
+
+focused_window_id=$(xdotool getwindowfocus)
+
+# parse coordinates and geometry from here
+container_pos_and_geom=$(xdotool getwindowgeometry ${focused_window_id})
+
+echo $container_pos_and_geom
+
+ws=$(i3-msg -t get_workspaces | jq '.[] | select(.focused).num')
+marks=$(i3-msg -t get_tree | jq -e -r '(.nodes[].nodes[].nodes[]) | select(.num == '"$ws"').nodes[] | select(.focused == true).marks[]' )
+
+case $? in
+  0)
+    echo $marks
+    ;;
+esac

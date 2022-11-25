@@ -1,0 +1,11 @@
+#!/bin/env bash
+
+file_loc="$HOME/.monitor_dimensions.json"
+
+# for now screen2 will be primary
+{ read screen1 screen2 ; } < <(xrandr | grep -w 'connected' | grep -wEo '[0-9]{4}x[0-9]{4}' | awk '{print}' ORS=' ')
+
+{ read mon1_max_x  mon1_max_y ; } < <(echo $screen1 | awk -F'x' '{print $1 " " $2}')
+{ read mon2_max_x  mon2_max_y ; } < <(echo $screen2 | awk -F'x' '{print $1 " " $2}')
+
+jq -n "{\"primary_x\": $mon2_max_x, \"primary_y\": $mon2_max_y, \"second_x\": $mon1_max_x, \"second_y\": $mon1_max_y}" > $file_loc
