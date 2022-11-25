@@ -7,7 +7,7 @@ playerctl
 ```  
 
 ## Installation  
-Run as root:  
+Run with sudo privileges:  
 ```# ./install.sh```  
 
 ## Scripts breakdown
