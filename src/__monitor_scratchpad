@@ -9,6 +9,9 @@ if [[ ! -f $CONFIG_FILE ]]; then
     echo '{"shown":false}' | jq . > $CONFIG_FILE
 fi
 
+# TODO: convert this into an array
+MONITOR_EXISTING_MARKS=$(i3-msg -t get_marks | jq -r 'join("\n")' | grep -E '^monitor[0-9]+$' | sort | tr "\n" ' ' | head -c -1)
+
 monitor1_abs_pos_x=3840
 monitor1_abs_pos_y=0
 monitor1_size_x=914
