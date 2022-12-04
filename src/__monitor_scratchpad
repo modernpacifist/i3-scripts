@@ -51,7 +51,7 @@ fi
 
 
 if [[ ${1} =~ ^toggle$ ]]; then
-    # make this flag individual per monitor
+    # TODO: make this flag individual per monitor
     shown_flag=$(jq '.shown' $CONFIG_FILE)
     if [[ $shown_flag == "true" ]]; then
         i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'
