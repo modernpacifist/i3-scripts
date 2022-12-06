@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+# TODO: check if particular monitor is in its position and then move <06-12-22, modernpacifist> #
+
 if [[ -z $1 ]]; then
     exit 1
 fi
