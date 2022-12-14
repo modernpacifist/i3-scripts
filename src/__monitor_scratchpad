@@ -40,6 +40,7 @@ if [[ ${1} =~ ^mark$ ]]; then
     stripped_m_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
     # maybe add a string to config if scratchpad was created
+    # TODO: bug with adding monitor to monitor scratchpad if monitor scratchpad is already shown <14-12-22, modernpacifist> #
     case ${stripped_m_usr_input} in
         1) i3-msg "mark monitor1, move scratchpad, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"; exit 0;;
         2) i3-msg "mark monitor2, move scratchpad, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"; exit 0;;
