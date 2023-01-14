@@ -54,18 +54,45 @@ if [[ $pos =~ ^preset$ ]]; then
 fi
 
 case $pos in
+    # primary left - bottom
     '1') new_pos="$(($window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    # primary mid - bottom
     '2') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    # primary right - bottom
     '3') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y - $window_g_y - $window_border_width + $top_offset))";;
-
+    # primary left - mid
     '4') new_pos="$(($window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    # primary mid - mid
     '5') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
+    # primary right - mid
     '6') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_width / 2))";;
-
+    # primary left - top
     '7') new_pos="$window_border_width $(($status_bar_width + $window_border_width + $top_offset))";;
+    # primary mid - top
     '8') new_pos="$(($primary_max_x / 2 - $window_g_x / 2)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    # primary right - top
     '9') new_pos="$(($primary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
-    *) echo 'Invalid value in $1 argument, must be 1-9' >&2; exit 2;;
+
+    # secondary left - top
+    '10') new_pos="$(($primary_max_x + $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    # secondary left - mid
+    '11') new_pos="$(($primary_max_x + $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $top_offset))";;
+    # secondary left - bottom
+    '12') new_pos="$(($primary_max_x + $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    # secondary mid - top
+    '13') new_pos="$(($primary_max_x + $secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    # secondary mid - mid
+    '14') new_pos="$(($primary_max_x + $secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $top_offset))";;
+    # secondary mid - bottom
+    '15') new_pos="$(($primary_max_x + $secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+    # secondary right - top
+    '16') new_pos="$(($primary_max_x + $secondary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $top_offset))";;
+    # secondary right - mid
+    '17') new_pos="$(($primary_max_x + $secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $top_offset))";;
+    # secondary right - bottom
+    '18') new_pos="$(($primary_max_x + $secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $top_offset))";;
+
+    *) echo 'Invalid value in $1 argument, must be 1-12' >&2; exit 2;;
 esac
 
 if [[ $2 =~ ^save$ ]]; then
