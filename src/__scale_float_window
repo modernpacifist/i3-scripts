@@ -1,0 +1,20 @@
+#!/bin/env bash
+
+if [[ ! ($1 && $2) ]]; then
+    echo '$1 $2 arguments were not specified'
+    exit 1
+fi
+
+increase_value=${2}
+
+case $1 in
+    '1') i3-msg "resize shrink width $increase_value px or $increase_value ppt, move container right $increase_value px";;
+    '2') i3-msg "resize grow height $increase_value px or $increase_value ppt, move container up $increase_value px";;
+    '3') i3-msg "resize shrink height $increase_value px or $increase_value ppt, move container down $increase_value px";;
+    '4') i3-msg "resize grow width $increase_value px or $increase_value ppt, move container left $increase_value px";;
+
+    '5') i3-msg "resize shrink width $increase_value px or $increase_value ppt";;
+    '6') i3-msg "resize grow height $increase_value px or $increase_value ppt";;
+    '7') i3-msg "resize shrink height $increase_value px or $increase_value ppt";;
+    '8') i3-msg "resize grow width $increase_value px or $increase_value ppt";;
+esac
