@@ -17,16 +17,31 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+function flip_flag() {
+    updated_json=$(jq ".VerticalResizeFlag = $1" $CONFIGFILE)
+    echo $updated_json | jq . > $CONFIGFILE
+}
+
+
+function screen_vertical_resize() {
+    case $1 in
+        0) i3-msg "resize grow height $resize_value px or $resize_value ppt, move container up $resize_value" && flip_flag 1 ;;
+        1) i3-msg "resize grow height 200 px or 200 ppt, move container up 200" && flip_flag 0 ;;
+    esac
+}
+
+
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 
-window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
-status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
-status_bar_position=$(grep -oP '(?<="StatusBarPosition": ")[^"]*' $CONFIGFILE | tr -d ',')
+window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
+status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
+status_bar_position=$(grep '"StatusBarPosition"' $CONFIGFILE | grep -o '[[:digit:]]*')
+flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
 
-increase_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
+resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') i3-msg "resize grow height $increase_value px or $increase_value ppt, move container up $increase_value";;
+    'w') screen_vertical_resize $flag_resized;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px";;
