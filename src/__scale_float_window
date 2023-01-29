@@ -5,6 +5,15 @@ if [[ ! ($1 && $2) ]]; then
     exit 1
 fi
 
+#MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
+#if [[ -f $MONITOR_DIMENSIONS_FILE ]]; then
+    #primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+    #primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+#fi
+
+#echo $primary_max_x
+#echo $primary_max_y
+
 increase_value=${2}
 
 case $1 in
