@@ -17,11 +17,17 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+function save_window_size() {
+    updated_json=$(jq ".window_g_x = $1" $CONFIGFILE)
+    echo $updated_json | jq . > $CONFIGFILE
+    updated_json=$(jq ".window_g_y = $2" $CONFIGFILE)
+    echo $updated_json | jq . > $CONFIGFILE
+}
+
 function flip_flag() {
     updated_json=$(jq ".VerticalResizeFlag = $1" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
-
 
 function screen_vertical_resize() {
     case $1 in
@@ -30,12 +36,11 @@ function screen_vertical_resize() {
     esac
 }
 
-
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+save_window_size $window_g_x $window_g_y
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
-status_bar_position=$(grep '"StatusBarPosition"' $CONFIGFILE | grep -o '[[:digit:]]*')
 flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
 
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
@@ -53,3 +58,6 @@ case $1 in
     '7') i3-msg "resize shrink height $2 px or $2 ppt";;
     '8') i3-msg "resize grow width $2 px or $2 ppt";;
 esac
+
+#{ read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+#save_window_size $window_g_x $window_g_y
