@@ -1,29 +1,40 @@
 #!/bin/env bash
 
-if [[ ! ($1 && $2) ]]; then
+if [[ -z $1 ]]; then
     echo '$1 $2 arguments were not specified'
     exit 1
 fi
 
-#MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
-#if [[ -f $MONITOR_DIMENSIONS_FILE ]]; then
-    #primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
-    #primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
-#fi
+MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
+if [[ -f $MONITOR_DIMENSIONS_FILE ]]; then
+    primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+    primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+fi
 
-#echo $primary_max_x
-#echo $primary_max_y
+CONFIGFILE=$HOME/.move_float_window.json
+if [[ ! -f $CONFIGFILE ]]; then
+    echo 'No config file found'
+    exit 1
+fi
 
-increase_value=${2}
+{ read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+
+window_border_width=$(grep -oP '(?<="WindowBorderWidth": )[^"]*' $CONFIGFILE | tr -d ',')
+status_bar_width=$(grep -oP '(?<="StatusBarWidth": )[^"]*' $CONFIGFILE | tr -d ',')
+status_bar_position=$(grep -oP '(?<="StatusBarPosition": ")[^"]*' $CONFIGFILE | tr -d ',')
+
+increase_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    '1') i3-msg "resize shrink width $increase_value px or $increase_value ppt, move container right $increase_value px";;
-    '2') i3-msg "resize grow height $increase_value px or $increase_value ppt, move container up $increase_value px";;
-    '3') i3-msg "resize shrink height $increase_value px or $increase_value ppt, move container down $increase_value px";;
-    '4') i3-msg "resize grow width $increase_value px or $increase_value ppt, move container left $increase_value px";;
+    'w') i3-msg "resize grow height $increase_value px or $increase_value ppt, move container up $increase_value";;
 
-    '5') i3-msg "resize shrink width $increase_value px or $increase_value ppt";;
-    '6') i3-msg "resize grow height $increase_value px or $increase_value ppt";;
-    '7') i3-msg "resize shrink height $increase_value px or $increase_value ppt";;
-    '8') i3-msg "resize grow width $increase_value px or $increase_value ppt";;
+    '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
+    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px";;
+    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px";;
+    '4') i3-msg "resize grow width $2 px or $2 ppt, move container left $2 px";;
+
+    '5') i3-msg "resize shrink width $2 px or $2 ppt";;
+    '6') i3-msg "resize grow height $2 px or $2 ppt";;
+    '7') i3-msg "resize shrink height $2 px or $2 ppt";;
+    '8') i3-msg "resize grow width $2 px or $2 ppt";;
 esac
