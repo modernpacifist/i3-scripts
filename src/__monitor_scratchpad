@@ -16,13 +16,15 @@ MONITOR_EXISTING_MARKS=$(i3-msg -t get_marks | jq -r 'join("\n")' | grep -E '^mo
 
 monitor1_abs_pos_x=3840
 monitor1_abs_pos_y=0
-monitor1_size_x=914
+monitor1_size_x=1314
 monitor1_size_y=1028
 
 monitor2_abs_pos_x=3840
 monitor2_abs_pos_y=1028
-monitor2_size_x=914
-monitor2_size_y=772
+monitor2_size_x=1314
+#monitor2_size_y=772
+#monitor2_size_y=$((2880-1028))
+monitor2_size_y=1852
 
 monitor3_abs_pos_x=5154
 monitor3_abs_pos_y=0
