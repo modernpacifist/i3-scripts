@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+# TODO: check if particular monitor is in its position and then move <06-12-22, modernpacifist> #
+
 if [[ -z $1 ]]; then
     exit 1
 fi
@@ -9,15 +11,20 @@ if [[ ! -f $CONFIG_FILE ]]; then
     echo '{"shown":false}' | jq . > $CONFIG_FILE
 fi
 
+# TODO: convert this into an array
+MONITOR_EXISTING_MARKS=$(i3-msg -t get_marks | jq -r 'join("\n")' | grep -E '^monitor[0-9]+$' | sort | tr "\n" ' ' | head -c -1)
+
 monitor1_abs_pos_x=3840
 monitor1_abs_pos_y=0
-monitor1_size_x=914
+monitor1_size_x=1314
 monitor1_size_y=1028
 
 monitor2_abs_pos_x=3840
 monitor2_abs_pos_y=1028
-monitor2_size_x=914
-monitor2_size_y=772
+monitor2_size_x=1314
+#monitor2_size_y=772
+#monitor2_size_y=$((2880-1028))
+monitor2_size_y=1852
 
 monitor3_abs_pos_x=5154
 monitor3_abs_pos_y=0
@@ -35,6 +42,7 @@ if [[ ${1} =~ ^mark$ ]]; then
     stripped_m_usr_input=$(echo -n $f_usr_prompt | rev | cut -f1 -d"=" | rev | tr -d ' ')
 
     # maybe add a string to config if scratchpad was created
+    # TODO: bug with adding monitor to monitor scratchpad if monitor scratchpad is already shown <14-12-22, modernpacifist> #
     case ${stripped_m_usr_input} in
         1) i3-msg "mark monitor1, move scratchpad, move absolute position ${monitor1_abs_pos_x} ${monitor1_abs_pos_y}, resize set ${monitor1_size_x} ${monitor1_size_y}"; exit 0;;
         2) i3-msg "mark monitor2, move scratchpad, move absolute position ${monitor2_abs_pos_x} ${monitor2_abs_pos_y}, resize set ${monitor2_size_x} ${monitor2_size_y}"; exit 0;;
@@ -43,17 +51,12 @@ if [[ ${1} =~ ^mark$ ]]; then
         *) :;;
     esac
 
-    #if (( ${stripped_m_usr_input} >= 4 && ${stripped_m_usr_input} <= 9 )); then
-        #i3-msg "mark monitor${stripped_m_usr_input}, move scratchpad"
-    #else
-        #exit 1
-    #fi
     exit 0
 fi
 
 
 if [[ ${1} =~ ^toggle$ ]]; then
-    # make this flag individual per monitor
+    # TODO: make this flag individual per monitor
     shown_flag=$(jq '.shown' $CONFIG_FILE)
     if [[ $shown_flag == "true" ]]; then
         i3-msg '[con_mark="^monitor[0-9]$"] move scratchpad'

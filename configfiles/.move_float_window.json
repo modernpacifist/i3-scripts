@@ -2,5 +2,8 @@
   "WindowBorderWidth": 3,
   "StatusBarWidth": 50,
   "StatusBarPosition": "top",
-  "Preset": 3
+  "Preset": 18,
+  "VerticalResizeFlag": 0,
+  "window_g_x": 1794,
+  "window_g_y": 1904
 }
