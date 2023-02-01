@@ -18,7 +18,7 @@ if [[ ! -f $CONFIGFILE ]]; then
 fi
 
 function save_window_size() {
-    updated_json=$(jq ".window_g_x = $1 | .window_g_y = $2" $CONFIGFILE)
+    updated_json=$(jq ".window_g_y = $1" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
 
@@ -28,9 +28,12 @@ function change_flag_to() {
 }
 
 function screen_vertical_resize() {
+    wingow_g_y_config=$(grep '"window_g_y"' $CONFIGFILE | grep -o '[[:digit:]]*')
+    vertical_diff=$(( $window_g_y - $wingow_g_y_config ))
+
     case $2 in
-        0) i3-msg "resize grow height $1 px or $1 ppt, move container up $resize_value" && change_flag_to 1;;
-        1) i3-msg "resize grow height 200 px or 200 ppt, move container up 200" && change_flag_to 0;;
+        0) save_window_size $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && change_flag_to 1;;
+        1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && change_flag_to 0;;
     esac
 }
 
@@ -43,7 +46,7 @@ flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') screen_vertical_resize $resize_value $flag_resized && save_window_size $window_g_x $window_g_y;;
+    'w') screen_vertical_resize $resize_value $flag_resized;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     # restoring the flag if window was resized vertically
