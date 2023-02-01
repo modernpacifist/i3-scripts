@@ -18,26 +18,23 @@ if [[ ! -f $CONFIGFILE ]]; then
 fi
 
 function save_window_size() {
-    updated_json=$(jq ".window_g_x = $1" $CONFIGFILE)
-    echo $updated_json | jq . > $CONFIGFILE
-    updated_json=$(jq ".window_g_y = $2" $CONFIGFILE)
+    updated_json=$(jq ".window_g_x = $1 | .window_g_y = $2" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
 
-function flip_flag() {
+function change_flag_to() {
     updated_json=$(jq ".VerticalResizeFlag = $1" $CONFIGFILE)
     echo $updated_json | jq . > $CONFIGFILE
 }
 
 function screen_vertical_resize() {
-    case $1 in
-        0) i3-msg "resize grow height $resize_value px or $resize_value ppt, move container up $resize_value" && flip_flag 1 ;;
-        1) i3-msg "resize grow height 200 px or 200 ppt, move container up 200" && flip_flag 0 ;;
+    case $2 in
+        0) i3-msg "resize grow height $1 px or $1 ppt, move container up $resize_value" && change_flag_to 1;;
+        1) i3-msg "resize grow height 200 px or 200 ppt, move container up 200" && change_flag_to 0;;
     esac
 }
 
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
-save_window_size $window_g_x $window_g_y
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
@@ -46,18 +43,16 @@ flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') screen_vertical_resize $flag_resized;;
+    'w') screen_vertical_resize $resize_value $flag_resized && save_window_size $window_g_x $window_g_y;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
-    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px";;
-    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px";;
+    # restoring the flag if window was resized vertically
+    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px" && change_flag_to 0;;
+    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px" && change_flag_to 0;;
     '4') i3-msg "resize grow width $2 px or $2 ppt, move container left $2 px";;
 
     '5') i3-msg "resize shrink width $2 px or $2 ppt";;
-    '6') i3-msg "resize grow height $2 px or $2 ppt";;
-    '7') i3-msg "resize shrink height $2 px or $2 ppt";;
+    '6') i3-msg "resize grow height $2 px or $2 ppt" && change_flag_to 0;;
+    '7') i3-msg "resize shrink height $2 px or $2 ppt" && change_flag_to 0;;
     '8') i3-msg "resize grow width $2 px or $2 ppt";;
 esac
-
-#{ read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
-#save_window_size $window_g_x $window_g_y
