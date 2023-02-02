@@ -18,13 +18,11 @@ if [[ ! -f $CONFIGFILE ]]; then
 fi
 
 function save_window_size() {
-    updated_json=$(jq ".window_g_y = $1" $CONFIGFILE)
-    echo $updated_json | jq . > $CONFIGFILE
+    sed -i "s/\"window_g_y\": [0-9]*/\"window_g_y\": $1/" $CONFIGFILE
 }
 
 function change_flag_to() {
-    updated_json=$(jq ".VerticalResizeFlag = $1" $CONFIGFILE)
-    echo $updated_json | jq . > $CONFIGFILE
+    sed -i "s/\"VerticalResizeFlag\": [0-9]*/\"VerticalResizeFlag\": $1/" $CONFIGFILE
 }
 
 function screen_vertical_resize() {
