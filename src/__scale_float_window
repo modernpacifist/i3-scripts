@@ -17,25 +17,23 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
-function save_window_size() {
+function update_window_size() {
     updated_list=$(jq ".Windows | map(if .id == $1 then .window_g_y |= $2 else . end)" $CONFIGFILE)
     jq ".Windows |= $updated_list" $CONFIGFILE | jq . > temp.json && mv temp.json $CONFIGFILE
 }
 
-function change_flag_to() {
+function update_window_flag() {
     updated_list=$(jq ".Windows | map(if .id == $focused_window_id then .resized_flag |= $1 else . end)" $CONFIGFILE)
     jq ".Windows |= $updated_list" $CONFIGFILE | jq . > temp.json && mv temp.json $CONFIGFILE
 }
 
-function screen_vertical_resize() {
+function resize_vertically() {
     window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
-
-    #jq "map(if .id == $3 then .resized_flag |= $1 else . end)" $CONFIGFILE > temp.json
     vertical_diff=$(( $window_g_y - $window_g_y_config ))
 
     case $2 in
-        0) save_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && change_flag_to 1;;
-        1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && change_flag_to 0;;
+        0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && update_window_flag 1;;
+        1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
     esac
 }
 
@@ -48,6 +46,9 @@ if (( $window_g_y == 2104 )); then
 fi
 
 result=$(jq ".Windows[] | select(.id == $focused_window_id) " $CONFIGFILE)
+echo $result
+echo $result
+echo $result
 new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
 
 # if value does not exist, add it to the JSON list
@@ -61,23 +62,21 @@ fi
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
-#flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
-#flag_resized=$(jq ".Windows | map(if .id == $focused_window_id then .resized_flag |= $1 else . end)" $CONFIGFILE)
-flag_resized=$(jq ".Windows | map(if .id == $focused_window_id then .resized_flag |= $1 else . end)" $CONFIGFILE)
+flag_resized=$(jq ".Windows[] | select(.id == $focused_window_id) | .resized_flag" $CONFIGFILE)
 
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') screen_vertical_resize $resize_value $flag_resized $focused_window_id;;
+    'w') resize_vertically $resize_value $flag_resized $focused_window_id;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     # restoring the flag if window was resized vertically
-    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px" && change_flag_to 0;;
-    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px" && change_flag_to 0;;
+    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px" && update_window_flag 0;;
+    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px" && update_window_flag 0;;
     '4') i3-msg "resize grow width $2 px or $2 ppt, move container left $2 px";;
 
     '5') i3-msg "resize shrink width $2 px or $2 ppt";;
-    '6') i3-msg "resize grow height $2 px or $2 ppt" && change_flag_to 0;;
-    '7') i3-msg "resize shrink height $2 px or $2 ppt" && change_flag_to 0;;
+    '6') i3-msg "resize grow height $2 px or $2 ppt" && update_window_flag 0;;
+    '7') i3-msg "resize shrink height $2 px or $2 ppt" && update_window_flag 0;;
     '8') i3-msg "resize grow width $2 px or $2 ppt";;
 esac
