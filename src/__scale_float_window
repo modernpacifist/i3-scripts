@@ -11,7 +11,7 @@ if [[ -f $MONITOR_DIMENSIONS_FILE ]]; then
     primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
 fi
 
-CONFIGFILE=$HOME/.move_float_window.json
+CONFIGFILE=$HOME/.scale_float_window.json
 if [[ ! -f $CONFIGFILE ]]; then
     echo 'No config file found'
     exit 1
@@ -36,6 +36,25 @@ function screen_vertical_resize() {
 }
 
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+focused_window_id=$(xdotool getwindowfocus)
+resized_flag=0
+
+if (( $window_g_y == 2104 )); then
+    resized_flag=1
+fi
+
+result=$(jq ".Windows[] | select(.id == $focused_window_id) " $CONFIGFILE)
+new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
+
+# if value does not exist, add it to the JSON list
+if [[ -z $result ]]; then
+  new_json_list=$(jq '.Windows' $CONFIGFILE | jq --argjson new_val "$new_val" "[.[], $new_val]")
+  jq ".Windows = $new_json_list" $CONFIGFILE > temp.json
+  cat temp.json > $CONFIGFILE
+else
+  echo "Value found in JSON list: $result"
+fi
+
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
