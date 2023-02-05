@@ -1,0 +1,19 @@
+{
+  "WindowBorderWidth": 3,
+  "StatusBarWidth": 50,
+  "StatusBarPosition": "top",
+  "Preset": 18,
+  "VerticalResizeFlag": 0,
+  "Windows": [
+    {
+      "id": 50331926,
+      "resized_flag": 0,
+      "window_g_y": 1080
+    },
+    {
+      "id": 41943073,
+      "resized_flag": 1,
+      "window_g_y": 2104
+    }
+  ]
+}
