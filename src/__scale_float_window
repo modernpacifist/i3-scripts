@@ -45,19 +45,12 @@ if (( $window_g_y == 2104 )); then
     resized_flag=1
 fi
 
-result=$(jq ".Windows[] | select(.id == $focused_window_id) " $CONFIGFILE)
-echo $result
-echo $result
-echo $result
-new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
+result=$(jq ".Windows[] | select(.id == $focused_window_id)" $CONFIGFILE)
 
 # if value does not exist, add it to the JSON list
 if [[ -z $result ]]; then
-  new_json_list=$(jq '.Windows' $CONFIGFILE | jq --argjson new_val "$new_val" "[.[], $new_val]")
-  jq ".Windows = $new_json_list" $CONFIGFILE > temp.json
-  cat temp.json > $CONFIGFILE
-else
-  echo "Value found in JSON list: $result"
+    new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
+    jq ".Windows += [$new_val]" $CONFIGFILE > temp.json && mv temp.json $CONFIGFILE
 fi
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
