@@ -18,19 +18,23 @@ if [[ ! -f $CONFIGFILE ]]; then
 fi
 
 function save_window_size() {
-    sed -i "s/\"window_g_y\": [0-9]*/\"window_g_y\": $1/" $CONFIGFILE
+    jq "map(if .id == $1 then .resized_flag |= $2 else . end)" $CONFIGFILE > output.json
+    cat output.json | jq .
 }
 
 function change_flag_to() {
-    sed -i "s/\"VerticalResizeFlag\": [0-9]*/\"VerticalResizeFlag\": $1/" $CONFIGFILE
+    jq "map(if .id == $focused_window_id then .resized_flag |= $1 else . end)" $CONFIGFILE > temp.json
 }
 
 function screen_vertical_resize() {
-    wingow_g_y_config=$(grep '"window_g_y"' $CONFIGFILE | grep -o '[[:digit:]]*')
-    vertical_diff=$(( $window_g_y - $wingow_g_y_config ))
+    window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
+
+    #jq "map(if .id == $3 then .resized_flag |= $1 else . end)" $CONFIGFILE > temp.json
+    #vertical_diff=$(( $window_g_y - $window_g_y_config ))
+    vertical_diff=$(( $window_g_y - $window_g_y_config ))
 
     case $2 in
-        0) save_window_size $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && change_flag_to 1;;
+        0) save_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && change_flag_to 1;;
         1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && change_flag_to 0;;
     esac
 }
@@ -55,7 +59,6 @@ else
   echo "Value found in JSON list: $result"
 fi
 
-
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
@@ -63,7 +66,7 @@ flag_resized=$(grep '"VerticalResizeFlag"' $CONFIGFILE | grep -o '[[:digit:]]*')
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') screen_vertical_resize $resize_value $flag_resized;;
+    'w') screen_vertical_resize $resize_value $flag_resized $focused_window_id;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     # restoring the flag if window was resized vertically
