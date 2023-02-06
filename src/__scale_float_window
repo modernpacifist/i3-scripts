@@ -47,8 +47,8 @@ function resize_vertically_down() {
     esac
 }
 
-{ read window_size_x window_size_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
-{ read window_pos_x window_pos_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | cut -d ":" -f2 | grep -o '[[:digit:]]*' | xargs)
+{ read window_size_x window_size_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | grep -o '[[:digit:]]*' | xargs)
+{ read window_pos_x window_pos_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | grep -o '[[:digit:]]*' | xargs | awk '{print $1,$2}')
 
 focused_window_id=$(xdotool getwindowfocus)
 resized_flag=0
