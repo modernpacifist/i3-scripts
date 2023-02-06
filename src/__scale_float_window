@@ -27,13 +27,24 @@ function update_window_flag() {
     jq ".Windows |= $updated_list" $CONFIGFILE | jq . > temp.json && mv temp.json $CONFIGFILE
 }
 
-function resize_vertically() {
+function resize_vertically_top() {
     window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
     vertical_diff=$(( $window_g_y - $window_g_y_config ))
 
     case $2 in
         0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && update_window_flag 1;;
         1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
+    esac
+}
+
+function resize_vertically_down() {
+    window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
+    vertical_diff=$(( $window_g_y - $window_g_y_config ))
+
+    case $2 in
+        0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt" && update_window_flag 1;;
+        #1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
+        1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt" && update_window_flag 0;;
     esac
 }
 
@@ -60,7 +71,8 @@ flag_resized=$(jq ".Windows[] | select(.id == $focused_window_id) | .resized_fla
 resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
 
 case $1 in
-    'w') resize_vertically $resize_value $flag_resized $focused_window_id;;
+    'w') resize_vertically_top $resize_value $flag_resized $focused_window_id;;
+    's') resize_vertically_down $resize_value $flag_resized $focused_window_id;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     # restoring the flag if window was resized vertically
