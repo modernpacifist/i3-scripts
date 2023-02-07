@@ -70,7 +70,7 @@ window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit
 status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 flag_resized=$(jq ".Windows[] | select(.id == $focused_window_id) | .resized_flag" $CONFIGFILE)
 
-resize_value=$(( $primary_max_y - $window_size_y - $status_bar_width - $window_border_width - $window_border_width ))
+resize_value=$(( $primary_max_y - $window_size_y - $status_bar_width - $(($window_border_width * 2)) ))
 
 case $1 in
     'w') resize_vertically_top $resize_value $flag_resized $focused_window_id;;
