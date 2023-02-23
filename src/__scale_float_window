@@ -17,6 +17,11 @@ if [[ ! -f $CONFIGFILE ]]; then
     exit 1
 fi
 
+# temp solution for json override
+if [[ ! -s $CONFIGFILE ]]; then
+    cp "${CONFIGFILE}_bak" $CONFIGFILE
+fi
+
 function update_window_size() {
     updated_list=$(jq ".Windows | map(if .id == $1 then .window_g_y |= $2 else . end)" $CONFIGFILE)
     jq ".Windows |= $updated_list" $CONFIGFILE | jq . > temp.json && mv temp.json $CONFIGFILE
