@@ -1,0 +1,12 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    echo '$1 argument was not specified'
+    exit 1
+fi
+
+i3-msg "resize grow width $1 px or $1 ppt"
+i3-msg "resize grow height $1 px or $1 ppt"
+
+i3-msg "move container left $(($1/2)) px"
+i3-msg "move container up $(($1/2)) px"

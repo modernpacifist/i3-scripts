@@ -1,6 +1,7 @@
 #!/bin/env bash
 
 if [[ -z $1 ]]; then
+    # TODO: this error message with this condition make no sense
     echo '$1 $2 arguments were not specified'
     exit 1
 fi
