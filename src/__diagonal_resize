@@ -5,8 +5,6 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-
-
 i3-msg "resize grow width $1 px or $1 ppt"
 i3-msg "resize grow height $1 px or $1 ppt"
 
