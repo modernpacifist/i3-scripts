@@ -20,7 +20,7 @@ MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
 if [[ ! -f $MONITOR_DIMENSIONS_FILE ]]; then
     { read primary_max_x primary_max_y ; } < <(xdotool getdisplaygeometry | awk '{print $1 " " $2}')
     # TODO: hardcoded default values, fix later <25-11-22, modernpacifist> #
-    echo "{\"primary_x\": ${primary_max_x}, \"primary_y\": ${primary_max_y}, \"secondary_x\": 2880, \"secondary_y\": 1800}" | jq . > $MONITOR_DIMENSIONS_FILE
+    echo "{\"primary_x\": ${primary_max_x}, \"primary_y\": ${primary_max_y}, \"secondary_x\": 1800, \"secondary_y\": 2880}" | jq . > $MONITOR_DIMENSIONS_FILE
 fi
 
 # primary monitor resolution
