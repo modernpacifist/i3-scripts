@@ -3,9 +3,17 @@
 file_loc="$HOME/.monitor_dimensions.json"
 
 # for now screen2 will be primary
-{ read screen1 screen2 ; } < <(xrandr | grep -w 'connected' | grep -wEo '[0-9]{4}x[0-9]{4}' | awk '{print}' ORS=' ')
+read -a screens_resolutions <<< $(xrandr | grep -w 'connected' | grep -wEo '[0-9]{4}x[0-9]{4}' | awk '{print}' ORS=' ')
 
-{ read mon1_max_x  mon1_max_y ; } < <(echo $screen1 | awk -F'x' '{print $1 " " $2}')
-{ read mon2_max_x  mon2_max_y ; } < <(echo $screen2 | awk -F'x' '{print $1 " " $2}')
+res="{"
+counter=1
+for s in ${screens_resolutions[@]}; do
+    { read x  y ; } < <(echo $s | awk -F'x' '{print $1 " " $2}')
+    res+="\"screen${counter}\":$x, \"screen$(($counter+1))\":$y,"
+    counter=$(($counter+2))
+done
 
-jq -n "{\"primary_x\": $mon2_max_x, \"primary_y\": $mon2_max_y, \"second_x\": $mon1_max_x, \"second_y\": $mon1_max_y}" > $file_loc
+res="${res%?}"
+res+="}"
+
+echo $res | jq . > $file_loc
