@@ -12,16 +12,10 @@ if [[ $1 == "toggle" ]]; then
     exit 0
 fi
 
-# round by 10
+# round to the closest 10
 if [[ $1 == "round" ]]; then
-    echo $CURRENT_VOLUME
-
-    difference=$(($CURRENT_VOLUME - 5))
-    echo $difference
-
-    #if (( $CURRENT_VOLUME )); then
-        #echo 
-    #fi
+    rounded_volume=$((($CURRENT_VOLUME + 5)/10 * 10))
+    #pactl set-sink-volume @DEFAULT_SINK@ ${MAX_VOLUME}%
     exit 0
 fi
 
