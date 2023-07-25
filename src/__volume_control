@@ -10,6 +10,11 @@ if [[ $1 == "toggle" ]]; then
     exit 0
 fi
 
+if [[ $1 == "round" ]]; then
+    current_volume=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
+    exit 0
+fi
+
 if [[ ! $1 =~ ^[\+\-]{1}[0-9]{1,}$ ]]; then
     echo '$1 argument does not match format'
     exit 1
