@@ -5,13 +5,23 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
+CURRENT_VOLUME=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
+
 if [[ $1 == "toggle" ]]; then
     pactl set-sink-mute @DEFAULT_SINK@ toggle
     exit 0
 fi
 
+# round by 10
 if [[ $1 == "round" ]]; then
-    current_volume=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
+    echo $CURRENT_VOLUME
+
+    difference=$(($CURRENT_VOLUME - 5))
+    echo $difference
+
+    #if (( $CURRENT_VOLUME )); then
+        #echo 
+    #fi
     exit 0
 fi
 
@@ -20,16 +30,15 @@ if [[ ! $1 =~ ^[\+\-]{1}[0-9]{1,}$ ]]; then
     exit 1
 fi
 
+stripped_usr_input=$(echo $1 | tr -d '\+\-')
+
 MAX_VOLUME=$2
 if [[ -z $2 ]]; then
     MAX_VOLUME=100
 fi
 
-stripped_usr_input=$(echo $1 | tr -d '\+\-')
-current_volume=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
-
 usr_input_sign=${1:0:1}
-wanted_volume_value=$(($current_volume $usr_input_sign $stripped_usr_input))
+wanted_volume_value=$(($CURRENT_VOLUME $usr_input_sign $stripped_usr_input))
 
 if (( $wanted_volume_value > $MAX_VOLUME )); then
     echo 'Wanted volume value exceeds max volume value'
