@@ -15,7 +15,7 @@ fi
 # round to the closest 10
 if [[ $1 == "round" ]]; then
     rounded_volume=$((($CURRENT_VOLUME + 5)/10 * 10))
-    #pactl set-sink-volume @DEFAULT_SINK@ ${MAX_VOLUME}%
+    pactl set-sink-volume @DEFAULT_SINK@ ${rounded_volume}%
     exit 0
 fi
 
