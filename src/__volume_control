@@ -8,14 +8,18 @@ fi
 CURRENT_VOLUME=$(amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%')
 
 if [[ $1 == "toggle" ]]; then
-    pactl set-sink-mute @DEFAULT_SINK@ toggle
+    pactl set-sink-mute @DEFAULT_SINK@ toggle && notify-send --expire-time=500 '__volume_control: toggled'
     exit 0
 fi
 
 # round to the closest 10
 if [[ $1 == "round" ]]; then
+    if [ $((CURRENT_VOLUME % 10)) -eq 0 ]; then
+        exit 0
+    fi
+
     rounded_volume=$((($CURRENT_VOLUME + 5)/10 * 10))
-    pactl set-sink-volume @DEFAULT_SINK@ ${rounded_volume}%
+    pactl set-sink-volume @DEFAULT_SINK@ ${rounded_volume}% && notify-send --expire-time=1500 "__volume_control: rounded to ${rounded_volume}"
     exit 0
 fi
 
@@ -40,5 +44,13 @@ if (( $wanted_volume_value > $MAX_VOLUME )); then
     exit 0
 fi
 
-pactl set-sink-volume @DEFAULT_SINK@ ${1}%
+if [ ${usr_input_sign} = '-' ]; then
+    msg="__volume_control: decreased by ${1:1}"
+else
+    msg="__volume_control: increased by ${1:1}"
+fi
+
+
+pactl set-sink-volume @DEFAULT_SINK@ ${1}% && notify-send --expire-time=1500 "${msg}"
+
 exit 0
