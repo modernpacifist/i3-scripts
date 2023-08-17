@@ -34,8 +34,9 @@ function update_window_flag() {
 }
 
 function resize_up() {
-    window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
-    vertical_diff=$(( $window_g_y - $window_g_y_config ))
+    # this must be checked if exists
+    previous_size=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
+    vertical_diff=$(( $4 - $previous_size ))
 
     case $2 in
         0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && update_window_flag 1;;
