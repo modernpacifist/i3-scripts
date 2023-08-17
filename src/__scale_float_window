@@ -53,39 +53,39 @@ function resize_up() {
 echo $window_loc_x
 echo $window_loc_y
 
-#focused_window_id=$(xdotool getwindowfocus)
-#resized_flag=0
+focused_window_id=$(xdotool getwindowfocus)
+resized_flag=0
 
-## this is bullshit
-#if (( $window_g_y == 2104 )); then
-    #resized_flag=1
-#fi
+# this is bullshit
+if (( $window_g_y == 2104 )); then
+    resized_flag=1
+fi
 
-#result=$(jq ".Windows[] | select(.id == $focused_window_id)" $CONFIGFILE)
+result=$(jq ".Windows[] | select(.id == $focused_window_id)" $CONFIGFILE)
 
-## if value does not exist, add it to the JSON list
-#if [[ -z $result ]]; then
-    #new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
-    #jq ".Windows += [$new_val]" $CONFIGFILE > temp.json && mv temp.json $CONFIGFILE
-#fi
+# if value does not exist, add it to the JSON list
+if [[ -z $result ]]; then
+    new_val="{\"id\": $focused_window_id, \"resized_flag\": $resized_flag, \"window_g_y\": $window_g_y}"
+    jq ".Windows += [$new_val]" $CONFIGFILE > temp.json && mv temp.json $CONFIGFILE
+fi
 
-#window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
-#status_bar_height=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
+window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
+status_bar_height=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 
-#resize_value=$(( $monitor_dimension_y - $((window_g_y / 2)) - $((window_loc_y / 2))  ))
+resize_value=$(( $monitor_dimension_y - $((window_g_y / 2)) - $((window_loc_y / 2))  ))
 
-#case $1 in
-    #'w') resize_up $resize_value $focused_window_id $window_g_y;;
-    #'a') resize_horizontally $resize_value $flag_resized $focused_window_id;;
+case $1 in
+    'w') resize_up $resize_value $focused_window_id $window_g_y;;
+    'a') resize_horizontally $resize_value $flag_resized $focused_window_id;;
 
-    #'1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
-    ## restoring the flag if window was resized vertically
-    #'2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px" && update_window_flag 0;;
-    #'3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px" && update_window_flag 0;;
-    #'4') i3-msg "resize grow width $2 px or $2 ppt, move container left $2 px";;
+    '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
+    # restoring the flag if window was resized vertically
+    '2') i3-msg "resize grow height $2 px or $2 ppt, move container up $2 px" && update_window_flag 0;;
+    '3') i3-msg "resize shrink height $2 px or $2 ppt, move container down $2 px" && update_window_flag 0;;
+    '4') i3-msg "resize grow width $2 px or $2 ppt, move container left $2 px";;
 
-    #'5') i3-msg "resize shrink width $2 px or $2 ppt";;
-    #'6') i3-msg "resize grow height $2 px or $2 ppt" && update_window_flag 0;;
-    #'7') i3-msg "resize shrink height $2 px or $2 ppt" && update_window_flag 0;;
-    #'8') i3-msg "resize grow width $2 px or $2 ppt";;
-#esac
+    '5') i3-msg "resize shrink width $2 px or $2 ppt";;
+    '6') i3-msg "resize grow height $2 px or $2 ppt" && update_window_flag 0;;
+    '7') i3-msg "resize shrink height $2 px or $2 ppt" && update_window_flag 0;;
+    '8') i3-msg "resize grow width $2 px or $2 ppt";;
+esac
