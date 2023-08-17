@@ -8,8 +8,8 @@ fi
 
 MONITOR_DIMENSIONS_FILE=$HOME/.monitor_dimensions.json
 if [[ -f $MONITOR_DIMENSIONS_FILE ]]; then
-    primary_max_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
-    primary_max_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+    monitor_dimension_x=$(grep '"primary_x"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
+    monitor_dimension_y=$(grep '"primary_y"' $MONITOR_DIMENSIONS_FILE | grep -o '[[:digit:]]*')
 fi
 
 CONFIGFILE=$HOME/.scale_float_window.json
@@ -33,7 +33,7 @@ function update_window_flag() {
     jq ".Windows |= $updated_list" $CONFIGFILE | jq . > temp.json && mv temp.json $CONFIGFILE
 }
 
-function resize_vertically() {
+function resize_up() {
     window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
     vertical_diff=$(( $window_g_y - $window_g_y_config ))
 
@@ -42,16 +42,6 @@ function resize_vertically() {
         1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
     esac
 }
-
-#function resize_horizontally() {
-    #window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
-    #vertical_diff=$(( $window_g_y - $window_g_y_config ))
-
-    #case $2 in
-        #0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && update_window_flag 1;;
-        #1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
-    #esac
-#}
 
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 { read window_loc_x window_loc_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | cut -d ":" -f2 | grep -o '[0-9]\+,[0-9]\+' | sed 's/,/ /g')
@@ -62,6 +52,7 @@ echo $window_loc_y
 focused_window_id=$(xdotool getwindowfocus)
 resized_flag=0
 
+# this is bullshit
 if (( $window_g_y == 2104 )); then
     resized_flag=1
 fi
@@ -75,13 +66,13 @@ if [[ -z $result ]]; then
 fi
 
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
-status_bar_width=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
+status_bar_height=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 flag_resized=$(jq ".Windows[] | select(.id == $focused_window_id) | .resized_flag" $CONFIGFILE)
 
-resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_border_width - $window_border_width ))
+resize_value=$(( $monitor_dimension_y - $window_g_y - $status_bar_height - $window_border_width - $window_loc_y ))
 
 case $1 in
-    'w') resize_vertically $resize_value $flag_resized $focused_window_id;;
+    'w') resize_up $resize_value $flag_resized $focused_window_id;;
     'a') resize_horizontally $resize_value $flag_resized $focused_window_id;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
