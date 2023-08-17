@@ -72,8 +72,9 @@ fi
 window_border_width=$(grep '"WindowBorderWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 status_bar_height=$(grep '"StatusBarWidth"' $CONFIGFILE | grep -o '[[:digit:]]*')
 
+offset_value=$(( totalscreensize - focused_container_size - window_centre ))
+echo $offset_value
 resize_value=$(( $monitor_dimension_y - $window_g_y - $TOP_Y_POINT - $window_border_width ))
-echo $resize_value
 
 case $1 in
     'w') resize_up $resize_value $focused_window_id $window_g_y;;
