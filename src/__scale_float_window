@@ -43,7 +43,22 @@ function resize_vertically() {
     esac
 }
 
+#function resize_horizontally() {
+    #window_g_y_config=$(jq ".Windows[] | select(.id == $3) | .window_g_y" $CONFIGFILE)
+    #vertical_diff=$(( $window_g_y - $window_g_y_config ))
+
+    #case $2 in
+        #0) update_window_size $focused_window_id $window_g_y && i3-msg "resize grow height $1 px or $1 ppt, move container up $1" && update_window_flag 1;;
+        #1) i3-msg "resize shrink height $vertical_diff px or $vertical_diff ppt, move container down $vertical_diff" && update_window_flag 0;;
+    #esac
+#}
+
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
+{ read window_loc_x window_loc_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | cut -d ":" -f2 | grep -o '[0-9]\+,[0-9]\+' | sed 's/,/ /g')
+
+echo $window_loc_x
+echo $window_loc_y
+
 focused_window_id=$(xdotool getwindowfocus)
 resized_flag=0
 
@@ -67,6 +82,7 @@ resize_value=$(( $primary_max_y - $window_g_y - $status_bar_width - $window_bord
 
 case $1 in
     'w') resize_vertically $resize_value $flag_resized $focused_window_id;;
+    'a') resize_horizontally $resize_value $flag_resized $focused_window_id;;
 
     '1') i3-msg "resize shrink width $2 px or $2 ppt, move container right $2 px";;
     # restoring the flag if window was resized vertically
