@@ -26,10 +26,10 @@ monitor2_size_x=1314
 #monitor2_size_y=$((2880-1028))
 monitor2_size_y=1852
 
-monitor3_abs_pos_x=5154
-monitor3_abs_pos_y=0
-monitor3_size_x=1566
-monitor3_size_y=1800
+monitor3_abs_pos_x=3840
+monitor3_abs_pos_y=29
+monitor3_size_x=1800
+monitor3_size_y=1700
 
 function dump_monitor_shown_flag() {
     #updated_json=$(jq ".Preset = $1" $CONFIGFILE)
