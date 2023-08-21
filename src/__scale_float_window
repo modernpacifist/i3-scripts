@@ -47,6 +47,10 @@ function resize_up() {
     esac
 }
 
+function widen() {
+    i3-msg "resize grow width $1 px or $1 ppt" && i3-msg "move container left $(($1/2)) px"
+}
+
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 { read window_loc_x window_loc_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | cut -d ":" -f2 | grep -o '[0-9]\+,[0-9]\+' | sed 's/,/ /g')
 
@@ -90,4 +94,6 @@ case $1 in
     '6') i3-msg "resize grow height $2 px or $2 ppt" && update_window_flag 0;;
     '7') i3-msg "resize shrink height $2 px or $2 ppt" && update_window_flag 0;;
     '8') i3-msg "resize grow width $2 px or $2 ppt";;
+
+    'widen') widen $2
 esac
