@@ -25,10 +25,17 @@ CONFIGFILE_BAK="${CONFIGFILE}_bak"
 if [[ ! -s $CONFIGFILE ]]; then
     notify-send --expire-time=3000 "__scale_float_window" "config was overriden!\nTrying to use backup..."
 
-    if [[ -s $CONFIGFILE_BAK ]] && [[ -f $CONFIGFILE_BAK ]]; then
-        cp $CONFIGFILE_BAK $CONFIGFILE && notify-send --expire-time=3000 "__scale_float_window: config was restored"
+    if [[ ! -s $CONFIGFILE_BAK ]]; then
+        notify-send --expire-time=3000 "__scale_float_window: backup config file is empty"
+        exit 1
     fi
 
+    if [[ ! -f $CONFIGFILE_BAK ]]; then
+        notify-send --expire-time=3000 "__scale_float_window: backup config file does not exist"
+        exit 1
+    fi
+
+    cp $CONFIGFILE_BAK $CONFIGFILE && notify-send --expire-time=3000 "__scale_float_window: config was restored"
 fi
 
 TOP_Y_POINT=53
@@ -104,6 +111,6 @@ case $1 in
 esac
 
 # temp backup
-if [[ -s $CONFIGFILE ]]: then
+if [[ -s $CONFIGFILE ]]; then
     cp $CONFIGFILE $CONFIGFILE_BAK
 fi
