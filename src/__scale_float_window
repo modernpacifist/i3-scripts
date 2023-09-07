@@ -23,7 +23,7 @@ fi
 CONFIGFILE_BAK="${CONFIGFILE}_bak"
 # use backup if config file was overriden
 if [[ ! -s $CONFIGFILE ]]; then
-    notify-send --expire-time=3000 "__scale_float_window" "config was overriden!\nTrying to use backup..."
+    notify-send --expire-time=3000 "__scale_float_window" "config was overriden!\nTrying to restore from backup..."
 
     if [[ ! -s $CONFIGFILE_BAK ]]; then
         notify-send --expire-time=3000 "__scale_float_window: backup config file is empty"
@@ -110,7 +110,7 @@ case $1 in
     'widen') widen $2
 esac
 
-# temp backup
+# temp backup mechanism
 if [[ -s $CONFIGFILE ]]; then
     cp $CONFIGFILE $CONFIGFILE_BAK
 fi
