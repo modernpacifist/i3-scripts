@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+# TODO: must create a function for restoration and backup of the config file
+
 if [[ -z $1 ]]; then
     # TODO: this error message with this condition make no sense
     echo '$1 $2 arguments were not specified'
@@ -14,16 +16,22 @@ fi
 
 CONFIGFILE=$HOME/.scale_float_window.json
 if [[ ! -f $CONFIGFILE ]]; then
-    echo 'No config file found'
+    notify-send --expire-time=2000 '__scale_float_window: config was not found'
     exit 1
 fi
 
-TOP_Y_POINT=53
-
-# temp solution for json override
+CONFIGFILE_BAK="${CONFIGFILE}_bak"
+# use backup if config file was overriden
 if [[ ! -s $CONFIGFILE ]]; then
-    cp "${CONFIGFILE}_bak" $CONFIGFILE
+    notify-send --expire-time=3000 "__scale_float_window" "config was overriden!\nTrying to use backup..."
+
+    if [[ -s $CONFIGFILE_BAK ]] && [[ -f $CONFIGFILE_BAK ]]; then
+        cp $CONFIGFILE_BAK $CONFIGFILE && notify-send --expire-time=3000 "__scale_float_window: config was restored"
+    fi
+
 fi
+
+TOP_Y_POINT=53
 
 function update_window_size() {
     updated_list=$(jq ".Windows | map(if .id == $1 then .window_g_y |= $2 else . end)" $CONFIGFILE)
@@ -53,9 +61,6 @@ function widen() {
 
 { read window_g_x window_g_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Geometry | cut -d ":" -f2 | sed 's/ //g' | sed 's/x/ /g')
 { read window_loc_x window_loc_y ; } < <(xdotool getwindowfocus getwindowgeometry | grep Position | cut -d ":" -f2 | grep -o '[0-9]\+,[0-9]\+' | sed 's/,/ /g')
-
-echo $window_loc_x
-echo $window_loc_y
 
 focused_window_id=$(xdotool getwindowfocus)
 resized_flag=0
@@ -97,3 +102,8 @@ case $1 in
 
     'widen') widen $2
 esac
+
+# temp backup
+if [[ -s $CONFIGFILE ]]: then
+    cp $CONFIGFILE $CONFIGFILE_BAK
+fi
