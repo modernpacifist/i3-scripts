@@ -1,0 +1,15 @@
+#!/bin/env bash
+
+if [[ -z $1 ]]; then
+    echo 'No $1 argument was specified'
+    exit 1
+fi
+
+echo $1
+
+available_displays=$(xrandr | grep -w 'connected' | awk '{print $1}')
+
+for d in ${available_displays[@]}; do
+    current_brightness=$(xrandr --verbose --current | grep $d -A5 | tail -n1 | awk -F ": " '{print $2}')
+    xrandr --output $d --brightness $(echo $current_brightness $1 | bc -l)
+done
