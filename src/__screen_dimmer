@@ -9,5 +9,12 @@ available_displays=$(xrandr | grep -w 'connected' | awk '{print $1}')
 
 for d in ${available_displays[@]}; do
     current_brightness=$(xrandr --verbose --current | grep $d -A5 | tail -n1 | awk -F ": " '{print $2}')
-    xrandr --output $d --brightness $(echo $current_brightness $1 | bc -l)
+    res_brightness=$(echo $current_brightness $1 | bc -l)
+
+    lower_interval=$(echo "$res_brightness >= 0.1" | bc -l)
+    upper_interval=$(echo "$res_brightness <= 1" | bc -l)
+
+    if ((lower_interval)) && ((upper_interval)); then
+        xrandr --output $d --brightness $res_brightness
+    fi
 done
