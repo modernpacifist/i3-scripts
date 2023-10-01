@@ -1,14 +1,27 @@
 #!/bin/env bash
 
+AVAILABLE_DISPLAYS=$(xrandr | grep -w 'connected' | awk '{print $1}')
+
+function get_max() {
+    local max=0
+    for decimal in ${@}; do
+        if (( $(echo "$decimal > $max" | bc -l) )); then
+            max=$decimal
+        fi
+    done
+    echo $max
+}
+
 if [[ ! $1 =~ ^[-+]{1}0\.[0-9]+$ ]]; then
-    echo 'No $1 argument was specified'
+    echo 'Brightness change value is in wrong format'
     exit 1
 fi
 
-available_displays=$(xrandr | grep -w 'connected' | awk '{print $1}')
-
-for d in ${available_displays[@]}; do
+res=()
+for d in ${AVAILABLE_DISPLAYS[@]}; do
     current_brightness=$(xrandr --verbose --current | grep $d -A5 | tail -n1 | awk -F ": " '{print $2}')
+    res+=($current_brightness)
+
     res_brightness=$(echo $current_brightness $1 | bc -l)
 
     lower_interval=$(echo "$res_brightness >= 0.1" | bc -l)
@@ -18,3 +31,5 @@ for d in ${available_displays[@]}; do
         xrandr --output $d --brightness $res_brightness
     fi
 done
+
+notify-send --expire-time=1000 "Brightness: $(get_max ${res[@]})"
