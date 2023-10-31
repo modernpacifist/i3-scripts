@@ -3,7 +3,9 @@
 usr_input=$(i3-input -P 'Mark container (press "f" to mark with function keys): ' -l 1)
 USR_INPUT_KEYCODE=$(echo $usr_input | grep -oP "Keypress\s+\K\w+")
 
-if [[ ${USR_INPUT_KEYCODE} == "66" ]]; then
+echo $USR_INPUT_KEYCODE
+
+if [[ ${USR_INPUT_KEYCODE} == "9" ]]; then
     exit 0
 fi
 
@@ -19,6 +21,8 @@ if [[ ${stripped_usr_input} =~ "f" ]]; then
         exit 1
     fi
 fi
+
+echo ${stripped_usr_input}
 
 if [[ ${stripped_usr_input} =~ ^[0-9]{1}$ ]]; then
     i3-msg "mark ${stripped_usr_input}"
