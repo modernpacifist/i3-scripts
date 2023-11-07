@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"os/exec"
 	"os/user"
@@ -14,10 +16,65 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-var JSONFILE string
+const ConfigFilename = ".ScreenDim.json"
 
 type JsonStruct struct {
 	Brightness float64 `json:"currentBrightness"`
+}
+
+type Config struct {
+	Path       string  `json:"-"`
+	Brightness float64 `json:"Brightness"`
+}
+
+func configConstructor(filename string) Config {
+	return Config{
+		Path:       filename,
+		Brightness: 0,
+	}
+}
+
+func (conf *Config) dump() {
+	jsonData, err := json.MarshalIndent(conf, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = ioutil.WriteFile(conf.Path, jsonData, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (conf *Config) updateBrightness(newBrightness float64) {
+	conf.Brightness = newBrightness
+}
+
+func (conf *Config) readFromFile() {
+	file, err := os.Open(conf.Path)
+	if err != nil {
+		log.Fatal("Error opening file:", err)
+	}
+	defer file.Close()
+
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatal("Error reading file:", err)
+	}
+
+	err = json.Unmarshal(content, conf)
+	if err != nil {
+		log.Fatal("Error unmarshaling JSON:", err)
+	}
+}
+
+func NotifySend(brightness float64) {
+	msg := fmt.Sprintf("Brightness: %.1f", brightness)
+	_, err := exec.Command("notify-send", "--expire-time=1000", msg).Output()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func getCurrentBrigthnessXrandr(display string) float64 {
@@ -35,74 +92,47 @@ func getCurrentBrigthnessXrandr(display string) float64 {
 	return num
 }
 
-func getCurrentBrigthnessJson() float64 {
-	file, err := os.Open(JSONFILE)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	var s JsonStruct
-	err = json.NewDecoder(file).Decode(&s)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return s.Brightness
-}
-
-//func changeBrightness(displays []string, currentBrightness float64) {
-	//resBrightness := currentBrightness
-
-	//for _, display := range displays {
-		//c := fmt.Sprintf("xrandr --output $d --brightness $res_brightness", display, resBrightness)
-		//cmd, err := exec.Command("bash", "-c", c)
-	//}
-//}
-
-func dumpJson(jsonFile string, currentBrightness float64) {
-	data := JsonStruct{Brightness: currentBrightness}
-
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	file, err := os.Create(jsonFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	_, err = file.Write(jsonData)
-	if err != nil {
-		log.Fatal(err)
+func SetBrightnessLevel(brightness float64) {
+	outputs, _ := i3.GetOutputs()
+	for _, o := range outputs {
+		if o.Active == true {
+			c := fmt.Sprintf("xrandr --output %s --brightness %f", o.Name, brightness)
+			_, err := exec.Command("bash", "-c", c).Output()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
 }
 
 func getPrimaryOutput() string {
 	outputs, _ := i3.GetOutputs()
-
 	for _, output := range outputs {
 		if output.Primary == true {
 			return output.Name
 		}
 	}
-
 	return ""
 }
 
-func resolveJsonAbsolutePath() string {
+func resolveBrightnessLevel(currentBrightness float64, changeValue float64) float64 {
+	num := currentBrightness + changeValue
+	resBrightness := math.Round(num*10) / 10
+
+	if !(0.1 <= resBrightness && resBrightness <= 1.0) {
+		log.Fatal("Brightness exceeds the allowed interval")
+	}
+
+	return resBrightness
+}
+
+func resolveAbsolutePath(filename string) string {
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return strings.Replace("~/.screen_dim.json", "~", usr.HomeDir, 1)
-}
-
-func init() {
-	JSONFILE = resolveJsonAbsolutePath()
+	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
 }
 
 func main() {
@@ -110,23 +140,34 @@ func main() {
 	flag.Float64Var(&floatValue, "f", 0.0, "Brightness value")
 	flag.Parse()
 
-	fmt.Println(floatValue)
+	if floatValue == 0 {
+		log.Fatal("The brightness level was not specified")
+	}
 
 	primaryOutput := getPrimaryOutput()
 	if primaryOutput == "" {
 		log.Fatal("Could not get primary output")
 	}
 
-	currentBrightness := getCurrentBrigthnessXrandr(primaryOutput)
+	absoluteConfigPath := resolveAbsolutePath(ConfigFilename)
 
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
+	config := configConstructor(absoluteConfigPath)
+
+	_, err := os.Stat(absoluteConfigPath)
+	if os.IsNotExist(err) {
+		currentBrightness := getCurrentBrigthnessXrandr(primaryOutput)
+		config.updateBrightness(currentBrightness)
+		config.dump()
+	} else {
+		config.readFromFile()
 	}
 
-	absJsonPath := strings.Replace(JSONFILE, "~", usr.HomeDir, 1)
-	dumpJson(absJsonPath, currentBrightness)
+	res := resolveBrightnessLevel(config.Brightness, floatValue)
 
-	currentBrightnessJson := getCurrentBrigthnessJson()
-	fmt.Println(currentBrightnessJson)
+	if res != 0 {
+		config.updateBrightness(res)
+		SetBrightnessLevel(config.Brightness)
+		NotifySend(config.Brightness)
+		config.dump()
+	}
 }
