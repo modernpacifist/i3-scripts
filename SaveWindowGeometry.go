@@ -23,6 +23,11 @@ type NodeConfig struct {
 }
 
 func nodeConfigConstructor(node *i3.Node) NodeConfig {
+	mark := getNodeMark(node)
+	if mark == "" {
+		log.Fatal("This node does not contain a mark")
+	}
+
 	return NodeConfig{
 		X:      node.Rect.X,
 		Y:      node.Rect.Y,
@@ -55,6 +60,7 @@ func getFocusedNode() *i3.Node {
 }
 
 func getNodeMark(node *i3.Node) string {
+	// TODO: a bug here if the window contains more than one mark <13-11-23, modernpacifist> //
 	if len(node.Marks) == 0 {
 		return ""
 	}
@@ -134,24 +140,40 @@ func resolveFileAbsolutePath(filename string) string {
 }
 
 func restoreWindowWithParameters(nodeConfig NodeConfig, mark string) {
-	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, nodeConfig.X, nodeConfig.Y - 24, nodeConfig.Width, nodeConfig.Height + 24)
+	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, nodeConfig.X, nodeConfig.Y-24, nodeConfig.Width, nodeConfig.Height+24)
+	i3.RunCommand(cmd)
+}
+
+func showWindowWithParameters(nodeConfig NodeConfig, mark string) {
+	cmd := fmt.Sprintf("[con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, nodeConfig.X, nodeConfig.Y, nodeConfig.Width, nodeConfig.Height)
 	i3.RunCommand(cmd)
 }
 
 func main() {
-	var restore string
+	var restoreFlag string
+	var showFlag string
 
-	flag.StringVar(&restore, "restore", "", "Specify the mark to restore")
+	flag.StringVar(&restoreFlag, "restore", "", "Specify the mark to restore")
+	flag.StringVar(&showFlag, "show", "", "Specify the mark to show")
 
 	flag.Parse()
 
 	configPath := resolveFileAbsolutePath(".SaveWindowGeometry.json")
 	config := ConfigConstructor(configPath)
 
-	if restore != "" {
-		value, exists := config.Nodes[restore]
+	if restoreFlag != "" {
+		value, exists := config.Nodes[restoreFlag]
 		if exists == true {
-			restoreWindowWithParameters(value, restore)
+			restoreWindowWithParameters(value, restoreFlag)
+		}
+
+		os.Exit(0)
+	}
+
+	if showFlag != "" {
+		value, exists := config.Nodes[showFlag]
+		if exists == true {
+			showWindowWithParameters(value, showFlag)
 		}
 
 		os.Exit(0)
