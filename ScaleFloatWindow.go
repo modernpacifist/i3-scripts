@@ -260,6 +260,10 @@ func (wc *WindowConfig) resizeMinusX() {
 	wc.PreviousMinusXValue = val
 }
 
+func (wc *WindowConfig) resizeHorizontally(val int) {
+	i3.RunCommand(fmt.Sprintf("resize grow width %d px, move container left %d px", val, val/2))
+}
+
 func getPrimaryOutputRect() i3.Rect {
 	outputs, err := i3.GetOutputs()
 	if err != nil {
@@ -304,15 +308,15 @@ func init() {
 
 func main() {
 	mode := flag.String("mode", "", "Specify resize mode")
+	widen := flag.Int("widen", 0, "Specify resize widen")
 	flag.Parse()
 
-	if len(*mode) != 1 {
-		log.Fatal(errors.New("The mode flag was not specified"))
+	if *mode == "" && *widen == 0 {
+		log.Fatal("No arguments were specified")
 	}
 
 	focusedNode := getFocusedNode()
 	focusedWindow := WindowConfigConstructor(focusedNode)
-	//fmt.Println(focusedWindow)
 
 	switch *mode {
 	case "w":
@@ -330,6 +334,10 @@ func main() {
 	//case "r":
 	default:
 		log.Fatal(errors.New("The -mode flag must be only of w/s/d/a values"))
+	}
+
+	if *widen != 0 {
+		focusedWindow.resizeHorizontally(*widen)
 	}
 
 	globalMainConfig.Update(focusedWindow)

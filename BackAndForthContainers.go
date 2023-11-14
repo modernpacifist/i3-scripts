@@ -24,6 +24,7 @@ type Config struct {
 func configConstructor(filename string) Config {
 	return Config{
 		Path:               filename,
+		// TODO: this must not be bound by 3, instead a stack must exist <13-11-23, modernpacifist> //
 		PreviousContainers: [3]i3.NodeID{0, 0, 0},
 	}
 }

@@ -15,11 +15,14 @@ import (
 )
 
 type NodeConfig struct {
-	X      int64  `json:"X"`
-	Y      int64  `json:"Y"`
-	Width  int64  `json:"Width"`
-	Height int64  `json:"Height"`
-	Mark   string `json:"Mark"`
+	// TODO: add a node id and adress some of the containers by it <13-11-23, modernpacifist> //
+	ID i3.NodeID `json:"ID"`
+	X      int64 `json:"X"`
+	Y      int64 `json:"Y"`
+	Width  int64 `json:"Width"`
+	Height int64 `json:"Height"`
+	// TODO: having a mark field here is extremely idiotic, since we have a map with keys of marks themselves <13-11-23, modernpacifist> //
+	Mark string `json:"Mark"`
 }
 
 func nodeConfigConstructor(node *i3.Node) NodeConfig {
@@ -29,6 +32,7 @@ func nodeConfigConstructor(node *i3.Node) NodeConfig {
 	}
 
 	return NodeConfig{
+		ID:     node.ID,
 		X:      node.Rect.X,
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
@@ -56,6 +60,20 @@ func getFocusedNode() *i3.Node {
 		log.Fatal(errors.New("Could not find focused node"))
 	}
 
+	return node
+}
+
+func getNodeWithMark(mark string) *i3.Node {
+	i3Tree := getI3Tree()
+
+	node := i3Tree.Root.FindChild(func(n *i3.Node) bool {
+		for _, m := range n.Marks {
+			if m == mark {
+				return true
+			}
+		}
+		return false
+	})
 	return node
 }
 
@@ -119,6 +137,14 @@ func (jc *Config) Update(np NodeConfig) {
 	jc.Nodes[np.Mark] = np
 }
 
+func (jc *Config) UpdateID(np NodeConfig) {
+	if entry, ok := jc.Nodes[np.Mark]; ok {
+		temp := entry
+		temp.ID = np.ID
+		jc.Nodes[np.Mark] = temp
+	}
+}
+
 func (jc *Config) Dump() {
 	jsonData, err := json.MarshalIndent(jc, "", "\t")
 	if err != nil {
@@ -145,16 +171,20 @@ func restoreWindowWithParameters(nodeConfig NodeConfig, mark string) {
 }
 
 func showWindowWithParameters(nodeConfig NodeConfig, mark string) {
-	cmd := fmt.Sprintf("[con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, nodeConfig.X, nodeConfig.Y, nodeConfig.Width, nodeConfig.Height)
-	i3.RunCommand(cmd)
+	cmd := fmt.Sprintf("[con_id=%d] scratchpad show, move absolute position %d %d, resize set %d %d", nodeConfig.ID, nodeConfig.X, nodeConfig.Y, nodeConfig.Width, nodeConfig.Height)
+	i, e := i3.RunCommand(cmd)
+	fmt.Println(i)
+	fmt.Println(e)
 }
 
 func main() {
 	var restoreFlag string
 	var showFlag string
+	var updateFlag string
 
 	flag.StringVar(&restoreFlag, "restore", "", "Specify the mark to restore")
 	flag.StringVar(&showFlag, "show", "", "Specify the mark to show")
+	flag.StringVar(&updateFlag, "update", "", "Specify the mark to show")
 
 	flag.Parse()
 
@@ -163,18 +193,28 @@ func main() {
 
 	if restoreFlag != "" {
 		value, exists := config.Nodes[restoreFlag]
-		if exists == true {
-			restoreWindowWithParameters(value, restoreFlag)
+		if exists == false {
+			os.Exit(0)
 		}
-
-		os.Exit(0)
+		restoreWindowWithParameters(value, restoreFlag)
 	}
 
 	if showFlag != "" {
-		value, exists := config.Nodes[showFlag]
-		if exists == true {
-			showWindowWithParameters(value, showFlag)
+		node, exists := config.Nodes[showFlag]
+		if exists == false {
+			os.Exit(0)
 		}
+		showWindowWithParameters(node, showFlag)
+	}
+
+	if updateFlag != "" {
+		markedNode := getNodeWithMark(updateFlag)
+		if markedNode == nil {
+			os.Exit(0)
+		}
+		nodeConfig := nodeConfigConstructor(markedNode)
+		config.UpdateID(nodeConfig)
+		config.Dump()
 
 		os.Exit(0)
 	}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	//"os"
 	//"flag"
 	"errors"
 	"io/ioutil"
@@ -21,7 +20,6 @@ const globalConfigFilename = ".MoveFloatContainer.json"
 const globalStatusBarDefaultHeight = 53
 
 type NodeConfig struct {
-	//ID     int64  `json:"ID"`
 	ID     i3.NodeID `json:"ID"`
 	X      int64     `json:"X"`
 	Y      int64     `json:"Y"`
