@@ -14,21 +14,35 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
+const (
+	ConfigFilename string = ".ManageFloatContainer.json"
+)
+
 type NodeConfig struct {
 	// TODO: add a node id and adress some of the containers by it <13-11-23, modernpacifist> //
-	ID i3.NodeID `json:"ID"`
-	X      int64 `json:"X"`
-	Y      int64 `json:"Y"`
-	Width  int64 `json:"Width"`
-	Height int64 `json:"Height"`
+	ID     i3.NodeID `json:"ID"`
+	X      int64     `json:"X"`
+	Y      int64     `json:"Y"`
+	Width  int64     `json:"Width"`
+	Height int64     `json:"Height"`
+	Marks  []string  `json:"Marks"`
 	// TODO: having a mark field here is extremely idiotic, since we have a map with keys of marks themselves <13-11-23, modernpacifist> //
-	Mark string `json:"Mark"`
+}
+
+// func getNodeMark(node *i3.Node) string {
+func getNodeMarks(node *i3.Node) []string {
+	// TODO: a bug here if the window contains more than one mark <13-11-23, modernpacifist> //
+	if len(node.Marks) == 0 {
+		return nil
+	}
+	return node.Marks
 }
 
 func nodeConfigConstructor(node *i3.Node) NodeConfig {
-	mark := getNodeMark(node)
-	if mark == "" {
-		log.Fatal("This node does not contain a mark")
+	mark := getNodeMarks(node)
+	//if mark == "" {
+	if mark == nil {
+		log.Fatal("This node does not have marks")
 	}
 
 	return NodeConfig{
@@ -37,7 +51,7 @@ func nodeConfigConstructor(node *i3.Node) NodeConfig {
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
 		Height: node.Rect.Height,
-		Mark:   getNodeMark(node),
+		Marks:  getNodeMarks(node),
 	}
 }
 
@@ -57,7 +71,7 @@ func getFocusedNode() *i3.Node {
 	})
 
 	if node == nil {
-		log.Fatal(errors.New("Could not find focused node"))
+		log.Fatal(errors.New("Could not get focused node"))
 	}
 
 	return node
@@ -75,14 +89,6 @@ func getNodeWithMark(mark string) *i3.Node {
 		return false
 	})
 	return node
-}
-
-func getNodeMark(node *i3.Node) string {
-	// TODO: a bug here if the window contains more than one mark <13-11-23, modernpacifist> //
-	if len(node.Marks) == 0 {
-		return ""
-	}
-	return node.Marks[0]
 }
 
 type Config struct {
@@ -133,15 +139,19 @@ func ConfigConstructor(configFileLoc string) Config {
 	return config
 }
 
-func (jc *Config) Update(np NodeConfig) {
-	jc.Nodes[np.Mark] = np
+func (jc *Config) Update(np NodeConfig, mark string) {
+	//jc.Nodes[np.Mark] = np
+	jc.Nodes[mark] = np
 }
 
-func (jc *Config) UpdateID(np NodeConfig) {
-	if entry, ok := jc.Nodes[np.Mark]; ok {
+// func (jc *Config) UpdateID(np NodeConfig) {
+func (jc *Config) UpdateID(np NodeConfig, mark string) {
+	//if entry, ok := jc.Nodes[np.Mark]; ok {
+	if entry, ok := jc.Nodes[mark]; ok {
 		temp := entry
 		temp.ID = np.ID
-		jc.Nodes[np.Mark] = temp
+		//jc.Nodes[np.Mark] = temp
+		jc.Nodes[mark] = temp
 	}
 }
 
@@ -170,7 +180,7 @@ func restoreWindowWithParameters(nodeConfig NodeConfig, mark string) {
 	i3.RunCommand(cmd)
 }
 
-func showWindowWithParameters(nodeConfig NodeConfig, mark string) {
+func showWindowWithParameters(nodeConfig NodeConfig) {
 	cmd := fmt.Sprintf("[con_id=%d] scratchpad show, move absolute position %d %d, resize set %d %d", nodeConfig.ID, nodeConfig.X, nodeConfig.Y, nodeConfig.Width, nodeConfig.Height)
 	i, e := i3.RunCommand(cmd)
 	fmt.Println(i)
@@ -181,15 +191,18 @@ func main() {
 	var restoreFlag string
 	var showFlag string
 	var updateFlag string
+	var resetFlag bool
 
+	// TODO: use only one argument and use switch statement <15-11-23, modernpacifist> //
 	flag.StringVar(&restoreFlag, "restore", "", "Specify the mark to restore")
 	flag.StringVar(&showFlag, "show", "", "Specify the mark to show")
 	flag.StringVar(&updateFlag, "update", "", "Specify the mark to show")
+	flag.BoolVar(&resetFlag, "reset", false, "Specify the mark to show")
 
 	flag.Parse()
 
-	configPath := resolveFileAbsolutePath(".SaveWindowGeometry.json")
-	config := ConfigConstructor(configPath)
+	absoluteConfigPath := resolveFileAbsolutePath(ConfigFilename)
+	config := ConfigConstructor(absoluteConfigPath)
 
 	if restoreFlag != "" {
 		value, exists := config.Nodes[restoreFlag]
@@ -204,23 +217,36 @@ func main() {
 		if exists == false {
 			os.Exit(0)
 		}
-		showWindowWithParameters(node, showFlag)
+		showWindowWithParameters(node)
 	}
 
 	if updateFlag != "" {
 		markedNode := getNodeWithMark(updateFlag)
+		fmt.Println(markedNode)
 		if markedNode == nil {
 			os.Exit(0)
 		}
-		nodeConfig := nodeConfigConstructor(markedNode)
-		config.UpdateID(nodeConfig)
-		config.Dump()
 
+		var nodeConfig NodeConfig
+		// if the node with this mark does not exist add it to config
+		configNode, exists := config.Nodes[updateFlag]
+		fmt.Println(configNode)
+		//nodeConfig, exists := config.Nodes[updateFlag]
+		if exists == false {
+			nodeConfig = nodeConfigConstructor(markedNode)
+			//nodeConfig.Mark = updateFlag
+			config.Update(nodeConfig, updateFlag)
+		}
+
+		nodeConfig = nodeConfigConstructor(markedNode)
+		//nodeConfig.Mark = updateFlag
+		config.UpdateID(nodeConfig, updateFlag)
+		config.Dump()
 		os.Exit(0)
 	}
 
 	focusedNode := getFocusedNode()
 	nodeConfig := nodeConfigConstructor(focusedNode)
-	config.Update(nodeConfig)
+	config.Update(nodeConfig, nodeConfig.Marks[0])
 	config.Dump()
 }

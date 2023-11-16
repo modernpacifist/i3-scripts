@@ -16,8 +16,11 @@ import (
 
 // TODO: must add checks for errors in i3.RunCommand <27-10-23, modernpacifist> //
 
-var i3Tree i3.Tree
-var globalMainConfig JsonConfig
+const (
+	ConfigFilename string = ".ScaleFloatWindow.json"
+)
+
+var globalConfig JsonConfig
 var globalMonitorDimensions i3.Rect
 
 type WindowConfig struct {
@@ -47,7 +50,7 @@ func getNodeMark(node *i3.Node) string {
 func resolveResizedFlags(node *i3.Node, flagname string) bool {
 	switch flagname {
 	case "plusY":
-		return node.Rect.Y == globalMainConfig.StatusBarHeight
+		return node.Rect.Y == globalConfig.StatusBarHeight
 	case "minusY":
 		return node.Rect.Height == globalMonitorDimensions.Height-node.Rect.Y
 	case "plusX":
@@ -61,7 +64,7 @@ func resolveResizedFlags(node *i3.Node, flagname string) bool {
 func getPreviousResizeValues(node *i3.Node) map[string]int64 {
 	resMap := make(map[string]int64)
 
-	for _, n := range globalMainConfig.Windows {
+	for _, n := range globalConfig.Windows {
 		if n.ID == node.Window {
 			resMap["plusY"] = n.PreviousPlusYValue
 			resMap["minusY"] = n.PreviousMinusYValue
@@ -81,6 +84,11 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 	plusX, _ := previousResizeValuesMap["plusX"]
 	minusX, _ := previousResizeValuesMap["minusX"]
 
+	nodeMark := getNodeMark(node)
+	if nodeMark == "" {
+		log.Fatal("This node does not contain a mark")
+	}
+
 	return WindowConfig{
 		ID:                  node.Window,
 		ResizedPlusYFlag:    resolveResizedFlags(node, "plusY"),
@@ -91,7 +99,7 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 		Y:                   node.Rect.Y,
 		Width:               node.Rect.Width,
 		Height:              node.Rect.Height,
-		Mark:                getNodeMark(node),
+		Mark:                nodeMark,
 		PreviousPlusYValue:  plusY,
 		PreviousMinusYValue: minusY,
 		PreviousPlusXValue:  plusX,
@@ -168,6 +176,8 @@ func (jc *JsonConfig) Dump() {
 }
 
 func getFocusedNode() *i3.Node {
+	i3Tree := getI3Tree()
+
 	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
 		return n.Focused == true
 	})
@@ -180,7 +190,7 @@ func getFocusedNode() *i3.Node {
 }
 
 func (wc *WindowConfig) resizePlusY() {
-	val := wc.Y - globalMainConfig.StatusBarHeight
+	val := wc.Y - globalConfig.StatusBarHeight
 	if val == 0 {
 		wc.ResizedPlusYFlag = true
 		val = -wc.PreviousPlusYValue
@@ -190,7 +200,7 @@ func (wc *WindowConfig) resizePlusY() {
 	i3.RunCommand(fmt.Sprintf("resize grow height %d px, move container up %d px", val, val))
 
 	wc.Y -= val
-	if wc.Y == globalMainConfig.StatusBarHeight {
+	if wc.Y == globalConfig.StatusBarHeight {
 		wc.ResizedPlusYFlag = true
 	} else {
 		wc.ResizedPlusYFlag = false
@@ -260,6 +270,16 @@ func (wc *WindowConfig) resizeMinusX() {
 	wc.PreviousMinusXValue = val
 }
 
+func (wc *WindowConfig) resetGeometry() {
+	node, exists := globalConfig.Windows[wc.Mark]
+	if exists == false {
+		os.Exit(0)
+	}
+
+	cmd := fmt.Sprintf("move absolute position %d %d, resize set %d %d", node.X, node.Y, node.Width, node.Height)
+	i3.RunCommand(cmd)
+}
+
 func (wc *WindowConfig) resizeHorizontally(val int) {
 	i3.RunCommand(fmt.Sprintf("resize grow width %d px, move container left %d px", val, val/2))
 }
@@ -298,9 +318,8 @@ func resolveJsonAbsolutePath(filename string) string {
 }
 
 func init() {
-	i3Tree = getI3Tree()
-	configFileLoc := resolveJsonAbsolutePath(".ScaleFloatWindow.json")
-	globalMainConfig = JsonConfigConstructor(configFileLoc)
+	configFileLoc := resolveJsonAbsolutePath(ConfigFilename)
+	globalConfig = JsonConfigConstructor(configFileLoc)
 
 	// TODO: this must not be like this <28-10-23, modernpacifist> //
 	globalMonitorDimensions = getPrimaryOutputRect()
@@ -331,15 +350,17 @@ func main() {
 	case "f":
 
 	// TODO: reset the size of the floating window to its default <29-10-23, modernpacifist> //
-	//case "r":
-	default:
-		log.Fatal(errors.New("The -mode flag must be only of w/s/d/a values"))
+	case "r":
+		focusedWindow.resetGeometry()
+	//default:
+		//log.Fatal(errors.New("The -mode flag must be only of w/s/d/a values"))
 	}
 
+	// TODO: this also must be in switch<15-11-23, modernpacifist> //
 	if *widen != 0 {
 		focusedWindow.resizeHorizontally(*widen)
 	}
 
-	globalMainConfig.Update(focusedWindow)
-	globalMainConfig.Dump()
+	globalConfig.Update(focusedWindow)
+	globalConfig.Dump()
 }

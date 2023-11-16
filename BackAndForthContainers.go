@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"os"
 	"os/user"
 	"strings"
@@ -13,8 +14,11 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-const Mark = "last"
-const ConfigFilename = ".BackAndForthContainer.json"
+const (
+	PreviousContainerMark string = "last"
+	ConfigFilename        string = ".BackAndForthContainer.json"
+	globalDaemonPort      string = ":63333"
+)
 
 type Config struct {
 	Path               string       `json:"-"`
@@ -23,7 +27,7 @@ type Config struct {
 
 func configConstructor(filename string) Config {
 	return Config{
-		Path:               filename,
+		Path: filename,
 		// TODO: this must not be bound by 3, instead a stack must exist <13-11-23, modernpacifist> //
 		PreviousContainers: [3]i3.NodeID{0, 0, 0},
 	}
@@ -96,7 +100,7 @@ func getFocusedNode(i3Tree i3.Tree) *i3.Node {
 func getPreviousNode(i3Tree i3.Tree) *i3.Node {
 	node := i3Tree.Root.FindChild(func(n *i3.Node) bool {
 		for _, m := range n.Marks {
-			if m == Mark {
+			if m == PreviousContainerMark {
 				return true
 			}
 		}
@@ -110,15 +114,22 @@ func focus(node *i3.Node) {
 }
 
 func mark(node *i3.Node) {
-	i3.RunCommand(fmt.Sprintf("[con_id=%d] mark --add %s", node.ID, Mark))
+	i3.RunCommand(fmt.Sprintf("[con_id=%d] mark --add %s", node.ID, PreviousContainerMark))
 }
 
 func markID(nodeID i3.NodeID) {
-	i3.RunCommand(fmt.Sprintf("[con_id=%d] mark --add %s", nodeID, Mark))
+	i3.RunCommand(fmt.Sprintf("[con_id=%d] mark --add %s", nodeID, PreviousContainerMark))
 }
 
 func RunDaemon(i3Tree i3.Tree, config Config) {
 	recv := i3.Subscribe(i3.WindowEventType)
+
+	ln, err := net.Listen("tcp", globalDaemonPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ln.Close()
+
 	for recv.Next() {
 		ev := recv.Event().(*i3.WindowEvent)
 		if ev.Change == "focus" {
@@ -141,6 +152,16 @@ func resolveAbsolutePath(filename string) string {
 	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
 }
 
+func checkDaemonPortAvailability() bool {
+	ln, err := net.Listen("tcp", globalDaemonPort)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	defer ln.Close()
+	return true
+}
+
 func main() {
 	var daemon bool
 
@@ -160,6 +181,10 @@ func main() {
 	}
 
 	if daemon == true {
+		if checkDaemonPortAvailability() == false {
+			log.Fatal("Another instance of the daemon is already running")
+		}
+
 		RunDaemon(i3Tree, config)
 		os.Exit(0)
 	}
@@ -167,6 +192,7 @@ func main() {
 	focusedNode := getFocusedNode(i3Tree)
 
 	var previousNode *i3.Node
+	//previousNode = getPreviousNode(i3Tree)
 	previousNode = getPreviousNode(i3Tree)
 	if previousNode == nil {
 		lastFocusedContainerID := config.PreviousContainers[len(config.PreviousContainers)-1]

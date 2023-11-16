@@ -14,7 +14,10 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-const globalConfigFilename = ".MoveFloatContainer.json"
+const (
+	ConfigFilename string =  ".MoveFloatWindow.json"
+	
+)
 
 // TODO: this must not be constant <05-11-23, modernpacifist> //
 const globalStatusBarDefaultHeight = 53
