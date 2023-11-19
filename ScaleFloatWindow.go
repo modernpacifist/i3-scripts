@@ -84,6 +84,7 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 	plusX, _ := previousResizeValuesMap["plusX"]
 	minusX, _ := previousResizeValuesMap["minusX"]
 
+	// TODO: is the node does not contain a mark, just use a container id <17-11-23, modernpacifist> //
 	nodeMark := getNodeMark(node)
 	if nodeMark == "" {
 		log.Fatal("This node does not contain a mark")
@@ -352,7 +353,7 @@ func main() {
 	// TODO: reset the size of the floating window to its default <29-10-23, modernpacifist> //
 	case "r":
 		focusedWindow.resetGeometry()
-	//default:
+		//default:
 		//log.Fatal(errors.New("The -mode flag must be only of w/s/d/a values"))
 	}
 

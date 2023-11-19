@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
@@ -18,7 +17,7 @@ const (
 	ConfigFilename string = ".ManageFloatContainer.json"
 )
 
-type NodeConfig struct {
+type ContainerParameters struct {
 	// TODO: add a node id and adress some of the containers by it <13-11-23, modernpacifist> //
 	ID     i3.NodeID `json:"ID"`
 	X      int64     `json:"X"`
@@ -29,8 +28,7 @@ type NodeConfig struct {
 	// TODO: having a mark field here is extremely idiotic, since we have a map with keys of marks themselves <13-11-23, modernpacifist> //
 }
 
-// func getNodeMark(node *i3.Node) string {
-func getNodeMarks(node *i3.Node) []string {
+func getContainerMarks(node *i3.Node) []string {
 	// TODO: a bug here if the window contains more than one mark <13-11-23, modernpacifist> //
 	if len(node.Marks) == 0 {
 		return nil
@@ -38,20 +36,24 @@ func getNodeMarks(node *i3.Node) []string {
 	return node.Marks
 }
 
-func nodeConfigConstructor(node *i3.Node) NodeConfig {
-	mark := getNodeMarks(node)
-	//if mark == "" {
-	if mark == nil {
-		log.Fatal("This node does not have marks")
-	}
+func containerParametersConstructor(node *i3.Node) ContainerParameters {
+	conMarks := getContainerMarks(node)
+	//if conMarks == nil {
+	//conMarks = []string
+	////log.Fatal("This node does not have marks")
+	//}
+	//if len(conMarks) == 0 {
+	//conMarks = []string
+	////log.Fatal("This node does not have marks")
+	//}
 
-	return NodeConfig{
+	return ContainerParameters{
 		ID:     node.ID,
 		X:      node.Rect.X,
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
 		Height: node.Rect.Height,
-		Marks:  getNodeMarks(node),
+		Marks:  conMarks,
 	}
 }
 
@@ -88,12 +90,13 @@ func getNodeWithMark(mark string) *i3.Node {
 		}
 		return false
 	})
+
 	return node
 }
 
 type Config struct {
-	Location string                `json:"-"`
-	Nodes    map[string]NodeConfig `json:"Nodes"`
+	Location string                         `json:"-"`
+	Nodes    map[string]ContainerParameters `json:"Nodes"`
 }
 
 func createConfigFile(configFileLoc string) {
@@ -119,7 +122,7 @@ func ConfigConstructor(configFileLoc string) Config {
 		createConfigFile(configFileLoc)
 	}
 
-	jsonData, err := ioutil.ReadFile(configFileLoc)
+	jsonData, err := os.ReadFile(configFileLoc)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -133,35 +136,33 @@ func ConfigConstructor(configFileLoc string) Config {
 	}
 
 	if config.Nodes == nil {
-		config.Nodes = make(map[string]NodeConfig)
+		config.Nodes = make(map[string]ContainerParameters)
 	}
 
 	return config
 }
 
-func (jc *Config) Update(np NodeConfig, mark string) {
-	//jc.Nodes[np.Mark] = np
-	jc.Nodes[mark] = np
+func (conf *Config) Update(cp ContainerParameters, mark string) {
+	//jc.Nodes[cp.Mark] = cp
+	conf.Nodes[mark] = cp
 }
 
-// func (jc *Config) UpdateID(np NodeConfig) {
-func (jc *Config) UpdateID(np NodeConfig, mark string) {
-	//if entry, ok := jc.Nodes[np.Mark]; ok {
-	if entry, ok := jc.Nodes[mark]; ok {
+func (conf *Config) UpdateID(cp ContainerParameters, mark string) {
+	//if entry, ok := jc.Nodes[cp.Mark]; ok {
+	if entry, ok := conf.Nodes[mark]; ok {
 		temp := entry
-		temp.ID = np.ID
-		//jc.Nodes[np.Mark] = temp
-		jc.Nodes[mark] = temp
+		temp.ID = cp.ID
+		conf.Nodes[mark] = temp
 	}
 }
 
-func (jc *Config) Dump() {
-	jsonData, err := json.MarshalIndent(jc, "", "\t")
+func (conf *Config) Dump() {
+	jsonData, err := json.MarshalIndent(conf, "", "\t")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(jc.Location, jsonData, 0644)
+	err = os.WriteFile(conf.Location, jsonData, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -175,13 +176,18 @@ func resolveFileAbsolutePath(filename string) string {
 	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
 }
 
-func restoreWindowWithParameters(nodeConfig NodeConfig, mark string) {
-	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, nodeConfig.X, nodeConfig.Y-24, nodeConfig.Width, nodeConfig.Height+24)
+func createFloatingContainer(conParams ContainerParameters, mark string) {
+	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, conParams.X, conParams.Y-24, conParams.Width, conParams.Height+24)
 	i3.RunCommand(cmd)
 }
 
-func showWindowWithParameters(nodeConfig NodeConfig) {
-	cmd := fmt.Sprintf("[con_id=%d] scratchpad show, move absolute position %d %d, resize set %d %d", nodeConfig.ID, nodeConfig.X, nodeConfig.Y, nodeConfig.Width, nodeConfig.Height)
+func createFloatingContainerDefault(conParams ContainerParameters, mark string) {
+	cmd := fmt.Sprintf("mark --add \"%s\", floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height+24)
+	i3.RunCommand(cmd)
+}
+
+func showContainer(conParams ContainerParameters) {
+	cmd := fmt.Sprintf("[con_id=%d] scratchpad show, move absolute position %d %d, resize set %d %d", conParams.ID, conParams.X, conParams.Y, conParams.Width, conParams.Height)
 	i, e := i3.RunCommand(cmd)
 	fmt.Println(i)
 	fmt.Println(e)
@@ -191,13 +197,13 @@ func main() {
 	var restoreFlag string
 	var showFlag string
 	var updateFlag string
-	var resetFlag bool
+	var saveFlag bool
 
 	// TODO: use only one argument and use switch statement <15-11-23, modernpacifist> //
 	flag.StringVar(&restoreFlag, "restore", "", "Specify the mark to restore")
 	flag.StringVar(&showFlag, "show", "", "Specify the mark to show")
 	flag.StringVar(&updateFlag, "update", "", "Specify the mark to show")
-	flag.BoolVar(&resetFlag, "reset", false, "Specify the mark to show")
+	flag.BoolVar(&saveFlag, "save", false, "Specify the mark to show")
 
 	flag.Parse()
 
@@ -205,11 +211,20 @@ func main() {
 	config := ConfigConstructor(absoluteConfigPath)
 
 	if restoreFlag != "" {
-		value, exists := config.Nodes[restoreFlag]
+		containerParameters, exists := config.Nodes[restoreFlag]
 		if exists == false {
+			// TODO: restore with some arbitrary values <17-11-23, modernpacifist> //
+			focusedNode := getFocusedNode()
+			containerParameters = containerParametersConstructor(focusedNode)
+
+			containerParameters.Width = 2000
+			containerParameters.Height = 1000
+
+			createFloatingContainerDefault(containerParameters, restoreFlag)
+
 			os.Exit(0)
 		}
-		restoreWindowWithParameters(value, restoreFlag)
+		createFloatingContainer(containerParameters, restoreFlag)
 	}
 
 	if showFlag != "" {
@@ -217,7 +232,7 @@ func main() {
 		if exists == false {
 			os.Exit(0)
 		}
-		showWindowWithParameters(node)
+		showContainer(node)
 	}
 
 	if updateFlag != "" {
@@ -227,26 +242,27 @@ func main() {
 			os.Exit(0)
 		}
 
-		var nodeConfig NodeConfig
+		var nodeConfig ContainerParameters
 		// if the node with this mark does not exist add it to config
 		configNode, exists := config.Nodes[updateFlag]
 		fmt.Println(configNode)
 		//nodeConfig, exists := config.Nodes[updateFlag]
 		if exists == false {
-			nodeConfig = nodeConfigConstructor(markedNode)
+			nodeConfig = containerParametersConstructor(markedNode)
 			//nodeConfig.Mark = updateFlag
 			config.Update(nodeConfig, updateFlag)
 		}
 
-		nodeConfig = nodeConfigConstructor(markedNode)
+		nodeConfig = containerParametersConstructor(markedNode)
 		//nodeConfig.Mark = updateFlag
 		config.UpdateID(nodeConfig, updateFlag)
 		config.Dump()
-		os.Exit(0)
 	}
 
-	focusedNode := getFocusedNode()
-	nodeConfig := nodeConfigConstructor(focusedNode)
-	config.Update(nodeConfig, nodeConfig.Marks[0])
-	config.Dump()
+	if saveFlag == true {
+		focusedNode := getFocusedNode()
+		nodeConfig := containerParametersConstructor(focusedNode)
+		config.Update(nodeConfig, nodeConfig.Marks[0])
+		config.Dump()
+	}
 }

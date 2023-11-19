@@ -38,8 +38,8 @@ func getNodeMark(node *i3.Node) string {
 	return node.Marks[0]
 }
 
-func nodeConfigConstructor(node *i3.Node) NodeConfig {
-	return NodeConfig{
+func nodeConfigConstructor(node *i3.Node) ContainerParameters {
+	return ContainerParameters{
 		ID:     node.ID,
 		X:      node.Rect.X,
 		Y:      node.Rect.Y,
@@ -51,7 +51,7 @@ func nodeConfigConstructor(node *i3.Node) NodeConfig {
 
 type JsonConfig struct {
 	Location string                `json:"-"`
-	Nodes    map[string]NodeConfig `json:"Nodes"`
+	Nodes    map[string]ContainerParameters `json:"Nodes"`
 }
 
 func createJsonConfigFile(configFileLoc string) {
@@ -72,7 +72,7 @@ func createJsonConfigFile(configFileLoc string) {
 
 }
 
-func (jc *JsonConfig) Update(np NodeConfig) {
+func (jc *JsonConfig) Update(np ContainerParameters) {
 	jc.Nodes[np.Mark] = np
 }
 
@@ -145,7 +145,7 @@ func main() {
 	i3Tree := getI3Tree()
 	node := getFocusedNode(i3Tree)
 	//fmt.Println(node)
-	ndconf := nodeConfigConstructor(node)
+	ndconf := containerParametersConstructor(node)
 	fmt.Println(ndconf)
 
 	//focusedNodeMark := getNodeMark(node)
