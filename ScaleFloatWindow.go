@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
@@ -116,7 +115,8 @@ type JsonConfig struct {
 
 func createJsonConfigFile(configFileLoc string) {
 	var jsonConfig JsonConfig
-	jsonConfig.StatusBarHeight = 53
+	// default value
+	jsonConfig.StatusBarHeight = 29
 
 	file, err := os.Create(configFileLoc)
 	if err != nil {
@@ -140,7 +140,7 @@ func JsonConfigConstructor(configFileLoc string) JsonConfig {
 		createJsonConfigFile(configFileLoc)
 	}
 
-	jsonData, err := ioutil.ReadFile(configFileLoc)
+	jsonData, err := os.ReadFile(configFileLoc)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -170,7 +170,7 @@ func (jc *JsonConfig) Dump() {
 		log.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(jc.Location, jsonData, 0644)
+	err = os.WriteFile(jc.Location, jsonData, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

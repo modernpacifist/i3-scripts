@@ -177,12 +177,13 @@ func resolveFileAbsolutePath(filename string) string {
 }
 
 func createFloatingContainer(conParams ContainerParameters, mark string) {
-	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, conParams.X, conParams.Y-24, conParams.Width, conParams.Height+24)
+	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, conParams.X, conParams.Y, conParams.Width, conParams.Height)
 	i3.RunCommand(cmd)
 }
 
 func createFloatingContainerDefault(conParams ContainerParameters, mark string) {
-	cmd := fmt.Sprintf("mark --add \"%s\", floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height+24)
+	//cmd := fmt.Sprintf("mark --add \"%s\", floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height+24)
+	cmd := fmt.Sprintf("mark --add \"%s\", move scratchpad, scratchpad show, floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height)
 	i3.RunCommand(cmd)
 }
 

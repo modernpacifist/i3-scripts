@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -39,7 +38,7 @@ func (conf *Config) dump() {
 		log.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(conf.Path, jsonData, 0644)
+	err = os.WriteFile(conf.Path, jsonData, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,12 +68,9 @@ func (conf *Config) readFromFile() {
 	}
 	defer file.Close()
 
-	content, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal("Error reading file:", err)
-	}
+	decoder := json.NewDecoder(file)
 
-	err = json.Unmarshal(content, &conf)
+	err = decoder.Decode(&conf)
 	if err != nil {
 		log.Fatal("Error unmarshaling JSON:", err)
 	}
