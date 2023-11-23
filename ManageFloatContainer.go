@@ -57,6 +57,27 @@ func containerParametersConstructor(node *i3.Node) ContainerParameters {
 	}
 }
 
+func containerParametersFactory(node *i3.Node) ContainerParameters {
+	conMarks := getContainerMarks(node)
+	//if conMarks == nil {
+	//conMarks = []string
+	////log.Fatal("This node does not have marks")
+	//}
+	//if len(conMarks) == 0 {
+	//conMarks = []string
+	////log.Fatal("This node does not have marks")
+	//}
+
+	return ContainerParameters{
+		ID:     node.ID,
+		X:      node.Rect.X,
+		Y:      node.Rect.Y,
+		Width:  node.Rect.Width,
+		Height: node.Rect.Height,
+		Marks:  conMarks,
+	}
+}
+
 func getI3Tree() i3.Tree {
 	tree, err := i3.GetTree()
 	if err != nil {
@@ -183,7 +204,7 @@ func createFloatingContainer(conParams ContainerParameters, mark string) {
 
 func createFloatingContainerDefault(conParams ContainerParameters, mark string) {
 	//cmd := fmt.Sprintf("mark --add \"%s\", floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height+24)
-	cmd := fmt.Sprintf("mark --add \"%s\", move scratchpad, scratchpad show, floating enable, resize set %d %d, move position center", mark, conParams.Width, conParams.Height)
+	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, floating enable, resize set %d %d, move position center", mark, mark, conParams.Width, conParams.Height)
 	i3.RunCommand(cmd)
 }
 
@@ -220,8 +241,12 @@ func main() {
 
 			containerParameters.Width = 2000
 			containerParameters.Height = 1000
+			containerParameters.Marks = []string{restoreFlag}
 
 			createFloatingContainerDefault(containerParameters, restoreFlag)
+
+			config.Update(containerParameters, restoreFlag)
+			config.Dump()
 
 			os.Exit(0)
 		}
