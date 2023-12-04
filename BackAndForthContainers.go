@@ -28,6 +28,7 @@ func configConstructor(filename string) Config {
 	return Config{
 		Path: filename,
 		// TODO: this must not be bound by 3, instead a stack must exist <13-11-23, modernpacifist> //
+		// chance this is not needed to be dumped into the file, since the daemon inits with the system
 		PreviousContainers: [3]i3.NodeID{0, 0, 0},
 	}
 }

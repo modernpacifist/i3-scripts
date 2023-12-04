@@ -15,8 +15,7 @@ import (
 )
 
 const (
-	ConfigFilename string =  ".MoveFloatWindow.json"
-	
+	ConfigFilename string = ".MoveFloatWindow.json"
 )
 
 // TODO: this must not be constant <05-11-23, modernpacifist> //
@@ -50,7 +49,7 @@ func nodeConfigConstructor(node *i3.Node) ContainerParameters {
 }
 
 type JsonConfig struct {
-	Location string                `json:"-"`
+	Location string                         `json:"-"`
 	Nodes    map[string]ContainerParameters `json:"Nodes"`
 }
 

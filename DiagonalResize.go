@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 
 	"go.i3wm.org/i3/v4"
 )

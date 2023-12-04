@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -11,7 +12,7 @@ import (
 func getKbdlayout() string {
 	out, err := exec.Command("bash", "-c", "setxkbmap -query | awk '/layout/{print $2}'").Output()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return strings.TrimSuffix(string(out), "\n")
 }
@@ -53,7 +54,8 @@ func main() {
 	flag.Parse()
 
 	if *layouts == "" {
-		panic("layouts flag was not specified")
+		//panic("layouts flag was not specified")
+		log.Fatalln("layouts flag was not specified")
 	}
 
 	layoutsArray := strings.Split(*layouts, "/")

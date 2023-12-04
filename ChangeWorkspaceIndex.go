@@ -1,12 +1,12 @@
 package main
 
 import (
-	"os"
 	"errors"
 	"flag"
 	"fmt"
-	"strings"
+	"os"
 	"os/exec"
+	"strings"
 
 	"go.i3wm.org/i3/v4"
 )

@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"strings"
 
+	"i3-integration/utils"
+
 	"go.i3wm.org/i3/v4"
 )
 
@@ -65,15 +67,6 @@ func (conf *Config) readFromFile() {
 	err = json.Unmarshal(content, conf)
 	if err != nil {
 		log.Fatal("Error unmarshaling JSON:", err)
-	}
-}
-
-func NotifySend(brightness float64) {
-	msg := fmt.Sprintf("Brightness: %.1f", brightness)
-	_, err := exec.Command("notify-send", "--expire-time=1000", msg).Output()
-	if err != nil {
-		fmt.Println(err)
-		return
 	}
 }
 
@@ -167,7 +160,7 @@ func main() {
 	if res != 0 {
 		config.updateBrightness(res)
 		SetBrightnessLevel(config.Brightness)
-		NotifySend(config.Brightness)
+		utils.NotifySend(1, fmt.Sprintf("Current brightness: %.1f", config.Brightness))
 		config.dump()
 	}
 }
