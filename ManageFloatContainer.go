@@ -10,6 +10,8 @@ import (
 	"os/user"
 	"strings"
 
+	"i3-integration/utils"
+
 	"go.i3wm.org/i3/v4"
 )
 
@@ -164,12 +166,10 @@ func ConfigConstructor(configFileLoc string) Config {
 }
 
 func (conf *Config) Update(cp ContainerParameters, mark string) {
-	//jc.Nodes[cp.Mark] = cp
 	conf.Nodes[mark] = cp
 }
 
 func (conf *Config) UpdateID(cp ContainerParameters, mark string) {
-	//if entry, ok := jc.Nodes[cp.Mark]; ok {
 	if entry, ok := conf.Nodes[mark]; ok {
 		temp := entry
 		temp.ID = cp.ID
@@ -290,5 +290,7 @@ func main() {
 		nodeConfig := containerParametersConstructor(focusedNode)
 		config.Update(nodeConfig, nodeConfig.Marks[0])
 		config.Dump()
+
+		utils.NotifySend(0.5, fmt.Sprintf("Saved mark %s", nodeConfig.Marks[0]))
 	}
 }

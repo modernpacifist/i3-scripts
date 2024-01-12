@@ -2,37 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"os/exec"
+	"strings"
 
 	"go.i3wm.org/i3/v4"
+
+	"i3-integration/utils"
 )
 
-func runi3Input() string {
-	output, err := exec.Command("bash", "-c", "i3-input -P \"Append title: \" | grep -oP \"output = \\K.*\" | tr -d '\n'").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return string(output)
-}
-
-func getFocusedWorkspaceNum() int64 {
-	var res int64
-	o, err := i3.GetWorkspaces()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	for _, ws := range o {
-		if ws.Focused == true {
-			res = ws.Num
-		}
-	}
-
-	return res
+func replaceSpacesWithUnderscore(s string) string {
+	trimmed := strings.TrimSpace(s)
+	return strings.ReplaceAll(trimmed, " ", "_")
 }
 
 func renamei3Ws(wsIndex int64, newName string) {
@@ -41,6 +21,7 @@ func renamei3Ws(wsIndex int64, newName string) {
 	if newName == "" {
 		cmdString = fmt.Sprintf("rename workspace to %d", wsIndex)
 	} else {
+		newName = replaceSpacesWithUnderscore(newName)
 		cmdString = fmt.Sprintf("rename workspace to %d:%s", wsIndex, newName)
 	}
 
@@ -48,12 +29,13 @@ func renamei3Ws(wsIndex int64, newName string) {
 }
 
 func main() {
-	focusedWS := getFocusedWorkspaceNum()
-	if focusedWS == -1 {
+	focusedWS, err := utils.GetFocusedWorkspace()
+	if err != nil {
+		utils.NotifySend(2, fmt.Sprintf("RenameWorkspace: %s", err.Error()))
 		os.Exit(1)
 	}
 
-	userPromptResult := runi3Input()
+	userPromptResult := utils.Runi3Input()
 
-	renamei3Ws(focusedWS, userPromptResult)
+	renamei3Ws(focusedWS.Num, userPromptResult)
 }

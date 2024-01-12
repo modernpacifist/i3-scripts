@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"strconv"
 	"strings"
 
 	"go.i3wm.org/i3/v4"
@@ -86,7 +87,7 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 	// TODO: is the node does not contain a mark, just use a container id <17-11-23, modernpacifist> //
 	nodeMark := getNodeMark(node)
 	if nodeMark == "" {
-		log.Fatal("This node does not contain a mark")
+		nodeMark = strconv.FormatInt(node.Window, 10)
 	}
 
 	return WindowConfig{
