@@ -1,10 +1,10 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
-	"errors"
 
 	"go.i3wm.org/i3/v4"
 )
@@ -17,8 +17,10 @@ func NotifySend(seconds float32, msg string) {
 	}
 }
 
-func Runi3Input() string {
-	output, err := exec.Command("bash", "-c", "i3-input -P \"Append title: \" | grep -oP \"output = \\K.*\" | tr -d '\n'").Output()
+/* i3InputLimit must be set to 0 for unlimited input*/
+func Runi3Input(i3PromptMessage string, i3InputLimit int) string {
+	cmd := fmt.Sprintf("i3-input -P \"%s\" -l %d | grep -oP \"output = \\K.*\" | tr -d '\n'", i3PromptMessage, i3InputLimit)
+	output, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,6 +33,7 @@ func GetI3Tree() i3.Tree {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return tree
 }
 

@@ -35,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	userPromptResult := utils.Runi3Input()
+	userPromptResult := utils.Runi3Input("Append title: ", 0)
 
 	renamei3Ws(focusedWS.Num, userPromptResult)
 }
