@@ -10,24 +10,46 @@ import (
 	"i3-integration/utils"
 )
 
+func getUserInput() (mark string) {
+	var userInput string
+	var promptMessage string = "Mark container (press \"f\" to mark with function keys): "
+
+	for {
+		userInput = utils.Runi3Input(promptMessage, 1)
+
+		switch {
+		case regexp.MustCompile("[0-9]").MatchString(userInput):
+			mark = mark + userInput
+			return
+
+		case userInput == "f":
+			mark = mark + userInput
+			promptMessage = "Function key chosen, input function index 1-9: "
+			break
+
+		case len(mark) > 1:
+			return
+
+		default:
+			return
+		}
+	}
+}
+
 func main() {
 	var mark string = ""
 
-	userInput := utils.Runi3Input("Mark container (press \"f\" to mark with function keys): ", 1)
+	mark = getUserInput()
+	if mark == "" {
+		os.Exit(0)
+	}
 
-	switch {
-	case regexp.MustCompile("[0-9]").MatchString(userInput):
-		mark = userInput
+	matched, err := regexp.MatchString("^(f?[0-9])$", mark)
+	if err != nil {
+		os.Exit(0)
+	}
 
-	case userInput == "f":
-		mark = "f"
-		userInput = utils.Runi3Input("F key chosen, input function index 1-9: ", 1)
-		if !regexp.MustCompile("[0-9]").MatchString(userInput) {
-			os.Exit(1)
-		}
-		mark = mark + userInput
-
-	default:
+	if !matched {
 		os.Exit(0)
 	}
 
