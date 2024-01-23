@@ -1,5 +1,6 @@
 *.txt
 *.json
-.env
+.env*
 
 bin/*
+*.vim
