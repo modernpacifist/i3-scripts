@@ -30,12 +30,34 @@ func getUserInput() (mark string) {
 	}
 }
 
-func swapWorkspaces(currentWs i3.Workspace, swapWs i3.Workspace) (err error) {
-	var bufferWsName string = "bufferWs"
+func resolveWorkspaceName(wsName string) string {
+	re := regexp.MustCompile(`\d+:(.+)`)
+	result := re.FindStringSubmatch(wsName)
+	if len(result) > 1 {
+		return result[1]
+	}
 
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", currentWs.Name, bufferWsName))
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", swapWs.Name, currentWs.Name))
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", bufferWsName, swapWs.Name))
+	return ""
+}
+
+func swapWorkspaces(currentWs i3.Workspace, swapWs i3.Workspace) (err error) {
+	a := resolveWorkspaceName(currentWs.Name)
+	b := resolveWorkspaceName(swapWs.Name)
+
+	if a != "" {
+		a = fmt.Sprintf("%d:%s", swapWs.Num, a)
+	} else {
+		a = fmt.Sprintf("%d", swapWs.Num)
+	}
+
+	if b == "" {
+		b = fmt.Sprintf("%d", currentWs.Num)
+	} else {
+		b = fmt.Sprintf("%d:%s", currentWs.Num, b)
+	}
+
+	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", currentWs.Name, a))
+	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", swapWs.Name, b))
 
 	return
 }
