@@ -18,6 +18,8 @@ func NotifySend(seconds float32, msg string) {
 }
 
 /* i3InputLimit must be set to 0 for unlimited input*/
+/* i3InputLimit must be set to 0 for unlimited input*/
+// TODO: must change the signature so that the i3-input payload is in the arguments <23-01-24, modernpacifist> //
 func Runi3Input(i3PromptMessage string, i3InputLimit int) string {
 	cmd := fmt.Sprintf("i3-input -P \"%s\" -l %d | grep -oP \"output = \\K.*\" | tr -d '\n'", i3PromptMessage, i3InputLimit)
 	output, err := exec.Command("bash", "-c", cmd).Output()
@@ -35,6 +37,15 @@ func GetI3Tree() i3.Tree {
 	}
 
 	return tree
+}
+
+func GetWorkspaces() ([]i3.Workspace, error) {
+	o, err := i3.GetWorkspaces()
+	if err != nil {
+		return []i3.Workspace{}, err
+	}
+
+	return o, nil
 }
 
 func GetWorkspaceNodes() *i3.Node {
@@ -78,4 +89,52 @@ func GetFocusedWorkspace() (i3.Workspace, error) {
 	}
 
 	return i3.Workspace{}, errors.New("Could not get focused workspace")
+}
+
+func GetWorkspaceByIndex(index int64) (i3.Workspace, error) {
+	o, err := i3.GetWorkspaces()
+	if err != nil {
+		return i3.Workspace{}, err
+	}
+
+	for _, ws := range o {
+		if ws.Num == index {
+			return ws, nil
+		}
+	}
+
+	return i3.Workspace{}, errors.New("Could not get focused workspace")
+}
+
+func GetFocusedOutput() (res i3.Output, err error) {
+	outputs, err := i3.GetOutputs()
+	if err != nil {
+		return i3.Output{}, err
+	}
+
+	var focusedWs i3.Workspace
+
+	o, err := i3.GetWorkspaces()
+	if err != nil {
+		return i3.Output{}, errors.New("Could not get focused workspace")
+	}
+
+	for _, ws := range o {
+		if ws.Focused == true {
+			focusedWs = ws
+			break
+		}
+	}
+
+	if focusedWs == (i3.Workspace{}) {
+		return i3.Output{}, errors.New("Focused workspace instance is null")
+	}
+
+	for _, o := range outputs {
+		if o.Active == true && o.CurrentWorkspace == focusedWs.Name {
+			return o, nil
+		}
+	}
+
+	return i3.Output{}, errors.New("Could not get focused output")
 }
