@@ -1,4 +1,4 @@
-module sample.com/m
+module i3-scripts-go
 
 go 1.21.0
 

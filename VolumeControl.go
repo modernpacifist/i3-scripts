@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"i3-integration/utils"
+	"i3-scripts-go/utils"
 )
 
 const MAX_VOLUME = 100

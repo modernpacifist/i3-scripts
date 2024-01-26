@@ -10,7 +10,7 @@ import (
 	"os/user"
 	"strings"
 
-	"i3-integration/utils"
+	"i3-scripts-go/utils"
 
 	"go.i3wm.org/i3/v4"
 )
