@@ -20,12 +20,7 @@ func getKbdlayout() string {
 func setKbdlayout(layout string, expireTime float64) {
 	_, err := exec.Command("bash", "-c", fmt.Sprintf("setxkbmap %s", layout)).Output()
 	if err == nil {
-		// exec.Command("bash", "-c", fmt.Sprintf("notify-send --expire-time=1000 \"Kb layout: %s\"", layout)).Output()
-		fmt.Println()
-		cmd := fmt.Sprintf("notify-send --expire-time=%.0f \"Kb layout: %s\"", expireTime * 1000, layout)
-		fmt.Println(cmd)
-		fmt.Println(cmd)
-		fmt.Println(cmd)
+		cmd := fmt.Sprintf("notify-send --expire-time=%.0f \"Kb layout: %s\"", expireTime*1000, layout)
 		exec.Command("bash", "-c", cmd).Output()
 	}
 }
