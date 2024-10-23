@@ -17,14 +17,20 @@ func getKbdlayout() string {
 	return strings.TrimSuffix(string(out), "\n")
 }
 
-func setKbdlayout(layout string) {
+func setKbdlayout(layout string, expireTime float64) {
 	_, err := exec.Command("bash", "-c", fmt.Sprintf("setxkbmap %s", layout)).Output()
 	if err == nil {
-		exec.Command("bash", "-c", fmt.Sprintf("notify-send --expire-time=1000 \"Kb layout: %s\"", layout)).Output()
+		// exec.Command("bash", "-c", fmt.Sprintf("notify-send --expire-time=1000 \"Kb layout: %s\"", layout)).Output()
+		fmt.Println()
+		cmd := fmt.Sprintf("notify-send --expire-time=%.0f \"Kb layout: %s\"", expireTime * 1000, layout)
+		fmt.Println(cmd)
+		fmt.Println(cmd)
+		fmt.Println(cmd)
+		exec.Command("bash", "-c", cmd).Output()
 	}
 }
 
-func cycle(layoutsArray []string) {
+func cycle(layoutsArray []string, expireTime float64) {
 	current_layout := getKbdlayout()
 	initIndex := -1
 
@@ -42,14 +48,15 @@ func cycle(layoutsArray []string) {
 
 	length := len(layoutsArray)
 	if initIndex == length-1 {
-		setKbdlayout(layoutsArray[0])
+		setKbdlayout(layoutsArray[0], expireTime)
 	} else {
-		setKbdlayout(layoutsArray[(initIndex+1)%length])
+		setKbdlayout(layoutsArray[(initIndex+1)%length], expireTime)
 	}
 }
 
 func main() {
 	layouts := flag.String("layouts", "", "New index")
+	notifyTimeout := flag.Float64("timeout", 0, "Notification timeout")
 
 	flag.Parse()
 
@@ -58,7 +65,12 @@ func main() {
 		log.Fatalln("layouts flag was not specified")
 	}
 
+	if *notifyTimeout == 0 {
+		//panic("layouts flag was not specified")
+		log.Fatalln("timeout flag was not specified")
+	}
+
 	layoutsArray := strings.Split(*layouts, "/")
 
-	cycle(layoutsArray)
+	cycle(layoutsArray, *notifyTimeout)
 }
