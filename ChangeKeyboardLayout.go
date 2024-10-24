@@ -36,7 +36,6 @@ func cycle(layoutsArray []string, expireTime float64) {
 		}
 	}
 
-	// TODO; wrong exit
 	if initIndex == -1 {
 		os.Exit(1)
 	}
