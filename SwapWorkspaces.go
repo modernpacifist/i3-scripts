@@ -12,7 +12,6 @@ import (
 	"i3-scripts-go/utils"
 )
 
-
 func getUserInput() (mark string) {
 	var userInput string
 	var promptMessage string = "Swap ws with number: "

@@ -51,7 +51,7 @@ func nodeConfigConstructor(node *i3.Node) types.Container {
 }
 
 type JsonConfig struct {
-	Location string                         `json:"-"`
+	Location string                     `json:"-"`
 	Nodes    map[string]types.Container `json:"Nodes"`
 }
 

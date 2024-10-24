@@ -54,7 +54,7 @@ func roundVolume() {
 func changeVolumeLevel(changeValue string) {
 	_, err := exec.Command("bash", "-c", fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %s%%", changeValue)).Output()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("%s: pactl is not installed on this system", err)
 	}
 	utils.NotifySend(1.5, fmt.Sprintf("VolumeControl: %s%%", changeValue))
 }

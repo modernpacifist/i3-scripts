@@ -11,21 +11,19 @@ import (
 )
 
 func replaceSpacesWithUnderscore(s string) string {
-	trimmed := strings.TrimSpace(s)
-	return strings.ReplaceAll(trimmed, " ", "_")
+	return strings.ReplaceAll(strings.TrimSpace(s), " ", "_")
 }
 
 func renamei3Ws(wsIndex int64, newName string) {
-	var cmdString string
+	var cmd string
 
 	if newName == "" {
-		cmdString = fmt.Sprintf("rename workspace to %d", wsIndex)
+		cmd = fmt.Sprintf("rename workspace to %d", wsIndex)
 	} else {
-		newName = replaceSpacesWithUnderscore(newName)
-		cmdString = fmt.Sprintf("rename workspace to %d:%s", wsIndex, newName)
+		cmd = fmt.Sprintf("rename workspace to %d:%s", wsIndex, replaceSpacesWithUnderscore(newName))
 	}
 
-	i3.RunCommand(cmdString)
+	i3.RunCommand(cmd)
 }
 
 func main() {
