@@ -112,23 +112,25 @@ case $pos in
     # '18') new_pos="$(($primary_max_x + $secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $status_bar_offset))";;
 
     # secondary left - top
-    '10') new_pos="$(($window_border_width)) $(($status_bar_width + $window_border_width + $status_bar_offset))";;
-    # secondary left - mid
-    '11') new_pos="$(($window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $status_bar_offset))";;
-    # secondary left - bottom
-    '12') new_pos="$(($window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $status_bar_offset))";;
+    '10') new_pos="$(($window_border_width)) $(($status_bar_width + $window_border_width))";;
     # secondary mid - top
-    '13') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($status_bar_width + $window_border_width + $status_bar_offset))";;
-    # secondary mid - mid
-    '14') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $status_bar_offset))";;
-    # secondary mid - bottom
-    '15') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $status_bar_offset))";;
+    '13') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($status_bar_width + $window_border_width))";;
     # secondary right - top
-    '16') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width + $status_bar_offset))";;
+    '16') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width))";;
+
+    # secondary left - mid
+    '11') new_pos="$(($window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
+    # secondary mid - mid
+    '14') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
     # secondary right - mid
-    '17') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width + $status_bar_offset))";;
+    '17') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
+
+    # secondary left - bottom
+    '12') new_pos="$(($window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
+    # secondary mid - bottom
+    '15') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
     # secondary right - bottom
-    '18') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $status_bar_offset))";;
+    '18') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
 
     *) echo 'Invalid value in $1 argument, must be 1-12' >&2; exit 2;;
 esac
