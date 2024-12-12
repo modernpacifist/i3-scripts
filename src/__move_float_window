@@ -38,7 +38,7 @@ status_bar_position=$(grep -oP '(?<="StatusBarPosition": ")[^"]*' $CONFIGFILE | 
 case $status_bar_position in 
     # TODO: hardcoded default values, fix later <11-12-24, modernpacifist> #
     # BUG: can be just negative/positive number must be calculated on individual position
-    "top") status_bar_offset=64;;
+    "top") status_bar_offset=$status_bar_width;;
     "bottom") status_bar_offset=$((- $status_bar_width ));;
     *) echo 'Invalid value for "status_bar_position" field, can be "top" or "bottom"';;
 esac
@@ -78,19 +78,19 @@ case $pos in
     # if secondary monitor is on the left of the primary monitor the init position
     # must start not from 0, but from secondary width
     # bottom
-    '1') new_pos="$(($window_border_width + $secondary_max_x)) $(($primary_max_y - $window_g_y - $window_border_width))";;
-    '2') new_pos="$(($primary_max_x / 2 - $window_g_x / 2 + $secondary_max_x)) $(($primary_max_y - $window_g_y - $window_border_width))";;
-    '3') new_pos="$(($primary_max_x - $window_g_x - $window_border_width + $secondary_max_x)) $(($primary_max_y - $window_g_y - $window_border_width))";;
+    1) new_pos="$((window_border_width + secondary_max_x)) $((primary_max_y - window_g_y - window_border_width))";;
+    2) new_pos="$((primary_max_x / 2 - window_g_x / 2 + secondary_max_x)) $((primary_max_y - window_g_y - window_border_width))";;
+    3) new_pos="$((primary_max_x - window_g_x - window_border_width + secondary_max_x)) $((primary_max_y - window_g_y - window_border_width))";;
 
     # mid
-    '4') new_pos="$(($window_border_width + $secondary_max_x)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_offset / 2))";;
-    '5') new_pos="$(($primary_max_x / 2 - $window_g_x / 2 + $secondary_max_x)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_offset / 2))";;
-    '6') new_pos="$(($primary_max_x - $window_g_x - $window_border_width + $secondary_max_x)) $(($primary_max_y / 2 - $window_g_y / 2 + $status_bar_offset / 2))";;
+    4) new_pos="$((window_border_width + secondary_max_x)) $((primary_max_y / 2 - window_g_y / 2 + status_bar_offset / 2))";;
+    5) new_pos="$((primary_max_x / 2 - window_g_x / 2 + secondary_max_x)) $((primary_max_y / 2 - window_g_y / 2 + status_bar_offset / 2))";;
+    6) new_pos="$((primary_max_x - window_g_x - window_border_width + secondary_max_x)) $((primary_max_y / 2 - window_g_y / 2 + status_bar_offset / 2))";;
 
     # top
-    '7') new_pos="$(($window_border_width + $secondary_max_x)) $(($status_bar_offset + $window_border_width))";;
-    '8') new_pos="$(($primary_max_x / 2 - $window_g_x / 2 + $secondary_max_x)) $(($status_bar_offset + $window_border_width))";;
-    '9') new_pos="$(($primary_max_x - $window_g_x - $window_border_width + $secondary_max_x)) $(($status_bar_offset + $window_border_width))";;
+    7) new_pos="$((window_border_width + secondary_max_x)) $((status_bar_offset + window_border_width))";;
+    8) new_pos="$((primary_max_x / 2 - window_g_x / 2 + secondary_max_x)) $((status_bar_offset + window_border_width))";;
+    9) new_pos="$((primary_max_x - window_g_x - window_border_width + secondary_max_x)) $((status_bar_offset + window_border_width))";;
 
     # # secondary left - top
     # '10') new_pos="$(($primary_max_x + $window_border_width)) $(($status_bar_width + $window_border_width + $status_bar_offset))";;
@@ -112,25 +112,19 @@ case $pos in
     # '18') new_pos="$(($primary_max_x + $secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width + $status_bar_offset))";;
 
     # secondary left - top
-    '10') new_pos="$(($window_border_width)) $(($status_bar_width + $window_border_width))";;
-    # secondary mid - top
-    '13') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($status_bar_width + $window_border_width))";;
-    # secondary right - top
-    '16') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($status_bar_width + $window_border_width))";;
+    10) new_pos="$((window_border_width)) $((status_bar_width + window_border_width))";;
+    13) new_pos="$((secondary_max_x / 2 - window_g_x / 2 - window_border_width)) $((status_bar_width + window_border_width))";;
+    16) new_pos="$((secondary_max_x - window_g_x - window_border_width)) $((status_bar_width + window_border_width))";;
 
     # secondary left - mid
-    '11') new_pos="$(($window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
-    # secondary mid - mid
-    '14') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
-    # secondary right - mid
-    '17') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y / 2 - $window_g_y / 2 - $window_border_width))";;
+    11) new_pos="$((window_border_width)) $((secondary_max_y / 2 - window_g_y / 2 - window_border_width))";;
+    14) new_pos="$((secondary_max_x / 2 - window_g_x / 2 - window_border_width)) $((secondary_max_y / 2 - window_g_y / 2 - window_border_width))";;
+    17) new_pos="$((secondary_max_x - window_g_x - window_border_width)) $((secondary_max_y / 2 - window_g_y / 2 - window_border_width))";;
 
     # secondary left - bottom
-    '12') new_pos="$(($window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
-    # secondary mid - bottom
-    '15') new_pos="$(($secondary_max_x / 2 - $window_g_x / 2 - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
-    # secondary right - bottom
-    '18') new_pos="$(($secondary_max_x - $window_g_x - $window_border_width)) $(($secondary_max_y - $window_g_y - $window_border_width))";;
+    12) new_pos="$((window_border_width)) $((secondary_max_y - window_g_y - window_border_width))";;
+    15) new_pos="$((secondary_max_x / 2 - window_g_x / 2 - window_border_width)) $((secondary_max_y - window_g_y - window_border_width))";;
+    18) new_pos="$((secondary_max_x - window_g_x - window_border_width)) $((secondary_max_y - window_g_y - window_border_width))";;
 
     *) echo 'Invalid value in $1 argument, must be 1-12' >&2; exit 2;;
 esac
