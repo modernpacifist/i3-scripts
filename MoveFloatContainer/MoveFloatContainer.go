@@ -47,7 +47,7 @@ func nodeConfigConstructor(node *i3.Node) types.Container {
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
 		Height: node.Rect.Height,
-		Marks:   getNodeMarks(node),
+		Marks:  getNodeMarks(node),
 	}
 }
 
