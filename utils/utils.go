@@ -9,6 +9,28 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
+type WindowConfig struct {
+	ID     int64  `json:"ID"`
+	X      int64  `json:"X"`
+	Y      int64  `json:"Y"`
+	Width  int64  `json:"Width"`
+	Height int64  `json:"Height"`
+	Mark   string `json:"Mark"`
+	Sticky bool   `json:"Sticky"`
+}
+
+func NewWindowConfig(node *i3.Node) *WindowConfig {
+	// TODO: is the node does not contain a mark, just use a container id <17-11-23, modernpacifist> //
+	return &WindowConfig{
+		ID:     node.Window,
+		X:      node.Rect.X,
+		Y:      node.Rect.Y,
+		Width:  node.Rect.Width,
+		Height: node.Rect.Height,
+		Sticky: node.Sticky,
+	}
+}
+
 func NotifySend(seconds float32, msg string) {
 	_, err := exec.Command("bash", "-c", fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)).Output()
 	// TODO: probably should catch this error via defer <04-12-23, modernpacifist> //
@@ -52,11 +74,11 @@ func GetWorkspaceNodes() *i3.Node {
 	i3Tree := GetI3Tree()
 
 	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
-		return n.Focused == true
+		return n.Focused
 	})
 
 	if node == nil {
-		log.Fatal(errors.New("Could not get focused node"))
+		log.Fatal(errors.New("could not get focused node"))
 	}
 
 	return node
@@ -66,11 +88,11 @@ func GetFocusedNode() *i3.Node {
 	i3Tree := GetI3Tree()
 
 	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
-		return n.Focused == true
+		return n.Focused
 	})
 
 	if node == nil {
-		log.Fatal(errors.New("Could not get focused node"))
+		log.Fatal(errors.New("could not get focused node"))
 	}
 
 	return node
@@ -83,12 +105,12 @@ func GetFocusedWorkspace() (i3.Workspace, error) {
 	}
 
 	for _, ws := range o {
-		if ws.Focused == true {
+		if ws.Focused {
 			return ws, nil
 		}
 	}
 
-	return i3.Workspace{}, errors.New("Could not get focused workspace")
+	return i3.Workspace{}, errors.New("could not get focused workspace")
 }
 
 func GetWorkspaceByIndex(index int64) (i3.Workspace, error) {
@@ -103,7 +125,7 @@ func GetWorkspaceByIndex(index int64) (i3.Workspace, error) {
 		}
 	}
 
-	return i3.Workspace{}, errors.New("Could not get focused workspace")
+	return i3.Workspace{}, errors.New("could not get focused workspace")
 }
 
 func GetFocusedOutput() (res i3.Output, err error) {
@@ -116,25 +138,25 @@ func GetFocusedOutput() (res i3.Output, err error) {
 
 	o, err := i3.GetWorkspaces()
 	if err != nil {
-		return i3.Output{}, errors.New("Could not get focused workspace")
+		return i3.Output{}, errors.New("could not get focused workspace")
 	}
 
 	for _, ws := range o {
-		if ws.Focused == true {
+		if ws.Focused {
 			focusedWs = ws
 			break
 		}
 	}
 
 	if focusedWs == (i3.Workspace{}) {
-		return i3.Output{}, errors.New("Focused workspace instance is null")
+		return i3.Output{}, errors.New("cocused workspace instance is null")
 	}
 
 	for _, o := range outputs {
-		if o.Active == true && o.CurrentWorkspace == focusedWs.Name {
+		if o.Active && o.CurrentWorkspace == focusedWs.Name {
 			return o, nil
 		}
 	}
 
-	return i3.Output{}, errors.New("Could not get focused output")
+	return i3.Output{}, errors.New("could not get focused output")
 }

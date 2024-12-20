@@ -293,7 +293,8 @@ func getPrimaryOutputRect() i3.Rect {
 	}
 
 	for _, output := range outputs {
-		if output.Primary == true {
+		if output.Primary && output.Active {
+			fmt.Println(output.Rect)
 			return output.Rect
 		}
 	}
