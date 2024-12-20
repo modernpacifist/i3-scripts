@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	ConfigFilename string = ".MoveFloatWindow.json"
+	ConfigFilename string = ".MoveFloatContainer.json"
 )
 
 // TODO: this must not be constant <05-11-23, modernpacifist> //
