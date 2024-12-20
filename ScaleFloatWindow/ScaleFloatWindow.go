@@ -14,8 +14,6 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-// TODO: must add checks for errors in i3.RunCommand <27-10-23, modernpacifist> //
-
 const (
 	ConfigFilename string = ".ScaleFloatWindow.json"
 )
@@ -24,20 +22,20 @@ var globalConfig JsonConfig
 var globalMonitorDimensions i3.Rect
 
 type WindowConfig struct {
-	ID                  int64  `json:"ID"`
-	ResizedPlusYFlag    bool   `json:"ResizedPlusYFlag"`
-	ResizedMinusYFlag   bool   `json:"ResizedMinusYFlag"`
-	ResizedPlusXFlag    bool   `json:"ResizedPlusXFlag"`
-	ResizedMinusXFlag   bool   `json:"ResizedMinusXFlag"`
-	X                   int64  `json:"X"`
-	Y                   int64  `json:"Y"`
-	Width               int64  `json:"Width"`
-	Height              int64  `json:"Height"`
-	Mark                string `json:"Mark"`
-	PreviousPlusYValue  int64  `json:"PreviousPlusYValue"`
-	PreviousMinusYValue int64  `json:"PreviousMinusYValue"`
-	PreviousPlusXValue  int64  `json:"PreviousPlusXValue"`
-	PreviousMinusXValue int64  `json:"PreviousMinusXValue"`
+	ID                  int64  `json:"id"`
+	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
+	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
+	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
+	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
+	X                   int64  `json:"x"`
+	Y                   int64  `json:"y"`
+	Width               int64  `json:"width"`
+	Height              int64  `json:"height"`
+	Mark                string `json:"mark"`
+	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
+	PreviousMinusYValue int64  `json:"previousMinusYValue"`
+	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
+	PreviousMinusXValue int64  `json:"previousMinusXValue"`
 }
 
 func getNodeMark(node *i3.Node) string {
@@ -132,7 +130,6 @@ func createJsonConfigFile(configFileLoc string) {
 		fmt.Println("Error encoding JSON:", err)
 		return
 	}
-
 }
 
 func JsonConfigConstructor(configFileLoc string) JsonConfig {

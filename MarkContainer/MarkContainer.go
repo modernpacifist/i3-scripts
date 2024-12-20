@@ -12,7 +12,7 @@ import (
 
 func getUserInput() (mark string) {
 	var userInput string
-	var promptMessage string = "Mark container (press \"f\" to mark with function keys): "
+	promptMessage := `Mark container (press "f" to mark with function keys): `
 
 	for {
 		userInput = utils.Runi3Input(promptMessage, 1)
