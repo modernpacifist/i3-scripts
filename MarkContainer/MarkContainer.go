@@ -7,7 +7,7 @@ import (
 
 	"go.i3wm.org/i3/v4"
 
-	"i3-scripts-go/utils"
+	"github.com/modernpacifist/i3-scripts-go/utils"
 )
 
 func getUserInput() (mark string) {
@@ -37,9 +37,7 @@ func getUserInput() (mark string) {
 }
 
 func main() {
-	var mark string = ""
-
-	mark = getUserInput()
+	mark := getUserInput()
 	if mark == "" {
 		os.Exit(0)
 	}

@@ -7,7 +7,7 @@ import (
 
 	// "go.i3wm.org/i3/v4"
 
-	"i3-scripts-go/utils"
+	"github.com/modernpacifist/i3-scripts-go/utils"
 )
 
 func StickNode() {

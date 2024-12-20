@@ -1,6 +1,6 @@
-module i3-scripts-go
+module github.com/modernpacifist/i3-scripts-go
 
-go 1.21.0
+go 1.23.2
 
 require go.i3wm.org/i3/v4 v4.21.0
 

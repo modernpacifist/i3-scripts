@@ -2,7 +2,7 @@ default:
 	go build -o ./bin/ $(src)
 
 build:
-	find . -type f -name "*.go" | xargs -n 1 go build -o ./bin/
+	find . -type f -name "*.go" -not -path "*/types/*" -not -path "*/common/*" -not -path "*/utils/*" | xargs -n 1 go build -o ./bin/
 
 fmt:
 	find . -type f -name "*.go" | xargs -n 1 go fmt

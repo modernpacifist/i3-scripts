@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
 	//"flag"
 	"errors"
 	"io/ioutil"
@@ -13,7 +14,7 @@ import (
 
 	"go.i3wm.org/i3/v4"
 
-	"i3-scripts-go/types"
+	"github.com/modernpacifist/i3-scripts-go/types"
 )
 
 const (
@@ -32,11 +33,11 @@ type NodeConfig struct {
 	Mark   string    `json:"Mark"`
 }
 
-func getNodeMark(node *i3.Node) string {
+func getNodeMarks(node *i3.Node) []string {
 	if len(node.Marks) == 0 {
-		return ""
+		return nil
 	}
-	return node.Marks[0]
+	return node.Marks
 }
 
 func nodeConfigConstructor(node *i3.Node) types.Container {
@@ -46,7 +47,7 @@ func nodeConfigConstructor(node *i3.Node) types.Container {
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
 		Height: node.Rect.Height,
-		Mark:   getNodeMark(node),
+		Marks:   getNodeMarks(node),
 	}
 }
 
@@ -74,7 +75,7 @@ func createJsonConfigFile(configFileLoc string) {
 }
 
 func (jc *JsonConfig) Update(np types.Container) {
-	jc.Nodes[np.Mark] = np
+	jc.Nodes[np.Marks[0]] = np
 }
 
 func (jc *JsonConfig) Dump() {
