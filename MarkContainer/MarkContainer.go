@@ -10,22 +10,26 @@ import (
 	"github.com/modernpacifist/i3-scripts-go/utils"
 )
 
-func getUserInput() (mark string) {
+func getMarkFromUser() (mark string) {
 	var userInput string
-	promptMessage := `Mark container (press "f" to mark with function keys): `
+	var promptMessage string = `Mark container (press "f" to mark with function keys): `
 
 	for {
 		userInput = utils.Runi3Input(promptMessage, 1)
 
 		switch {
 		case regexp.MustCompile("[0-9]").MatchString(userInput):
+			if mark == "f" && userInput == "0" {
+				return "f10"
+			}
 			mark = mark + userInput
 			return
 
 		case userInput == "f":
 			mark = mark + userInput
-			promptMessage = "Function key chosen, input function index 1-9: "
-			break
+			promptMessage = "Function key chosen, input function index 0-9: "
+
+			continue
 
 		case len(mark) > 1:
 			return
@@ -37,12 +41,12 @@ func getUserInput() (mark string) {
 }
 
 func main() {
-	mark := getUserInput()
+	mark := getMarkFromUser()
 	if mark == "" {
 		os.Exit(0)
 	}
 
-	matched, err := regexp.MatchString("^(f?[0-9])$", mark)
+	matched, err := regexp.MatchString("^(f?[0-9]{1,2})$", mark)
 	if err != nil {
 		os.Exit(0)
 	}
