@@ -22,22 +22,22 @@ const (
 var globalConfig config.JsonConfig
 var globalMonitorDimensions i3.Rect
 
-type WindowConfig struct {
-	ID                  int64  `json:"id"`
-	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
-	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
-	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
-	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
-	X                   int64  `json:"x"`
-	Y                   int64  `json:"y"`
-	Width               int64  `json:"width"`
-	Height              int64  `json:"height"`
-	Mark                string `json:"mark"`
-	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
-	PreviousMinusYValue int64  `json:"previousMinusYValue"`
-	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
-	PreviousMinusXValue int64  `json:"previousMinusXValue"`
-}
+// type WindowConfig struct {
+// 	ID                  int64  `json:"id"`
+// 	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
+// 	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
+// 	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
+// 	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
+// 	X                   int64  `json:"x"`
+// 	Y                   int64  `json:"y"`
+// 	Width               int64  `json:"width"`
+// 	Height              int64  `json:"height"`
+// 	Mark                string `json:"mark"`
+// 	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
+// 	PreviousMinusYValue int64  `json:"previousMinusYValue"`
+// 	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
+// 	PreviousMinusXValue int64  `json:"previousMinusXValue"`
+// }
 
 func getNodeMark(node *i3.Node) string {
 	if len(node.Marks) == 0 {
@@ -76,7 +76,7 @@ func getPreviousResizeValues(node *i3.Node) map[string]int64 {
 	return resMap
 }
 
-func WindowConfigConstructor(node *i3.Node) WindowConfig {
+func WindowConfigConstructor(node *i3.Node) config.WindowConfig {
 	previousResizeValuesMap := getPreviousResizeValues(node)
 	plusY, _ := previousResizeValuesMap["plusY"]
 	minusY, _ := previousResizeValuesMap["minusY"]
