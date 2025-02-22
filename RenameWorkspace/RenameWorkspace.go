@@ -14,7 +14,7 @@ func replaceSpacesWithUnderscore(s string) string {
 	return strings.ReplaceAll(strings.TrimSpace(s), " ", "_")
 }
 
-func renamei3Ws(wsIndex int64, newName string) {
+func renamei3Workspace(wsIndex int64, newName string) {
 	var cmd string
 
 	if newName == "" {
@@ -35,5 +35,5 @@ func main() {
 
 	userPromptResult := utils.Runi3Input("Append title: ", 0)
 
-	renamei3Ws(focusedWS.Num, userPromptResult)
+	renamei3Workspace(focusedWS.Num, userPromptResult)
 }
