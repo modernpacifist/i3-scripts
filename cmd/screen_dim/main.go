@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/modernpacifist/i3-scripts-go/utils"
+	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
 
 	"go.i3wm.org/i3/v4"
 )

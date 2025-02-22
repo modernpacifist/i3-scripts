@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/modernpacifist/i3-scripts-go/utils"
+	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
 )
 
 const MAX_VOLUME = 100

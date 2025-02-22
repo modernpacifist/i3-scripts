@@ -14,7 +14,7 @@ import (
 
 	"go.i3wm.org/i3/v4"
 
-	"github.com/modernpacifist/i3-scripts-go/types"
+	common "github.com/modernpacifist/i3-scripts-go/internal/common"
 )
 
 const (
@@ -40,8 +40,8 @@ func getNodeMarks(node *i3.Node) []string {
 	return node.Marks
 }
 
-func nodeConfigConstructor(node *i3.Node) types.Container {
-	return types.Container{
+func nodeConfigConstructor(node *i3.Node) common.Container {
+	return common.Container{
 		ID:     node.ID,
 		X:      node.Rect.X,
 		Y:      node.Rect.Y,
@@ -53,7 +53,7 @@ func nodeConfigConstructor(node *i3.Node) types.Container {
 
 type JsonConfig struct {
 	Location string                     `json:"-"`
-	Nodes    map[string]types.Container `json:"Nodes"`
+	Nodes    map[string]common.Container `json:"Nodes"`
 }
 
 func createJsonConfigFile(configFileLoc string) {
@@ -74,7 +74,7 @@ func createJsonConfigFile(configFileLoc string) {
 
 }
 
-func (jc *JsonConfig) Update(np types.Container) {
+func (jc *JsonConfig) Update(np common.Container) {
 	jc.Nodes[np.Marks[0]] = np
 }
 
