@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/modernpacifist/i3-scripts-go/config"
 	"go.i3wm.org/i3/v4"
 )
 
@@ -18,7 +19,7 @@ const (
 	ConfigFilename string = ".ScaleFloatWindow.json"
 )
 
-var globalConfig JsonConfig
+var globalConfig config.JsonConfig
 var globalMonitorDimensions i3.Rect
 
 type WindowConfig struct {
@@ -106,14 +107,8 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 	}
 }
 
-type JsonConfig struct {
-	Location        string                  `json:"-"`
-	StatusBarHeight int64                   `json:"StatusBarHeight"`
-	Windows         map[string]WindowConfig `json:"Windows"`
-}
-
 func createJsonConfigFile(configFileLoc string) {
-	var jsonConfig JsonConfig
+	var jsonConfig config.JsonConfig
 	// default value
 	jsonConfig.StatusBarHeight = 29
 
@@ -132,7 +127,7 @@ func createJsonConfigFile(configFileLoc string) {
 	}
 }
 
-func JsonConfigConstructor(configFileLoc string) JsonConfig {
+func JsonConfigConstructor(configFileLoc string) config.JsonConfig {
 	_, err := os.Stat(configFileLoc)
 	if os.IsNotExist(err) == true {
 		createJsonConfigFile(configFileLoc)
@@ -143,7 +138,8 @@ func JsonConfigConstructor(configFileLoc string) JsonConfig {
 		log.Fatal(err)
 	}
 
-	var jsonConfig JsonConfig
+	// TODO: why is this here? <22-02-25, modernpacifist> //
+	var jsonConfig config.JsonConfig
 	jsonConfig.Location = configFileLoc
 
 	err = json.Unmarshal(jsonData, &jsonConfig)
@@ -158,11 +154,11 @@ func JsonConfigConstructor(configFileLoc string) JsonConfig {
 	return jsonConfig
 }
 
-func (jc *JsonConfig) Update(wc WindowConfig) {
+func (jc *config.JsonConfig) Update(wc WindowConfig) {
 	jc.Windows[wc.Mark] = wc
 }
 
-func (jc *JsonConfig) Dump() {
+func (jc *config.JsonConfig) Dump() {
 	jsonData, err := json.MarshalIndent(jc, "", "\t")
 	if err != nil {
 		log.Fatal(err)

@@ -40,7 +40,6 @@ func NotifySend(seconds float32, msg string) {
 }
 
 /* i3InputLimit must be set to 0 for unlimited input*/
-/* i3InputLimit must be set to 0 for unlimited input*/
 // TODO: must change the signature so that the i3-input payload is in the arguments <23-01-24, modernpacifist> //
 func Runi3Input(i3PromptMessage string, i3InputLimit int) string {
 	cmd := fmt.Sprintf("i3-input -P \"%s\" -l %d | grep -oP \"output = \\K.*\" | tr -d '\n'", i3PromptMessage, i3InputLimit)
