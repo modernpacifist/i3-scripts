@@ -25,8 +25,20 @@ func replaceSpacesWithUnderscore(s string) string {
 	return strings.ReplaceAll(strings.TrimSpace(s), " ", "_")
 }
 
-func Renamei3Workspace(wsIndex int64, newName string) error {
+func Execute() error {
 	var cmd string
+
+	newName, err := GetWorkspaceNameFromUser()
+	if err != nil {
+		return err
+	}
+
+	focusedWorkspace, err := common.GetFocusedWorkspace()
+	if err != nil {
+		return err
+	}
+
+	wsIndex := focusedWorkspace.Num
 
 	if newName == "" {
 		cmd = fmt.Sprintf("rename workspace to %d", wsIndex)
@@ -38,5 +50,5 @@ func Renamei3Workspace(wsIndex int64, newName string) error {
 		return err
 	}
 
-	return nil
+	return nil 
 }
