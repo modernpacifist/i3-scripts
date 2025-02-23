@@ -1,39 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
-	"strings"
 
-	"go.i3wm.org/i3/v4"
-
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	renameOps "github.com/modernpacifist/i3-scripts-go/internal/i3operations/rename_workspace"
 )
 
-func replaceSpacesWithUnderscore(s string) string {
-	return strings.ReplaceAll(strings.TrimSpace(s), " ", "_")
-}
-
-func renamei3Workspace(wsIndex int64, newName string) {
-	var cmd string
-
-	if newName == "" {
-		cmd = fmt.Sprintf("rename workspace to %d", wsIndex)
-	} else {
-		cmd = fmt.Sprintf("rename workspace to %d:%s", wsIndex, replaceSpacesWithUnderscore(newName))
-	}
-
-	i3.RunCommand(cmd)
-}
-
 func main() {
-	focusedWS, err := utils.GetFocusedWorkspace()
+	focusedWorkspace, err := common.GetFocusedWorkspace()
 	if err != nil {
-		utils.NotifySend(2, fmt.Sprintf("RenameWorkspace: %s", err.Error()))
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
-	userPromptResult := utils.Runi3Input("Append title: ", 0)
+	userInput, err := renameOps.GetWorkspaceNameFromUser()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	renamei3Workspace(focusedWS.Num, userPromptResult)
+	if err := renameOps.Renamei3Workspace(focusedWorkspace.Num, userInput); err != nil {
+		log.Fatal(err)
+	}
+
+	os.Exit(0)
 }

@@ -5,9 +5,8 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 	"go.i3wm.org/i3/v4"
-
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
 )
 
 func getMarkFromUser() (mark string) {
@@ -15,7 +14,7 @@ func getMarkFromUser() (mark string) {
 	var promptMessage string = `Mark container (press "f" to mark with function keys): `
 
 	for {
-		userInput = utils.Runi3Input(promptMessage, 1)
+		userInput = i3operations.Runi3Input(promptMessage, 1)
 
 		switch {
 		case regexp.MustCompile("[0-9]").MatchString(userInput):

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/modernpacifist/i3-scripts-go/config"
+	"github.com/modernpacifist/i3-scripts-go/internal/configs"
 	"go.i3wm.org/i3/v4"
 )
 
@@ -29,8 +29,8 @@ func getFocusedNode() *i3.Node {
 	return node
 }
 
-func (wc *WindowConfig) resizePlusY() {
-	val := wc.Y - config.CONFIG.StatusBarHeight
+func (wc *configs.WindowConfig) resizePlusY() {
+	val := wc.Y - configs.CONFIG.StatusBarHeight
 	if val == 0 {
 		wc.ResizedPlusYFlag = true
 		val = -wc.PreviousPlusYValue
@@ -40,7 +40,7 @@ func (wc *WindowConfig) resizePlusY() {
 	i3.RunCommand(fmt.Sprintf("resize grow height %d px, move container up %d px", val, val))
 
 	wc.Y -= val
-	if wc.Y == config.CONFIG.StatusBarHeight {
+	if wc.Y == configs.CONFIG.StatusBarHeight {
 		wc.ResizedPlusYFlag = true
 	} else {
 		wc.ResizedPlusYFlag = false

@@ -1,19 +1,13 @@
-package config
+package configs
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"os/user"
 	"strconv"
-	"strings"
 
 	"go.i3wm.org/i3/v4"
-)
-
-const (
-	ConfigDirectory string = "~/.config/"
 )
 
 var (
@@ -21,21 +15,14 @@ var (
 	MONITOR_DIMENSIONS i3.Rect
 )
 
-type WindowConfig struct {
-	ID                  int64  `json:"id"`
-	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
-	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
-	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
-	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
-	X                   int64  `json:"x"`
-	Y                   int64  `json:"y"`
-	Width               int64  `json:"width"`
-	Height              int64  `json:"height"`
-	Mark                string `json:"mark"`
-	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
-	PreviousMinusYValue int64  `json:"previousMinusYValue"`
-	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
-	PreviousMinusXValue int64  `json:"previousMinusXValue"`
+type JsonConfig struct {
+	Location        string                  `json:"-"`
+	StatusBarHeight int64                   `json:"statusBarHeight"`
+	Windows         map[string]WindowConfig `json:"Windows"`
+}
+
+type NodeConfig struct {
+	i3.Node
 }
 
 func getPreviousResizeValues(node *i3.Node) map[string]int64 {
@@ -106,13 +93,9 @@ func WindowConfigConstructor(node *i3.Node) WindowConfig {
 	}
 }
 
-type JsonConfig struct {
-	Location        string                  `json:"-"`
-	StatusBarHeight int64                   `json:"statusBarHeight"`
-	Windows         map[string]WindowConfig `json:"Windows"`
-}
-
 func JsonConfigConstructor(configFileLoc string) JsonConfig {
+	var jsonConfig JsonConfig
+
 	_, err := os.Stat(configFileLoc)
 	if os.IsNotExist(err) == true {
 		createJsonConfigFile(configFileLoc)
@@ -123,7 +106,6 @@ func JsonConfigConstructor(configFileLoc string) JsonConfig {
 		log.Fatal(err)
 	}
 
-	var jsonConfig JsonConfig
 	jsonConfig.Location = configFileLoc
 
 	err = json.Unmarshal(jsonData, &jsonConfig)
@@ -162,9 +144,6 @@ func createJsonConfigFile(configFileLoc string) {
 	}
 }
 
-type NodeConfig struct {
-	i3.Node
-}
 
 func (jc JsonConfig) Dump() {
 	jsonData, err := json.MarshalIndent(jc, "", "\t")
@@ -176,13 +155,4 @@ func (jc JsonConfig) Dump() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func resolveJsonAbsolutePath(filename string) string {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
 }

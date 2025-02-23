@@ -7,7 +7,8 @@ import (
 
 	// "go.i3wm.org/i3/v4"
 
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
+	"github.com/modernpacifist/i3-scripts-go/internal/configs"
+	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 )
 
 func StickNode() {
@@ -15,8 +16,8 @@ func StickNode() {
 }
 
 func main() {
-	focusedNode := utils.GetFocusedNode()
-	focusedWindow := utils.NewWindowConfig(focusedNode)
+	focusedNode := i3operations.GetFocusedNode()
+	focusedWindow := configs.NewWindowConfig(focusedNode)
 
 	fmt.Println(focusedWindow)
 }

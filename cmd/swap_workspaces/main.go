@@ -1,81 +1,32 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
-	"regexp"
-	"strconv"
-	"strings"
 
-	"go.i3wm.org/i3/v4"
-
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	swapOps "github.com/modernpacifist/i3-scripts-go/internal/i3operations/swap_workspaces"
 )
 
-func getUserInput() (mark string) {
-	var userInput string
-	var promptMessage string = "Swap ws with number: "
-
-	for {
-		userInput = utils.Runi3Input(promptMessage, 1)
-
-		switch {
-		case regexp.MustCompile("[0-9]").MatchString(userInput):
-			mark = userInput
-			return
-
-		default:
-			return
-		}
-	}
-}
-
-func resolveNewWorkspaceName(ws1 i3.Workspace, ws2 i3.Workspace) string {
-	result := strings.Split(ws1.Name, ":")
-	if len(result) > 1 {
-		return fmt.Sprintf("%d:%s", ws2.Num, result[1])
-	}
-
-	return fmt.Sprintf("%d", ws2.Num)
-}
-
-func swapWorkspaces(currentWs i3.Workspace, swapWs i3.Workspace) (err error) {
-	var bufferWsName string = "BufferWs"
-
-	currentWsNewName := resolveNewWorkspaceName(currentWs, swapWs)
-	swapWsNewName := resolveNewWorkspaceName(swapWs, currentWs)
-
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", currentWs.Name, bufferWsName))
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", swapWs.Name, swapWsNewName))
-	i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", bufferWsName, currentWsNewName))
-
-	return
-}
-
 func main() {
-	userInput := getUserInput()
-	if userInput == "" {
-		os.Exit(0)
-	}
-	//userInput := "4"
-
-	wsIndex, err := strconv.ParseInt(userInput, 10, 64)
-	if err != nil {
-		os.Exit(0)
+	userInput, err := swapOps.GetWorkspaceIndexFromUser()
+	if err != nil || userInput == -1 {
+		log.Fatal(err)
 	}
 
-	indWs, err := utils.GetWorkspaceByIndex(wsIndex)
+	targetWorkspace, err := common.GetWorkspaceByIndex(userInput)
 	if err != nil {
-		os.Exit(0)
+		log.Fatal(err)
 	}
 
-	currentWorkspace, err := utils.GetFocusedWorkspace()
+	focusedWorkspace, err := common.GetFocusedWorkspace()
 	if err != nil {
-		os.Exit(0)
+		log.Fatal(err)
 	}
 
-	err = swapWorkspaces(currentWorkspace, indWs)
-	if err != nil {
-		os.Exit(0)
+	if err := swapOps.SwapWorkspaces(focusedWorkspace, targetWorkspace); err != nil {
+		log.Fatal(err)
 	}
+
+	os.Exit(0)
 }

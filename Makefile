@@ -64,6 +64,8 @@ build:
 	make volume_control
 
 install:
+	@if [ $$(id -u) != 0 ]; then echo "You must run install with root privileges"; exit 1; fi
+
 	make build
 
 	find ./bin/ -type f -executable -exec mv {} /bin/ \;

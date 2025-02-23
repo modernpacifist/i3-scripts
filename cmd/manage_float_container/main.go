@@ -10,8 +10,7 @@ import (
 	"os/user"
 	"strings"
 
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
-
+	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 	"go.i3wm.org/i3/v4"
 )
 
@@ -291,6 +290,6 @@ func main() {
 		config.Update(nodeConfig, nodeConfig.Marks[0])
 		config.Dump()
 
-		utils.NotifySend(0.5, fmt.Sprintf("Saved mark %s", nodeConfig.Marks[0]))
+		i3operations.NotifySend(0.5, fmt.Sprintf("Saved mark %s", nodeConfig.Marks[0]))
 	}
 }

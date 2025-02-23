@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	utils "github.com/modernpacifist/i3-scripts-go/pkg/i3utils"
+	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 
 	"go.i3wm.org/i3/v4"
 )
@@ -160,7 +160,7 @@ func main() {
 	if res != 0 {
 		config.updateBrightness(res)
 		SetBrightnessLevel(config.Brightness)
-		utils.NotifySend(1, fmt.Sprintf("Current brightness: %.1f", config.Brightness))
+		i3operations.NotifySend(1, fmt.Sprintf("Current brightness: %.1f", config.Brightness))
 		config.dump()
 	}
 }
