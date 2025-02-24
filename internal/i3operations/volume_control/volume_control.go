@@ -12,13 +12,16 @@ import (
 )
 
 func getCurrentVolume() float64 {
-	out, err := exec.Command("bash", "-c", "amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'").Output()
-	if err != nil {
+	var out []byte
+	var err error
+
+	cmd := `amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'`
+	if out, err = exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatal(err)
 	}
 
-	num, err := strconv.ParseFloat(strings.TrimSuffix(string(out), "\n"), 64)
-	if err != nil {
+	var num float64
+	if num, err = strconv.ParseFloat(strings.TrimSuffix(string(out), "\n"), 64); err != nil {
 		log.Fatal(err)
 	}
 
@@ -26,7 +29,8 @@ func getCurrentVolume() float64 {
 }
 
 func ToggleVolume() {
-	if _, err := exec.Command("bash", "-c", "pactl set-sink-mute @DEFAULT_SINK@ toggle").Output(); err != nil {
+	cmd := `pactl set-sink-mute @DEFAULT_SINK@ toggle`
+	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -37,7 +41,8 @@ func RoundVolume() {
 	currentVolume := getCurrentVolume()
 	roundedVolume := math.Round(currentVolume/5) * 5
 
-	if _, err := exec.Command("bash", "-c", fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %.f%%", roundedVolume)).Output(); err != nil {
+	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %.f%%", roundedVolume)
+	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -45,9 +50,10 @@ func RoundVolume() {
 }
 
 func ChangeVolumeLevel(changeValue string) {
-	_, err := exec.Command("bash", "-c", fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %s%%", changeValue)).Output()
-	if err != nil {
+	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %s%%", changeValue)
+	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatalf("%s: pactl is not installed on this system", err)
 	}
+
 	common.NotifySend(1.5, fmt.Sprintf("VolumeControl: %s%%", changeValue))
 }

@@ -9,29 +9,6 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-// type Container struct {
-// 	// TODO: add a node id and adress some of the containers by it <13-11-23, modernpacifist> //
-// 	// TODO: having a mark field here is extremely idiotic, since we have a map with keys of marks themselves <13-11-23, modernpacifist> //
-// 	ID     i3.NodeID `json:"ID"`
-// 	X      int64     `json:"X"`
-// 	Y      int64     `json:"Y"`
-// 	Width  int64     `json:"Width"`
-// 	Height int64     `json:"Height"`
-// 	Marks  []string  `json:"Marks"`
-// }
-
-// type FocusedMarkedContainer struct {
-// 	// TODO: add a node id and adress some of the containers by it <13-11-23, modernpacifist> //
-// 	// TODO: having a mark field here is extremely idiotic, since we have a map with keys of marks themselves <13-11-23, modernpacifist> //
-// 	ID     i3.NodeID `json:"ID"`
-// 	X      int64     `json:"X"`
-// 	Y      int64     `json:"Y"`
-// 	Width  int64     `json:"Width"`
-// 	Height int64     `json:"Height"`
-// 	Marks  []string  `json:"Marks"`
-// 	Output string    `json:"Output"`
-// }
-
 func GetI3Tree() i3.Tree {
 	tree, err := i3.GetTree()
 	if err != nil {
@@ -80,12 +57,12 @@ func GetFocusedWorkspace() (i3.Workspace, error) {
 }
 
 func GetFocusedOutput() (res i3.Output, err error) {
+	var focusedWs i3.Workspace
+
 	outputs, err := i3.GetOutputs()
 	if err != nil {
 		return i3.Output{}, err
 	}
-
-	var focusedWs i3.Workspace
 
 	o, err := i3.GetWorkspaces()
 	if err != nil {
@@ -127,9 +104,9 @@ func GetFocusedNode() *i3.Node {
 }
 
 func NotifySend(seconds float32, msg string) {
-	_, err := exec.Command("bash", "-c", fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)).Output()
+	cmd := fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)
 	// TODO: probably should catch this error via defer <04-12-23, modernpacifist> //
-	if err != nil {
+	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Println(err)
 	}
 }

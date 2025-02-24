@@ -6,7 +6,7 @@ import (
 	"os"
 	"regexp"
 
-	ops "github.com/modernpacifist/i3-scripts-go/internal/i3operations/volume_control"
+	volumeControl "github.com/modernpacifist/i3-scripts-go/internal/i3operations/volume_control"
 )
 
 const MAX_VOLUME = 100
@@ -23,12 +23,12 @@ func main() {
 	}
 
 	if *toggle == true {
-		ops.ToggleVolume()
+		volumeControl.ToggleVolume()
 		os.Exit(0)
 	}
 
 	if *round == true {
-		ops.RoundVolume()
+		volumeControl.RoundVolume()
 		os.Exit(0)
 	}
 
@@ -39,5 +39,5 @@ func main() {
 		log.Fatal("Wrong input user format")
 	}
 
-	ops.ChangeVolumeLevel(userInputDummy)
+	volumeControl.ChangeVolumeLevel(userInputDummy)
 }
