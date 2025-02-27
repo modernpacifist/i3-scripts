@@ -10,11 +10,13 @@ import (
 )
 
 func getMarkFromUser() (mark string) {
-	var userInput string
 	var promptMessage string = `Mark container (press "f" to mark with function keys): `
 
 	for {
-		userInput = i3operations.Runi3Input(promptMessage, 1)
+		userInput, err := i3operations.Runi3Input(promptMessage, 1)
+		if err != nil {
+			return ""
+		}
 
 		switch {
 		case regexp.MustCompile("[0-9]").MatchString(userInput):
@@ -42,17 +44,19 @@ func getMarkFromUser() (mark string) {
 func main() {
 	mark := getMarkFromUser()
 	if mark == "" {
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	matched, err := regexp.MatchString("^(f?[0-9]{1,2})$", mark)
 	if err != nil {
-		os.Exit(0)
+		os.Exit(1)
 	}
 
 	if !matched {
-		os.Exit(0)
+		os.Exit(1)
 	}
 
-	i3.RunCommand(fmt.Sprintf("mark %s", mark))
+	if _, err := i3.RunCommand(fmt.Sprintf("mark %s", mark)); err != nil {
+		os.Exit(1)
+	}
 }

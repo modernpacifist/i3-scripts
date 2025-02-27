@@ -9,11 +9,13 @@ import (
 )
 
 func GetWorkspaceNameFromUser() (string, error) {
-	var userInput string
 	var promptMessage string = "Rename workspace to: "
 
 	for {
-		userInput = common.Runi3Input(promptMessage, 0)
+		userInput, err := common.Runi3Input(promptMessage, 0)
+		if err != nil {
+			return "", err
+		}
 
 		if userInput != "" {
 			return userInput, nil

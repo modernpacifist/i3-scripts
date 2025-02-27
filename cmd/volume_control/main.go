@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO: read from env <28-02-25, modernpacifist> //
 const MAX_VOLUME = 100
 
 var rootCmd = &cobra.Command{

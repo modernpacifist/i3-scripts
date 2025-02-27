@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 	swapOps "github.com/modernpacifist/i3-scripts-go/internal/i3operations/swap_workspaces"
@@ -27,6 +26,4 @@ func main() {
 	if err := swapOps.SwapWorkspaces(focusedWorkspace, targetWorkspace); err != nil {
 		log.Fatal(err)
 	}
-
-	os.Exit(0)
 }

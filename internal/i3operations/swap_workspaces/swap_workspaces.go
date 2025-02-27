@@ -16,11 +16,13 @@ const (
 )
 
 func GetWorkspaceIndexFromUser() (int64, error) {
-	var userInput string
 	var promptMessage string = "Swap workspace with: "
 
 	for {
-		userInput = common.Runi3Input(promptMessage, 1)
+		userInput, err := common.Runi3Input(promptMessage, 1)
+		if err != nil {
+			return -1, err
+		}
 
 		switch {
 		case regexp.MustCompile("[0-9]").MatchString(userInput):

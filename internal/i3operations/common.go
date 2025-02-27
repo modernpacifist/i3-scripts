@@ -103,6 +103,13 @@ func GetFocusedNode() *i3.Node {
 	return node
 }
 
+func GetNodeMark(node *i3.Node) string {
+	if len(node.Marks) == 0 {
+		return ""
+	}
+	return node.Marks[0]
+}
+
 // TODO: make function accept error level
 func NotifySend(seconds float32, msg string) {
 	cmd := fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)
@@ -114,14 +121,14 @@ func NotifySend(seconds float32, msg string) {
 
 /* i3InputLimit must be set to 0 for unlimited input*/
 // TODO: must change the signature so that the i3-input payload is in the arguments <23-01-24, modernpacifist> //
-func Runi3Input(promptMessage string, inputLimit int) string {
+func Runi3Input(promptMessage string, inputLimit int) (string, error) {
 	cmd := fmt.Sprintf("i3-input -P \"%s\" -l %d | grep -oP \"output = \\K.*\" | tr -d '\n'", promptMessage, inputLimit)
 	output, err := exec.Command("bash", "-c", cmd).Output()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return string(output)
+	return string(output), nil
 }
 
 func GetWorkspaceByIndex(index int64) (i3.Workspace, error) {
