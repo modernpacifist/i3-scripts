@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
-	"go.i3wm.org/i3/v4"
 )
 
 var jsonWhitelistPath string
@@ -68,7 +67,7 @@ func resolveJsonAbsolutePath(filename string) string {
 	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
 }
 
-func Execute() {
+func Execute() error {
 	var jsonWhitelist JsonWhitelist
 
 	jsonWhitelistPath = resolveJsonAbsolutePath(".KillContainerConfig.json")
@@ -80,16 +79,17 @@ func Execute() {
 	focusedNode := common.GetFocusedNode()
 	focusedNodeMark := common.GetNodeMark(focusedNode)
 	if focusedNodeMark == "" || jsonWhitelist.checkWhitelist(focusedNodeMark) {
-		i3.RunCommand("kill")
-		os.Exit(0)
+		return common.RunKillCommand()
 	}
 
 	userConfirmation, err := common.Runi3Input("Kill container?", 1)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if userConfirmation == "y" {
-		i3.RunCommand("kill")
+		return common.RunKillCommand()
 	}
+
+	return nil
 }
