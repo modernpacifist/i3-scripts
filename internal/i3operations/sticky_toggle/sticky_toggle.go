@@ -1,8 +1,6 @@
 package sticky_toggle
 
-import (
-
-)
+import ()
 
 func Execute() error {
 	return nil

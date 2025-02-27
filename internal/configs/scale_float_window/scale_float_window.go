@@ -144,7 +144,6 @@ func createJsonConfigFile(configFileLoc string) {
 	}
 }
 
-
 func (jc JsonConfig) Dump() {
 	jsonData, err := json.MarshalIndent(jc, "", "\t")
 	if err != nil {

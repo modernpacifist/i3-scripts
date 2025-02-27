@@ -1,43 +1,68 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
 	"os"
 	"regexp"
 
 	volumeControl "github.com/modernpacifist/i3-scripts-go/internal/i3operations/volume_control"
+	"github.com/spf13/cobra"
 )
 
 const MAX_VOLUME = 100
 
-func main() {
-	toggle := flag.Bool("toggle", false, "Mute/unmute volume")
-	round := flag.Bool("round", false, "Round volume value to closest 5")
+var rootCmd = &cobra.Command{
+	Use:   "VolumeControl",
+	Short: "Control system volume",
+	Long:  `A CLI tool to control system volume including mute/unmute and volume adjustment`,
+}
 
-	flag.Parse()
-
-	if *toggle && *round {
-		log.Println("Arguments toggle and round can't be specified at the same time")
-		os.Exit(0)
-	}
-
-	if *toggle == true {
+var toggleCmd = &cobra.Command{
+	Use:   "toggle",
+	Short: "Toggle mute/unmute",
+	Run: func(cmd *cobra.Command, args []string) {
 		volumeControl.ToggleVolume()
-		os.Exit(0)
-	}
+	},
+}
 
-	if *round == true {
+var roundCmd = &cobra.Command{
+	Use:   "round",
+	Short: "Round volume to nearest 5",
+	Run: func(cmd *cobra.Command, args []string) {
 		volumeControl.RoundVolume()
-		os.Exit(0)
+	},
+}
+
+var adjustCmd = &cobra.Command{
+	Use:   "adjust [+-]<number>",
+	Short: "Adjust volume up or down",
+	DisableFlagParsing: true,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return cmd.Help()
+		}
+		regex := regexp.MustCompile(`^[-+]\d+$`)
+		fmt.Println(args)
+		if !regex.MatchString(args[0]) {
+			log.Fatal("Wrong input format. Use +N or -N where N is a number")
+		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			log.Fatal("No argument provided")
+		}
+		volumeControl.ChangeVolumeLevel(args[0])
+	},
+}
+
+func main() {
+	rootCmd.AddCommand(toggleCmd)
+	rootCmd.AddCommand(roundCmd)
+	rootCmd.AddCommand(adjustCmd)
+
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
 	}
-
-	userInputDummy := flag.Arg(0)
-
-	regex := regexp.MustCompile(`^[-+]\d+$`)
-	if !regex.MatchString(userInputDummy) {
-		log.Fatal("Wrong input user format")
-	}
-
-	volumeControl.ChangeVolumeLevel(userInputDummy)
 }
