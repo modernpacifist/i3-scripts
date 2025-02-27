@@ -103,11 +103,12 @@ func GetFocusedNode() *i3.Node {
 	return node
 }
 
+// TODO: make function accept error level
 func NotifySend(seconds float32, msg string) {
 	cmd := fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)
 	// TODO: probably should catch this error via defer <04-12-23, modernpacifist> //
 	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
 

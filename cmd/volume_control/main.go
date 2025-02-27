@@ -35,8 +35,8 @@ var roundCmd = &cobra.Command{
 }
 
 var adjustCmd = &cobra.Command{
-	Use:   "adjust [+-]<number>",
-	Short: "Adjust volume up or down",
+	Use:                "adjust [+-]<number>",
+	Short:              "Adjust volume up or down",
 	DisableFlagParsing: true,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
@@ -53,7 +53,7 @@ var adjustCmd = &cobra.Command{
 		if len(args) == 0 {
 			log.Fatal("No argument provided")
 		}
-		volumeControl.ChangeVolumeLevel(args[0])
+		volumeControl.AdjustVolume(args[0], MAX_VOLUME)
 	},
 }
 

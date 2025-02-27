@@ -49,7 +49,19 @@ func RoundVolume() {
 	common.NotifySend(1.5, fmt.Sprintf("VolumeControl: rounded to %.f%%", roundedVolume))
 }
 
-func ChangeVolumeLevel(changeValue string) {
+func AdjustVolume(changeValue string, maxVolume float64) {
+	currentVolume := getCurrentVolume()
+	change, err := strconv.ParseFloat(changeValue, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	newVolume := currentVolume + change
+	if newVolume > maxVolume {
+		common.NotifySend(1.5, fmt.Sprintf("VolumeControl: cannot adjust volume above %.f%%", maxVolume))
+		return
+	}
+
 	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %s%%", changeValue)
 	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatalf("%s: pactl is not installed on this system", err)
