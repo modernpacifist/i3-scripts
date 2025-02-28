@@ -15,7 +15,7 @@ const (
 	bufferWsName = "i3scripts_swap_workspace_buffer_ws"
 )
 
-func GetWorkspaceIndexFromUser() (int64, error) {
+func getWorkspaceIndexFromUser() (int64, error) {
 	var promptMessage string = "Swap workspace with: "
 
 	for {
@@ -68,6 +68,29 @@ func SwapWorkspaces(currentWs i3.Workspace, swapWs i3.Workspace) (err error) {
 		i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", swapWsNewName, swapWsName))
 		i3.RunCommand(fmt.Sprintf("rename workspace %s to %s", bufferWsName, currentWsName))
 		return fmt.Errorf("failed to complete workspace swap: %w", err)
+	}
+
+	return nil
+}
+
+func Execute() (err error) {
+	userInput, err := getWorkspaceIndexFromUser()
+	if err != nil || userInput == -1 {
+		return err
+	}
+
+	targetWorkspace, err := common.GetWorkspaceByIndex(userInput)
+	if err != nil {
+		return err
+	}
+
+	focusedWorkspace, err := common.GetFocusedWorkspace()
+	if err != nil {
+		return err
+	}
+
+	if err := SwapWorkspaces(focusedWorkspace, targetWorkspace); err != nil {
+		return err
 	}
 
 	return nil

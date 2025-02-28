@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 	"regexp"
 
 	volumeControl "github.com/modernpacifist/i3-scripts-go/internal/i3operations/volume_control"
@@ -44,7 +42,6 @@ var adjustCmd = &cobra.Command{
 			return cmd.Help()
 		}
 		regex := regexp.MustCompile(`^[-+]\d+$`)
-		fmt.Println(args)
 		if !regex.MatchString(args[0]) {
 			log.Fatal("Wrong input format. Use +N or -N where N is a number")
 		}
@@ -64,6 +61,6 @@ func main() {
 	rootCmd.AddCommand(adjustCmd)
 
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }

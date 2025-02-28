@@ -1,23 +1,51 @@
 package main
 
 import (
-	"flag"
-	"fmt"
+	"log"
+	"regexp"
+	"strconv"
 
-	"go.i3wm.org/i3/v4"
+	diagonalResize "github.com/modernpacifist/i3-scripts-go/internal/i3operations/diagonal_resize"
+	"github.com/spf13/cobra"
 )
 
-func resize(resizeValue int) {
-	i3.RunCommand(fmt.Sprintf("resize grow width %d px or %d ppt", resizeValue, resizeValue))
-	i3.RunCommand(fmt.Sprintf("resize grow height %d px or %d ppt", resizeValue, resizeValue))
-	i3.RunCommand(fmt.Sprintf("move container left %d px", resizeValue/2))
-	i3.RunCommand(fmt.Sprintf("move container up %d px", resizeValue/2))
+var rootCmd = &cobra.Command{
+	Use:   "DiagonalResize",
+	Short: "Resize the i3 floating window diagonally",
+	Long:  `A CLI tool to resize the i3 floating window diagonally`,
+}
+
+var sizeCmd = &cobra.Command{
+	Use:                "size [value]",
+	Short:              "Resize the i3 floating window diagonally",
+	DisableFlagParsing: true,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return cmd.Help()
+		}
+		regex := regexp.MustCompile(`^[-+]\d+$`)
+		if !regex.MatchString(args[0]) {
+			log.Fatal("Wrong input format. Use +N or -N where N is a number")
+		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			log.Fatal("No argument provided")
+		}
+
+		resizeValue, err := strconv.Atoi(args[0])
+		if err != nil {
+			log.Fatal("Invalid value:", args[0])
+		}
+		diagonalResize.Execute(resizeValue)
+	},
 }
 
 func main() {
-	resizeValue := flag.Int("size", 0, "Resize value")
+	rootCmd.AddCommand(sizeCmd)
 
-	flag.Parse()
-
-	resize(*resizeValue)
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
