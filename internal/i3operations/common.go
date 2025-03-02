@@ -153,3 +153,11 @@ func RunKillCommand() error {
 
 	return nil
 }
+
+func RunRenameWorkspaceCommand(newWsName string) error {
+	if _, err := i3.RunCommand(fmt.Sprintf("rename workspace to %s", newWsName)); err != nil {
+		return err
+	}
+
+	return nil
+}

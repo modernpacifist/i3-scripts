@@ -1,81 +1,42 @@
 package main
 
 import (
-	"errors"
-	"flag"
-	"fmt"
-	"os"
-	"os/exec"
-	"strings"
+	"log"
+	"strconv"
 
-	"go.i3wm.org/i3/v4"
+	changeWorkspaceIndex "github.com/modernpacifist/i3-scripts-go/internal/i3operations/change_workspace_index"
+	"github.com/spf13/cobra"
 )
 
-func getCurrentWsNum() (int64, string, error) {
-	workspaces, _ := i3.GetWorkspaces()
+var rootCmd = &cobra.Command{
+	Use:   "ChangeWorkspaceIndex",
+	Short: "Change the current workspace index",
+	Long:  `A CLI tool to change the current workspace index`,
+}
 
-	for _, ws := range workspaces {
-		if ws.Focused == true {
-			return ws.Num, ws.Name, nil
+var indexCmd = &cobra.Command{
+	Use:   "index",
+	Short: "Specify the new workspace index",
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			log.Fatal("Index was not specified")
 		}
-	}
 
-	return 0, "", errors.New("The error")
-}
-
-func getExistingWs() []int64 {
-	var res []int64
-	workspaces, _ := i3.GetWorkspaces()
-
-	for _, ws := range workspaces {
-		res = append(res, ws.Num)
-	}
-
-	return res
-}
-
-func notifySend(time int, msg string) {
-	cmd := exec.Command("notify-send", fmt.Sprintf("--expire-time=%d", time), msg)
-	_, err := cmd.Output()
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-func checkOccupiedWsIndex(wsNum int64, numbers []int64) {
-	for _, num := range numbers {
-		if num == wsNum {
-			notifySend(3000, fmt.Sprintf("Index %d already occupied", wsNum))
-			os.Exit(0)
+		newWsIndex, err := strconv.ParseInt(args[0], 10, 64)
+		if err != nil {
+			log.Fatal(err)
 		}
-	}
+
+		if err := changeWorkspaceIndex.Execute(newWsIndex); err != nil {
+			log.Fatal(err)
+		}
+	},
 }
 
 func main() {
-	newWsIndex := flag.Int64("index", -1, "New index")
+	rootCmd.AddCommand(indexCmd)
 
-	flag.Parse()
-
-	if *newWsIndex == -1 {
-		panic("Index was not specified")
-	}
-
-	existingIndices := getExistingWs()
-	checkOccupiedWsIndex(*newWsIndex, existingIndices)
-
-	_, currentWsName, err := getCurrentWsNum()
-	// TODO: handle error and exit explicitly <13-10-23, modernpacifist> //
-	if err != nil {
-		panic("Could not retrieve")
-	}
-
-	parts := strings.Split(currentWsName, ":")
-
-	if len(parts) == 2 {
-		i3.RunCommand(fmt.Sprintf("rename workspace to %d:%s", *newWsIndex, parts[1]))
-	}
-
-	if len(parts) == 1 {
-		i3.RunCommand(fmt.Sprintf("rename workspace to %d", *newWsIndex))
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
 }
