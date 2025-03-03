@@ -13,28 +13,24 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	// "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 
 	"go.i3wm.org/i3/v4"
 )
 
-const ConfigFilename = ".ScreenDim.json"
+// const ConfigFilename = ".ScreenDim.json"
 
-type JsonStruct struct {
-	Brightness float64 `json:"currentBrightness"`
-}
+// type Config struct {
+// 	Path       string  `json:"-"`
+// 	Brightness float64 `json:"Brightness"`
+// }
 
-type Config struct {
-	Path       string  `json:"-"`
-	Brightness float64 `json:"Brightness"`
-}
-
-func configConstructor(filename string) Config {
-	return Config{
-		Path:       filename,
-		Brightness: 0,
-	}
-}
+// func configConstructor(filename string) Config {
+// 	return Config{
+// 		Path:       filename,
+// 		Brightness: 0,
+// 	}
+// }
 
 func (conf *Config) dump() {
 	jsonData, err := json.MarshalIndent(conf, "", "\t")
@@ -98,15 +94,15 @@ func SetBrightnessLevel(brightness float64) {
 	}
 }
 
-func getPrimaryOutput() string {
-	outputs, _ := i3.GetOutputs()
-	for _, output := range outputs {
-		if output.Primary == true {
-			return output.Name
-		}
-	}
-	return ""
-}
+// func getPrimaryOutput() string {
+// 	outputs, _ := i3.GetOutputs()
+// 	for _, output := range outputs {
+// 		if output.Primary == true {
+// 			return output.Name
+// 		}
+// 	}
+// 	return ""
+// }
 
 func resolveBrightnessLevel(currentBrightness float64, changeValue float64) float64 {
 	num := currentBrightness + changeValue

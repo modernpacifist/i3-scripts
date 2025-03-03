@@ -56,6 +56,30 @@ func GetFocusedWorkspace() (i3.Workspace, error) {
 	return i3.Workspace{}, errors.New("could not get focused workspace")
 }
 
+func GetOutputs() ([]i3.Output, error) {
+	o, err := i3.GetOutputs()
+	if err != nil {
+		return []i3.Output{}, err
+	}
+
+	return o, nil
+}
+
+func GetPrimaryOutput() (i3.Output, error) {
+	o, err := i3.GetOutputs()
+	if err != nil {
+		return i3.Output{}, err
+	}
+
+	for _, output := range o {
+		if output.Primary {
+			return output, nil
+		}
+	}
+
+	return i3.Output{}, errors.New("could not get primary output")
+}
+
 func GetFocusedOutput() (res i3.Output, err error) {
 	var focusedWs i3.Workspace
 
