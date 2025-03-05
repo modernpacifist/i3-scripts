@@ -17,7 +17,9 @@ func GetWorkspaceNameFromUser() (string, error) {
 			return "", err
 		}
 
-		return userInput, nil
+		if userInput != "" {
+			return userInput, nil
+		}
 	}
 }
 
