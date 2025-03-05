@@ -2,8 +2,8 @@ package change_monitor_brightness
 
 import (
 	"encoding/json"
-	"os"
 	"log"
+	"os"
 )
 
 const configFilename = "~/.ScreenDim.json"

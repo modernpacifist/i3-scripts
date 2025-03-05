@@ -13,13 +13,11 @@ func GetWorkspaceNameFromUser() (string, error) {
 
 	for {
 		userInput, err := common.Runi3Input(promptMessage, 0)
-		if err != nil {
+		if err != nil || userInput == "" {
 			return "", err
 		}
 
-		if userInput != "" {
-			return userInput, nil
-		}
+		return userInput, nil
 	}
 }
 

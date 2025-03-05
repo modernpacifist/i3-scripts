@@ -1,10 +1,10 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"encoding/json"
 	"os/user"
 	"strings"
 

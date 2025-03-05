@@ -19,7 +19,7 @@ func resize(resizeValue int) error {
 
 func Execute(resizeValue int) error {
 	if err := resize(resizeValue); err != nil {
-		
+
 	}
 
 	return nil
