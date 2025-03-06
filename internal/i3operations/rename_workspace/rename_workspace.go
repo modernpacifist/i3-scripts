@@ -43,6 +43,7 @@ func Execute() error {
 		return err
 	}
 
+	// TODO: add check if newName is spaces
 	if newName == "" {
 		cmd = fmt.Sprintf("rename workspace to %s", currentWsName)
 	} else {
