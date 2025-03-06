@@ -30,20 +30,21 @@ func replaceSpacesWithUnderscore(s string) string {
 func Execute() error {
 	var cmd string
 
-	newName, err := GetWorkspaceNameFromUser()
-	if err != nil {
-		return err
-	}
-
 	focusedWorkspace, err := common.GetFocusedWorkspace()
 	if err != nil {
 		return err
 	}
 
 	wsIndex := focusedWorkspace.Num
+	currentWsName := focusedWorkspace.Name
+
+	newName, err := GetWorkspaceNameFromUser()
+	if err != nil {
+		return err
+	}
 
 	if newName == "" {
-		cmd = fmt.Sprintf("rename workspace to %d", wsIndex)
+		cmd = fmt.Sprintf("rename workspace to %s", currentWsName)
 	} else {
 		cmd = fmt.Sprintf("rename workspace to %d:%s", wsIndex, replaceSpacesWithUnderscore(newName))
 	}
