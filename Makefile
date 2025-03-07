@@ -4,8 +4,8 @@ fmt:
 back_and_forth_containers:
 	go build -o ./bin/BackAndForthContainers ./cmd/back_and_forth_containers/main.go
 
-change_keyboard_layout:
-	go build -o ./bin/ChangeKeyboardLayout ./cmd/change_keyboard_layout/main.go
+keyboard_layout:
+	go build -o ./bin/KeyboardLayout ./cmd/keyboard_layout/main.go
 
 change_monitor_brightness:
 	go build -o ./bin/ChangeMonitorBrightness ./cmd/change_monitor_brightness/main.go
@@ -48,7 +48,7 @@ volume_control:
 
 build:
 	make back_and_forth_containers
-	make change_keyboard_layout
+	make keyboard_layout
 	make change_monitor_brightness
 	make change_workspace_index
 	make diagonal_resize
