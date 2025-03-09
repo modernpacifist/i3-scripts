@@ -10,13 +10,18 @@ var rootCmd = &cobra.Command{
 	Use:   "change-brightness",
 	Short: "Change monitor brightness by a specified value",
 	Run: func(cmd *cobra.Command, args []string) {
-		change, _ := cmd.Flags().GetFloat64("change")
+		change, err := cmd.Flags().GetFloat64("change")
+		if err != nil || !cmd.Flags().Changed("change") {
+			cmd.Help()
+			return
+		}
 		changeMonitorBrightness.Execute(change)
 	},
 }
 
 func init() {
-	rootCmd.Flags().Float64P("change", "c", 0.1, "Amount to change brightness (positive or negative float)")
+	rootCmd.Flags().Float64P("change", "c", 0, "Amount to change brightness (positive or negative float)")
+	rootCmd.MarkFlagRequired("change")
 }
 
 func main() {
