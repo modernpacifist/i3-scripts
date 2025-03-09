@@ -134,6 +134,13 @@ func GetNodeMark(node *i3.Node) string {
 	return node.Marks[0]
 }
 
+func GetNodeMarks(node *i3.Node) []string {
+	if len(node.Marks) == 0 {
+		return []string{}
+	}
+	return node.Marks
+}
+
 // TODO: make function accept error level
 func NotifySend(seconds float32, msg string) {
 	cmd := fmt.Sprintf("notify-send --expire-time=%.f \"%s\"", seconds*1000, msg)
@@ -185,3 +192,20 @@ func RunRenameWorkspaceCommand(newWsName string) error {
 
 	return nil
 }
+
+// func GetBarConfig() (i3.BarConfig, error) {
+// 	barIDs, err := i3.GetBarIDs()
+// 	if err != nil {
+// 		return i3.BarConfig{}, err
+// 	}
+
+// 	fmt.Println("Bar IDs: ")
+// 	fmt.Printf("%+v\n", barIDs)
+
+// 	barConfig, err := i3.GetBarConfig(barIDs[0])
+// 	if err != nil {
+// 		return i3.BarConfig{}, err
+// 	}
+
+// 	return barConfig, nil
+// }

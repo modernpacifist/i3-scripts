@@ -1,162 +1,24 @@
 package main
 
 import (
-	"encoding/json"
-	"flag"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"math"
-	"os"
-	"os/exec"
-	"os/user"
-	"strconv"
-	"strings"
+	"github.com/spf13/cobra"
 
-	// "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
-
-	"go.i3wm.org/i3/v4"
+	changeMonitorBrightness "github.com/modernpacifist/i3-scripts-go/internal/i3operations/change_monitor_brightness"
 )
 
-// const ConfigFilename = ".ScreenDim.json"
-
-// type Config struct {
-// 	Path       string  `json:"-"`
-// 	Brightness float64 `json:"Brightness"`
-// }
-
-// func configConstructor(filename string) Config {
-// 	return Config{
-// 		Path:       filename,
-// 		Brightness: 0,
-// 	}
-// }
-
-func (conf *Config) dump() {
-	jsonData, err := json.MarshalIndent(conf, "", "\t")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = ioutil.WriteFile(conf.Path, jsonData, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+var rootCmd = &cobra.Command{
+	Use:   "change-brightness",
+	Short: "Change monitor brightness by a specified value",
+	Run: func(cmd *cobra.Command, args []string) {
+		change, _ := cmd.Flags().GetFloat64("change")
+		changeMonitorBrightness.Execute(change)
+	},
 }
 
-func (conf *Config) updateBrightness(newBrightness float64) {
-	conf.Brightness = newBrightness
-}
-
-func (conf *Config) readFromFile() {
-	file, err := os.Open(conf.Path)
-	if err != nil {
-		log.Fatal("Error opening file:", err)
-	}
-	defer file.Close()
-
-	content, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal("Error reading file:", err)
-	}
-
-	err = json.Unmarshal(content, conf)
-	if err != nil {
-		log.Fatal("Error unmarshaling JSON:", err)
-	}
-}
-
-func getCurrentBrigthnessXrandr(display string) float64 {
-	c := fmt.Sprintf("xrandr --verbose --current | grep %s -A5 | tail -n1 | awk -F \": \" '{print $2}'", display)
-	cmd, err := exec.Command("bash", "-c", c).Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	num, err := strconv.ParseFloat(strings.TrimRight(string(cmd), "\n"), 64)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return num
-}
-
-func SetBrightnessLevel(brightness float64) {
-	outputs, _ := i3.GetOutputs()
-	for _, o := range outputs {
-		if o.Active == true {
-			c := fmt.Sprintf("xrandr --output %s --brightness %f", o.Name, brightness)
-			_, err := exec.Command("bash", "-c", c).Output()
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
-}
-
-// func getPrimaryOutput() string {
-// 	outputs, _ := i3.GetOutputs()
-// 	for _, output := range outputs {
-// 		if output.Primary == true {
-// 			return output.Name
-// 		}
-// 	}
-// 	return ""
-// }
-
-func resolveBrightnessLevel(currentBrightness float64, changeValue float64) float64 {
-	num := currentBrightness + changeValue
-	resBrightness := math.Round(num*10) / 10
-
-	if !(0.1 <= resBrightness && resBrightness <= 1.0) {
-		log.Fatal("Brightness exceeds the allowed interval")
-	}
-
-	return resBrightness
-}
-
-func resolveAbsolutePath(filename string) string {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return strings.Replace(fmt.Sprintf("~/%s", filename), "~", usr.HomeDir, 1)
+func init() {
+	rootCmd.Flags().Float64P("change", "c", 0.1, "Amount to change brightness (positive or negative float)")
 }
 
 func main() {
-	var floatValue float64
-	flag.Float64Var(&floatValue, "f", 0.0, "Brightness value")
-	flag.Parse()
-
-	if floatValue == 0 {
-		log.Fatal("The brightness level was not specified")
-	}
-
-	primaryOutput := getPrimaryOutput()
-	if primaryOutput == "" {
-		log.Fatal("Could not get primary output")
-	}
-
-	absoluteConfigPath := resolveAbsolutePath(ConfigFilename)
-
-	config := configConstructor(absoluteConfigPath)
-
-	_, err := os.Stat(absoluteConfigPath)
-	if os.IsNotExist(err) {
-		currentBrightness := getCurrentBrigthnessXrandr(primaryOutput)
-		config.updateBrightness(currentBrightness)
-		config.dump()
-	} else {
-		config.readFromFile()
-	}
-
-	res := resolveBrightnessLevel(config.Brightness, floatValue)
-
-	if res != 0 {
-		config.updateBrightness(res)
-		SetBrightnessLevel(config.Brightness)
-		i3operations.NotifySend(1, fmt.Sprintf("Current brightness: %.1f", config.Brightness))
-		config.dump()
-	}
+	rootCmd.Execute()
 }
