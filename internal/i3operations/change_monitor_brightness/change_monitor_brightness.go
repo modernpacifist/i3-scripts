@@ -14,6 +14,18 @@ import (
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 )
 
+const (
+	MinBrightness = 0.1
+	MaxBrightness = 1.0
+)
+
+func Validate(b float64) error {
+	if b < MinBrightness || b > MaxBrightness {
+		return fmt.Errorf("brightness %.1f exceeds allowed range [%.1f, %.1f]", b, MinBrightness, MaxBrightness)
+	}
+	return nil
+}
+
 func getCurrentBrightnessXrandr(display string) (float64, error) {
 	if !isValidDisplayName(display) {
 		return 0, fmt.Errorf("invalid display name: %s", display)
@@ -49,6 +61,7 @@ func getCurrentBrightnessXrandr(display string) (float64, error) {
 	if !displayFound {
 		return 0, fmt.Errorf("display %s not found", display)
 	}
+
 	return 0, fmt.Errorf("brightness information not found for display %s", display)
 }
 
@@ -58,34 +71,37 @@ func isValidDisplayName(display string) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
-func setBrightnessLevel(brightness float64) {
+func setBrightnessLevel(brightness float64) error {
 	outputs, err := common.GetOutputs()
 	if err != nil {
-		log.Fatal("Could not get outputs")
+		return fmt.Errorf("could not get outputs: %w", err)
 	}
 
 	for _, o := range outputs {
 		if o.Active {
 			cmd := fmt.Sprintf(`xrandr --output %s --brightness %f`, o.Name, brightness)
 			if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
-				log.Fatal(err)
+				return fmt.Errorf("failed to set brightness for %s: %w", o.Name, err)
 			}
 		}
 	}
+
+	return nil
 }
 
-func resolveBrightnessLevel(currentBrightness float64, changeValue float64) float64 {
+func resolveBrightnessLevel(currentBrightness float64, changeValue float64) (float64, error) {
 	num := currentBrightness + changeValue
 	resBrightness := math.Round(num*10) / 10
 
-	if !(0.1 <= resBrightness && resBrightness <= 1.0) {
-		log.Fatal("Brightness exceeds the allowed interval")
+	if err := Validate(resBrightness); err != nil {
+		return 0, err
 	}
 
-	return resBrightness
+	return resBrightness, nil
 }
 
 func Execute(arg float64) {
@@ -108,11 +124,17 @@ func Execute(arg float64) {
 		config.Load()
 	}
 
-	res := resolveBrightnessLevel(config.Brightness, arg)
+	res, err := resolveBrightnessLevel(config.Brightness, arg)
+	if err != nil {
+		log.Fatalf("Error resolving brightness level: %v", err)
+	}
 
 	if res != 0 {
 		config.UpdateBrightness(res)
-		setBrightnessLevel(config.Brightness)
+		err = setBrightnessLevel(res)
+		if err != nil {
+			log.Fatalf("Error setting brightness: %v", err)
+		}
 		common.NotifySend(1, fmt.Sprintf("Current brightness: %.1f", config.Brightness))
 		config.Dump()
 	}
