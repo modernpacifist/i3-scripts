@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 
 	changeMonitorBrightness "github.com/modernpacifist/i3-scripts-go/internal/i3operations/change_monitor_brightness"
@@ -12,8 +14,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		change, err := cmd.Flags().GetFloat64("change")
 		if err != nil || !cmd.Flags().Changed("change") {
-			cmd.Help()
-			return
+			log.Fatal("No argument provided")
 		}
 		changeMonitorBrightness.Execute(change)
 	},
