@@ -115,13 +115,22 @@ func Execute(arg float64) {
 		log.Fatalf("Error getting current brightness: %v", err)
 	}
 
-	config := config.Create()
+	config, err := config.Create()
+	if err != nil {
+		log.Fatalf("Error creating config: %v", err)
+	}
 
 	if _, err := os.Stat(config.Path); os.IsNotExist(err) {
-		config.UpdateBrightness(currentBrightness)
-		config.Dump()
+		if err = config.UpdateBrightness(currentBrightness); err != nil {
+			log.Fatalf("Error updating brightness: %v", err)
+		}
+		if err = config.Dump(); err != nil {
+			log.Fatalf("Error dumping config: %v", err)
+		}
 	} else {
-		config.Load()
+		if err := config.Load(); err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
 	}
 
 	res, err := resolveBrightnessLevel(config.Brightness, arg)
