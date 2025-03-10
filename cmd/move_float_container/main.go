@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	moveFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/move_float_container"
 )
 
@@ -14,7 +16,9 @@ func main() {
 	//os.Exit(0)
 	//}
 
+	// dummy value
 	arg := 1
-	moveFloatContainer.Execute(arg)
-
+	if err := moveFloatContainer.Execute(arg); err != nil {
+		log.Fatal(err)
+	}
 }

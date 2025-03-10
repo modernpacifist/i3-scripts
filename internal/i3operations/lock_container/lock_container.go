@@ -30,7 +30,7 @@ func generateMD5Hash(input string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func markFocusedContainer(node *i3.Node, mark string) error {
+func markFocusedContainer(node i3.Node, mark string) error {
 	if _, err := i3.RunCommand(fmt.Sprintf("[con_id=%d] mark --add %s", node.ID, mark)); err != nil {
 		return fmt.Errorf("failed to mark focused container: %w", err)
 	}
@@ -39,7 +39,11 @@ func markFocusedContainer(node *i3.Node, mark string) error {
 }
 
 func Execute() error {
-	node := common.GetFocusedNode()
+	node, err := common.GetFocusedNode()
+	if err != nil {
+		return fmt.Errorf("failed to get focused node: %w", err)
+	}
+
 	md5Hash := generateMD5Hash(generateRandomString(randomStringLength))
 
 	if err := markFocusedContainer(node, md5Hash); err != nil {

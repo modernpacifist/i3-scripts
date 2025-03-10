@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/user"
-	"strings"
+
+	common "github.com/modernpacifist/i3-scripts-go/internal/config"
 )
 
 const (
 	configFilename string      = "~/.ScreenDim.json"
 	defaultPerms   os.FileMode = 0644
-	minBrightness  float64     = 0
-	maxBrightness  float64     = 1
+
+	// these must not be here
+	minBrightness float64 = 0
+	maxBrightness float64 = 1
 )
 
 type Config struct {
@@ -22,7 +24,7 @@ type Config struct {
 }
 
 func Create() (Config, error) {
-	absolutePath, err := ResolveAbsolutePath(configFilename)
+	absolutePath, err := common.ExpandHomeDir(configFilename)
 	if err != nil {
 		return Config{}, fmt.Errorf("resolving absolute path: %w", err)
 	}
@@ -73,17 +75,4 @@ func (conf *Config) UpdateBrightness(newBrightness float64) error {
 	}
 	conf.Brightness = newBrightness
 	return nil
-}
-
-func ResolveAbsolutePath(filename string) (string, error) {
-	if !strings.HasPrefix(filename, "~") {
-		return filename, nil
-	}
-
-	usr, err := user.Current()
-	if err != nil {
-		return "", fmt.Errorf("failed to get current user: %w", err)
-	}
-
-	return strings.Replace(filename, "~", usr.HomeDir, 1), nil
 }

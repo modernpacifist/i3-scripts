@@ -9,13 +9,13 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-func GetI3Tree() i3.Tree {
+func GetI3Tree() (i3.Tree, error) {
 	tree, err := i3.GetTree()
 	if err != nil {
-		log.Fatal(err)
+		return i3.Tree{}, err
 	}
 
-	return tree
+	return tree, nil
 }
 
 func GetWorkspaces() ([]i3.Workspace, error) {
@@ -27,18 +27,40 @@ func GetWorkspaces() ([]i3.Workspace, error) {
 	return o, nil
 }
 
-func GetWorkspaceNodes() *i3.Node {
-	i3Tree := GetI3Tree()
+func GetWorkspaceNodes() (i3.Node, error) {
+	i3Tree, err := GetI3Tree()
+	if err != nil {
+		return i3.Node{}, err
+	}
 
 	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
 		return n.Focused
 	})
 
 	if node == nil {
-		log.Fatal(errors.New("could not get focused node"))
+		return i3.Node{}, errors.New("could not get focused node")
 	}
 
-	return node
+	// get rid of the pointer
+	return *node, nil
+}
+
+func GetFocusedNode() (i3.Node, error) {
+	i3Tree, err := GetI3Tree()
+	if err != nil {
+		return i3.Node{}, err
+	}
+
+	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
+		return n.Focused
+	})
+
+	if node == nil {
+		return i3.Node{}, errors.New("could not get focused node")
+	}
+
+	// get rid of the pointer
+	return *node, nil
 }
 
 func GetFocusedWorkspace() (i3.Workspace, error) {
@@ -63,6 +85,23 @@ func GetOutputs() ([]i3.Output, error) {
 	}
 
 	return o, nil
+}
+
+func GetActiveOutputs() ([]i3.Output, error) {
+	var activeOutputs []i3.Output
+
+	o, err := i3.GetOutputs()
+	if err != nil {
+		return []i3.Output{}, err
+	}
+
+	for _, output := range o {
+		if output.Active {
+			activeOutputs = append(activeOutputs, output)
+		}
+	}
+
+	return activeOutputs, nil
 }
 
 func GetPrimaryOutput() (i3.Output, error) {
@@ -113,28 +152,16 @@ func GetFocusedOutput() (res i3.Output, err error) {
 	return i3.Output{}, errors.New("could not get focused output")
 }
 
-func GetFocusedNode() *i3.Node {
-	i3Tree := GetI3Tree()
-
-	node := i3Tree.Root.FindFocused(func(n *i3.Node) bool {
-		return n.Focused
-	})
-
-	if node == nil {
-		log.Fatal(errors.New("could not get focused node"))
-	}
-
-	return node
-}
-
-func GetNodeMark(node *i3.Node) string {
+// bullshit function
+func GetNodeMark(node i3.Node) string {
 	if len(node.Marks) == 0 {
 		return ""
 	}
 	return node.Marks[0]
 }
 
-func GetNodeMarks(node *i3.Node) []string {
+// correct version of bullshit function
+func GetNodeMarks(node i3.Node) []string {
 	if len(node.Marks) == 0 {
 		return []string{}
 	}
@@ -193,19 +220,11 @@ func RunRenameWorkspaceCommand(newWsName string) error {
 	return nil
 }
 
-// func GetBarConfig() (i3.BarConfig, error) {
-// 	barIDs, err := i3.GetBarIDs()
-// 	if err != nil {
-// 		return i3.BarConfig{}, err
-// 	}
+func MoveNodeToPosition(nodeId, x, y int64) error {
+	cmd := fmt.Sprintf("xdotool windowmove %d %d %d", nodeId, x, y)
+	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
+		return err
+	}
 
-// 	fmt.Println("Bar IDs: ")
-// 	fmt.Printf("%+v\n", barIDs)
-
-// 	barConfig, err := i3.GetBarConfig(barIDs[0])
-// 	if err != nil {
-// 		return i3.BarConfig{}, err
-// 	}
-
-// 	return barConfig, nil
-// }
+	return nil
+}

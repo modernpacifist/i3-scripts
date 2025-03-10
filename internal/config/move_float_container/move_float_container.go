@@ -1,66 +1,84 @@
-package config
+package move_float_container
 
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"io"
 	"os"
 
 	"go.i3wm.org/i3/v4"
 
 	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+
+	common "github.com/modernpacifist/i3-scripts-go/internal/config"
 )
 
 const (
-	ConfigFilename string = "~/.MoveFloatContainer.json"
-	StatusBarHeight int = 53
+	configFilename  string      = "~/.MoveFloatContainer.json"
+	defaultPerms    os.FileMode = 0644
+	StatusBarHeight int         = 53
 )
 
+type Config struct {
+	Path  string                `json:"-"`
+	Nodes map[string]NodeConfig `json:"Nodes"`
+}
+
+func Create() (Config, error) {
+	absolutePath, err := common.ExpandHomeDir(configFilename)
+	if err != nil {
+		return Config{}, fmt.Errorf("resolving absolute path: %w", err)
+	}
+
+	return Config{
+		Path:  absolutePath,
+		Nodes: make(map[string]NodeConfig),
+	}, nil
+}
+
+func (conf *Config) Dump() error {
+	jsonData, err := json.MarshalIndent(conf, "", "\t")
+	if err != nil {
+		return fmt.Errorf("marshaling JSON: %w", err)
+	}
+
+	if err := os.WriteFile(conf.Path, jsonData, 0644); err != nil {
+		return fmt.Errorf("writing file: %w", err)
+	}
+
+	return nil
+}
+
+func (conf *Config) Load() error {
+	file, err := os.Open(conf.Path)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("opening config file: %w", err)
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		return fmt.Errorf("reading file: %w", err)
+	}
+
+	if err := json.Unmarshal(content, conf); err != nil {
+		return fmt.Errorf("unmarshaling JSON: %w", err)
+	}
+	return nil
+}
+
+// ConfigEntity
 type NodeConfig struct {
 	i3.Node
 	Marks []string
 }
 
-
-func NodeConfigConstructor(node *i3.Node) NodeConfig {
+func NodeConfigConstructor(node i3.Node) NodeConfig {
 	return NodeConfig{
-		Node:  *node,
+		Node:  node,
 		Marks: i3operations.GetNodeMarks(node),
-	}
-}
-
-type JsonConfig struct {
-	Location string                `json:"-"`
-	Nodes    map[string]NodeConfig `json:"Nodes"`
-}
-
-// func CreateJsonConfigFile[T any](config T, configFileLoc string) {
-// 	file, err := os.Create(configFileLoc)
-// 	if err != nil {
-// 		log.Fatal("Error creating file:", err)
-// 	}
-// 	defer file.Close()
-// 	encoder := json.NewEncoder(file)
-// 	err = encoder.Encode(config)
-// 	if err != nil {
-// 		fmt.Println("Error encoding JSON:", err)
-// 		return
-// 	}
-// }
-
-func CreateJsonConfigFile(jsonConfig JsonConfig, configFileLoc string) {
-	// var jsonConfig JsonConfig
-
-	file, err := os.Create(configFileLoc)
-	if err != nil {
-		log.Fatal("Error creating file:", err)
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(jsonConfig)
-	if err != nil {
-		fmt.Println("Error encoding JSON:", err)
-		return
 	}
 }

@@ -72,11 +72,15 @@ func Execute() error {
 
 	jsonWhitelistPath = resolveJsonAbsolutePath(".KillContainerConfig.json")
 
-	if fileExists(jsonWhitelistPath) == true {
+	if fileExists(jsonWhitelistPath) {
 		jsonWhitelist = readJsonWhitelist(jsonWhitelistPath)
 	}
 
-	focusedNode := common.GetFocusedNode()
+	focusedNode, err := common.GetFocusedNode()
+	if err != nil {
+		return fmt.Errorf("failed to get focused node: %w", err)
+	}
+
 	focusedNodeMark := common.GetNodeMark(focusedNode)
 	if focusedNodeMark == "" || jsonWhitelist.checkWhitelist(focusedNodeMark) {
 		return common.RunKillCommand()
