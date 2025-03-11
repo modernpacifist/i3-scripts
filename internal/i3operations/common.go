@@ -220,11 +220,11 @@ func RunRenameWorkspaceCommand(newWsName string) error {
 	return nil
 }
 
-func MoveNodeToPosition(nodeId, x, y int64) error {
-	cmd := fmt.Sprintf("xdotool windowmove %d %d %d", nodeId, x, y)
-	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
-		return err
+func GetBarConfig() (i3.BarConfig, error) {
+	reply, err := i3.GetBarConfig("*")
+	if err != nil {
+		return i3.BarConfig{}, err
 	}
 
-	return nil
+	return reply, nil
 }
