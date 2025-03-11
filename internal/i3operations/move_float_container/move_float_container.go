@@ -68,7 +68,10 @@ type Position struct {
 func resolveNewPosition(outputGeometry outputGeometry, nodeGeometry nodeGeometry) (int64, int64, error) {
 	// move to bottom right
 	// dummyInput := bottomRight
-	dummyInput := bottomMiddle
+	// dummyInput := bottomMiddle
+	// dummyInput := middleRight
+	// dummyInput := middleMiddle
+	dummyInput := middleLeft
 
 	positions := map[uint8]Position{
 		topLeft: {
@@ -84,16 +87,16 @@ func resolveNewPosition(outputGeometry outputGeometry, nodeGeometry nodeGeometry
 			Y: 0,
 		},
 		middleLeft: {
-			X: 0,
-			Y: outputGeometry.Height / 2,
+			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		middleMiddle: {
-			X: outputGeometry.Width / 2,
-			Y: outputGeometry.Height / 2,
+			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		middleRight: {
-			X: outputGeometry.Width,
-			Y: outputGeometry.Height / 2,
+			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		bottomLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
