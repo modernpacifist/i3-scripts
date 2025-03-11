@@ -65,46 +65,47 @@ type Position struct {
 	Y int64
 }
 
-func resolveNewPosition(oGeometry outputGeometry, nGeometry nodeGeometry) (int64, int64, error) {
+func resolveNewPosition(outputGeometry outputGeometry, nodeGeometry nodeGeometry) (int64, int64, error) {
 	// move to bottom right
-	dummyInput := bottomRight
+	// dummyInput := bottomRight
+	dummyInput := bottomMiddle
 
 	positions := map[uint8]Position{
 		topLeft: {
-			X: nGeometry.X,
-			Y: nGeometry.Y,
+			X: nodeGeometry.X,
+			Y: nodeGeometry.Y,
 		},
 		topMiddle: {
-			X: oGeometry.Width / 2,
+			X: outputGeometry.Width / 2,
 			Y: 0,
 		},
 		topRight: {
-			X: oGeometry.Width,
+			X: outputGeometry.Width,
 			Y: 0,
 		},
 		middleLeft: {
 			X: 0,
-			Y: oGeometry.Height / 2,
+			Y: outputGeometry.Height / 2,
 		},
 		middleMiddle: {
-			X: oGeometry.Width / 2,
-			Y: oGeometry.Height / 2,
+			X: outputGeometry.Width / 2,
+			Y: outputGeometry.Height / 2,
 		},
 		middleRight: {
-			X: oGeometry.Width,
-			Y: oGeometry.Height / 2,
+			X: outputGeometry.Width,
+			Y: outputGeometry.Height / 2,
 		},
 		bottomLeft: {
-			X: 0,
-			Y: oGeometry.Height,
+			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		bottomMiddle: {
-			X: oGeometry.Width / 2,
-			Y: oGeometry.Height,
+			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		bottomRight: {
-			X: oGeometry.Width + oGeometry.WidthOffset - nGeometry.Width + nGeometry.BorderWidth,
-			Y: oGeometry.Height + oGeometry.HeightOffset - nGeometry.Height + nGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 	}
 
