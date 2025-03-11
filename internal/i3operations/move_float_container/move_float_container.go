@@ -65,38 +65,42 @@ type Position struct {
 	Y int64
 }
 
-func resolveNewPosition(outputGeometry outputGeometry, nodeGeometry nodeGeometry) (int64, int64, error) {
+func resolveNewPosition(dummyInput uint8, outputGeometry outputGeometry, nodeGeometry nodeGeometry) (Position, error) {
 	// move to bottom right
 	// dummyInput := bottomRight
 	// dummyInput := bottomMiddle
 	// dummyInput := middleRight
 	// dummyInput := middleMiddle
-	dummyInput := middleLeft
+	// dummyInput := middleLeft
+	// dummyInput := topRight
+	// dummyInput := topMiddle
+	// dummyInput := topLeft
 
+	// TODO: some of the calculations are repeated
 	positions := map[uint8]Position{
 		topLeft: {
-			X: nodeGeometry.X,
-			Y: nodeGeometry.Y,
+			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
+			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		topMiddle: {
-			X: outputGeometry.Width / 2,
-			Y: 0,
+			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
+			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		topRight: {
-			X: outputGeometry.Width,
-			Y: 0,
+			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
+			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		middleLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		middleMiddle: {
 			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		middleRight: {
 			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height / 2 - nodeGeometry.Height / 2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
 		},
 		bottomLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
@@ -112,13 +116,16 @@ func resolveNewPosition(outputGeometry outputGeometry, nodeGeometry nodeGeometry
 		},
 	}
 
-	pos := positions[dummyInput]
+	if _, ok := positions[dummyInput]; ok {
+		// return Position{}, fmt.Errorf("invalid input: %d", dummyInput)
+		return positions[dummyInput], nil
+	}
 
-	return pos.X, pos.Y, nil
+	return Position{}, fmt.Errorf("invalid input: %d", dummyInput)
 }
 
-func moveNodeToPosition(nodeId, x, y int64) error {
-	cmd := fmt.Sprintf("xdotool windowmove %d %d %d", nodeId, x, y)
+func moveNodeToPosition(nodeId int64, position Position) error {
+	cmd := fmt.Sprintf("xdotool windowmove %d %d %d", nodeId, position.X, position.Y)
 	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		return err
 	}
@@ -141,13 +148,13 @@ func Execute(arg int) error {
 	focusedNodeGeometry := nodeGeometryConstructor(focusedNode)
 	fmt.Printf("%+v\n", focusedNodeGeometry)
 
-	newX, newY, err := resolveNewPosition(focusedOutputGeometry, focusedNodeGeometry)
+	newPosition, err := resolveNewPosition(bottomLeft, focusedOutputGeometry, focusedNodeGeometry)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("newX: %d, newY: %d\n", newX, newY)
+	fmt.Printf("newX: %d, newY: %d\n", newPosition.X, newPosition.Y)
 
-	if err := moveNodeToPosition(focusedNode.Window, newX, newY); err != nil {
+	if err := moveNodeToPosition(focusedNode.Window, newPosition); err != nil {
 		return err
 	}
 
