@@ -66,97 +66,66 @@ type Position struct {
 }
 
 func resolveNewPosition(dummyInput uint8, outputGeometry outputGeometry, nodeGeometry nodeGeometry) (Position, error) {
-	// move to bottom right
-	// dummyInput := bottomRight
-	// dummyInput := bottomMiddle
-	// dummyInput := middleRight
-	// dummyInput := middleMiddle
-	// dummyInput := middleLeft
-	// dummyInput := topRight
-	// dummyInput := topMiddle
-	// dummyInput := topLeft
+	topX := outputGeometry.WidthOffset + nodeGeometry.BorderWidth
+	topY := nodeGeometry.BorderWidth + 61
+	middleX := outputGeometry.WidthOffset +
+		outputGeometry.Width/2 -
+		nodeGeometry.Width/2 +
+		nodeGeometry.BorderWidth
+	middleY := outputGeometry.Height/2 -
+		nodeGeometry.Height/2 +
+		nodeGeometry.BorderWidth +
+		shittemp_StatusBarOffset
+	bottomX := outputGeometry.Width +
+		outputGeometry.WidthOffset -
+		nodeGeometry.Width +
+		nodeGeometry.BorderWidth
+	bottomY := outputGeometry.Height +
+		outputGeometry.HeightOffset -
+		nodeGeometry.Height +
+		nodeGeometry.BorderWidth +
+		shittemp_StatusBarOffset
 
-	// TODO: some of the calculations are repeated
 	positions := map[uint8]Position{
 		topLeft: {
-			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + 64,
+			X: topX,
+			Y: topY,
 		},
 		topMiddle: {
-			X: outputGeometry.WidthOffset +
-				outputGeometry.Width/2 -
-				nodeGeometry.Width/2 +
-				nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + 64,
+			X: middleX,
+			Y: topY,
 		},
 		topRight: {
-			X: outputGeometry.Width +
-				outputGeometry.WidthOffset -
-				nodeGeometry.Width +
-				nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + 64,
+			X: bottomX,
+			Y: topY,
 		},
 		middleLeft: {
-			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 -
-				nodeGeometry.Height/2 +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: topX,
+			Y: middleY,
 		},
 		middleMiddle: {
-			X: outputGeometry.WidthOffset +
-				outputGeometry.Width/2 -
-				nodeGeometry.Width/2 +
-				nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 -
-				nodeGeometry.Height/2 +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: middleX,
+			Y: middleY,
 		},
 		middleRight: {
-			X: outputGeometry.Width +
-				outputGeometry.WidthOffset -
-				nodeGeometry.Width +
-				nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 -
-				nodeGeometry.Height/2 +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: bottomX,
+			Y: middleY,
 		},
 		bottomLeft: {
-			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height +
-				outputGeometry.HeightOffset -
-				nodeGeometry.Height +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: topX,
+			Y: bottomY,
 		},
 		bottomMiddle: {
-			X: outputGeometry.WidthOffset +
-				outputGeometry.Width/2 -
-				nodeGeometry.Width/2 +
-				nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height +
-				outputGeometry.HeightOffset -
-				nodeGeometry.Height +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: middleX,
+			Y: bottomY,
 		},
 		bottomRight: {
-			X: outputGeometry.Width +
-				outputGeometry.WidthOffset -
-				nodeGeometry.Width +
-				nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height +
-				outputGeometry.HeightOffset -
-				nodeGeometry.Height +
-				nodeGeometry.BorderWidth +
-				shittemp_StatusBarOffset,
+			X: bottomX,
+			Y: bottomY,
 		},
 	}
 
 	if _, ok := positions[dummyInput]; ok {
-		// return Position{}, fmt.Errorf("invalid input: %d", dummyInput)
 		return positions[dummyInput], nil
 	}
 
