@@ -16,7 +16,6 @@ import (
 const (
 	configFilename  string      = "~/.MoveFloatContainer.json"
 	defaultPerms    os.FileMode = 0644
-	StatusBarHeight int         = 53
 )
 
 type Config struct {

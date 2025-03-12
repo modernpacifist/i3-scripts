@@ -142,27 +142,23 @@ func moveNodeToPosition(nodeId int64, position Position) error {
 }
 
 // story: possibility to move to different output based on the flag like output [DP-1/HDMI-1]
-
 func Execute(arg uint8) error {
 	focusedOutput, err := i3operations.GetFocusedOutput()
 	if err != nil {
 		return err
 	}
 	focusedOutputGeometry := outputGeometryConstructor(focusedOutput)
-	fmt.Printf("%+v\n", focusedOutputGeometry)
 
 	focusedNode, err := i3operations.GetFocusedNode()
 	if err != nil {
 		return err
 	}
 	focusedNodeGeometry := nodeGeometryConstructor(focusedNode)
-	fmt.Printf("%+v\n", focusedNodeGeometry)
 
 	newPosition, err := resolveNewPosition(arg, focusedOutputGeometry, focusedNodeGeometry)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("newX: %d, newY: %d\n", newPosition.X, newPosition.Y)
 
 	if err := moveNodeToPosition(focusedNode.Window, newPosition); err != nil {
 		return err
