@@ -54,9 +54,11 @@ func (conf *Config) Load() error {
 	if os.IsNotExist(err) {
 		return nil
 	}
+
 	if err != nil {
 		return fmt.Errorf("opening config file: %w", err)
 	}
+
 	defer file.Close()
 
 	content, err := io.ReadAll(file)

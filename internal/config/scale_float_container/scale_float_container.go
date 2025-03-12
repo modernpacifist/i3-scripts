@@ -61,6 +61,7 @@ func getPreviousResizeValues(node *i3.Node) map[string]int64 {
 func resolveResizedFlags(node *i3.Node, flagname string) bool {
 	switch flagname {
 	case "plusY":
+		// don't believe I wrote this
 		return node.Rect.Y == CONFIG.StatusBarHeight
 	case "minusY":
 		return node.Rect.Height == MONITOR_DIMENSIONS.Height-node.Rect.Y
@@ -123,7 +124,7 @@ func JsonConfigConstructor(configFileLoc string) Config {
 		log.Fatal(err)
 	}
 
-	jsonConfig.Location = configFileLoc
+	jsonConfig.Path = configFileLoc
 
 	err = json.Unmarshal(jsonData, &jsonConfig)
 	if err != nil {
@@ -153,9 +154,7 @@ func createJsonConfigFile(configFileLoc string) {
 	}
 	defer file.Close()
 
-	encoder := json.NewEncoder(file)
-	err = encoder.Encode(jsonConfig)
-	if err != nil {
+	if err := json.NewEncoder(file).Encode(jsonConfig); err != nil {
 		fmt.Println("Error encoding JSON:", err)
 		return
 	}
@@ -167,8 +166,7 @@ func (jc Config) Dump() {
 		log.Fatal(err)
 	}
 
-	err = os.WriteFile(jc.Location, jsonData, 0644)
-	if err != nil {
+	if err := os.WriteFile(jc.Path, jsonData, defaultPerms); err != nil {
 		log.Fatal(err)
 	}
 }
