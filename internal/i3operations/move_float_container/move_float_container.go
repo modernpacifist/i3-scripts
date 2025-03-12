@@ -133,7 +133,7 @@ func moveNodeToPosition(nodeId int64, position Position) error {
 	return nil
 }
 
-func Execute(arg int) error {
+func Execute(arg uint8) error {
 	focusedOutput, err := i3operations.GetFocusedOutput()
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func Execute(arg int) error {
 	focusedNodeGeometry := nodeGeometryConstructor(focusedNode)
 	fmt.Printf("%+v\n", focusedNodeGeometry)
 
-	newPosition, err := resolveNewPosition(bottomLeft, focusedOutputGeometry, focusedNodeGeometry)
+	newPosition, err := resolveNewPosition(arg, focusedOutputGeometry, focusedNodeGeometry)
 	if err != nil {
 		return err
 	}
