@@ -21,7 +21,7 @@ const (
 
 type Config struct {
 	Path  string                `json:"-"`
-	Nodes map[string]NodeConfig `json:"Nodes"`
+	Nodes map[string]NodeConfig `json:"nodes"`
 }
 
 func Create() (Config, error) {

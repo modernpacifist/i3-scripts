@@ -80,39 +80,78 @@ func resolveNewPosition(dummyInput uint8, outputGeometry outputGeometry, nodeGeo
 	positions := map[uint8]Position{
 		topLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: nodeGeometry.BorderWidth + 64,
 		},
 		topMiddle: {
-			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.WidthOffset +
+				outputGeometry.Width/2 -
+				nodeGeometry.Width/2 +
+				nodeGeometry.BorderWidth,
+			Y: nodeGeometry.BorderWidth + 64,
 		},
 		topRight: {
-			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
-			Y: nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.Width +
+				outputGeometry.WidthOffset -
+				nodeGeometry.Width +
+				nodeGeometry.BorderWidth,
+			Y: nodeGeometry.BorderWidth + 64,
 		},
 		middleLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: outputGeometry.Height/2 -
+				nodeGeometry.Height/2 +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 		middleMiddle: {
-			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.WidthOffset +
+				outputGeometry.Width/2 -
+				nodeGeometry.Width/2 +
+				nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height/2 -
+				nodeGeometry.Height/2 +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 		middleRight: {
-			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height/2 - nodeGeometry.Height/2 + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.Width +
+				outputGeometry.WidthOffset -
+				nodeGeometry.Width +
+				nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height/2 -
+				nodeGeometry.Height/2 +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 		bottomLeft: {
 			X: outputGeometry.WidthOffset + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			Y: outputGeometry.Height +
+				outputGeometry.HeightOffset -
+				nodeGeometry.Height +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 		bottomMiddle: {
-			X: outputGeometry.WidthOffset + outputGeometry.Width/2 - nodeGeometry.Width/2 + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.WidthOffset +
+				outputGeometry.Width/2 -
+				nodeGeometry.Width/2 +
+				nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height +
+				outputGeometry.HeightOffset -
+				nodeGeometry.Height +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 		bottomRight: {
-			X: outputGeometry.Width + outputGeometry.WidthOffset - nodeGeometry.Width + nodeGeometry.BorderWidth,
-			Y: outputGeometry.Height + outputGeometry.HeightOffset - nodeGeometry.Height + nodeGeometry.BorderWidth + shittemp_StatusBarOffset,
+			X: outputGeometry.Width +
+				outputGeometry.WidthOffset -
+				nodeGeometry.Width +
+				nodeGeometry.BorderWidth,
+			Y: outputGeometry.Height +
+				outputGeometry.HeightOffset -
+				nodeGeometry.Height +
+				nodeGeometry.BorderWidth +
+				shittemp_StatusBarOffset,
 		},
 	}
 
@@ -132,6 +171,8 @@ func moveNodeToPosition(nodeId int64, position Position) error {
 
 	return nil
 }
+
+// story: possibility to move to different output based on the flag like output [DP-1/HDMI-1]
 
 func Execute(arg uint8) error {
 	focusedOutput, err := i3operations.GetFocusedOutput()

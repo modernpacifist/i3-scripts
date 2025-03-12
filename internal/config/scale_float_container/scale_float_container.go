@@ -1,157 +1,174 @@
 package scale_float_container
 
-// import (
-// 	"encoding/json"
-// 	"fmt"
-// 	"log"
-// 	"os"
-// 	"strconv"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
 
-// 	"go.i3wm.org/i3/v4"
-// )
+	"go.i3wm.org/i3/v4"
+)
 
-// var (
-// 	CONFIG             JsonConfig
-// 	MONITOR_DIMENSIONS i3.Rect
-// )
+const (
+	configFilename  string      = "~/.ScaleFloatWindow.json"
+	defaultPerms    os.FileMode = 0644
+	statusBarHeight int         = 53
+)
 
-// type JsonConfig struct {
-// 	Location        string                  `json:"-"`
-// 	StatusBarHeight int64                   `json:"statusBarHeight"`
-// 	Windows         map[string]WindowConfig `json:"Windows"`
-// }
+type Config struct {
+	Path  string                  `json:"-"`
+	Nodes map[string]WindowConfig `json:"nodes"`
+}
 
-// type NodeConfig struct {
-// 	i3.Node
-// }
+type WindowConfig struct {
+	ID                  int64  `json:"id"`
+	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
+	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
+	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
+	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
+	X                   int64  `json:"x"`
+	Y                   int64  `json:"y"`
+	Width               int64  `json:"width"`
+	Height              int64  `json:"height"`
+	Mark                string `json:"mark"`
+	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
+	PreviousMinusYValue int64  `json:"previousMinusYValue"`
+	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
+	PreviousMinusXValue int64  `json:"previousMinusXValue"`
+}
 
-// func getPreviousResizeValues(node *i3.Node) map[string]int64 {
-// 	resMap := make(map[string]int64)
+type NodeConfig struct {
+	i3.Node
+}
 
-// 	for _, n := range CONFIG.Windows {
-// 		if n.ID == node.Window {
-// 			resMap["plusY"] = n.PreviousPlusYValue
-// 			resMap["minusY"] = n.PreviousMinusYValue
-// 			resMap["plusX"] = n.PreviousPlusXValue
-// 			resMap["minusX"] = n.PreviousMinusXValue
-// 			break
-// 		}
-// 	}
+func getPreviousResizeValues(node *i3.Node) map[string]int64 {
+	resMap := make(map[string]int64)
 
-// 	return resMap
-// }
+	for _, n := range CONFIG.Windows {
+		if n.ID == node.Window {
+			resMap["plusY"] = n.PreviousPlusYValue
+			resMap["minusY"] = n.PreviousMinusYValue
+			resMap["plusX"] = n.PreviousPlusXValue
+			resMap["minusX"] = n.PreviousMinusXValue
+			break
+		}
+	}
 
-// func resolveResizedFlags(node *i3.Node, flagname string) bool {
-// 	switch flagname {
-// 	case "plusY":
-// 		return node.Rect.Y == CONFIG.StatusBarHeight
-// 	case "minusY":
-// 		return node.Rect.Height == MONITOR_DIMENSIONS.Height-node.Rect.Y
-// 	case "plusX":
-// 		return node.Rect.Width == MONITOR_DIMENSIONS.Width-node.Rect.X
-// 	case "minusX":
-// 		return node.Rect.X == 0
-// 	}
-// 	return false
-// }
+	return resMap
+}
 
-// func getNodeMark(node *i3.Node) string {
-// 	if len(node.Marks) == 0 {
-// 		return ""
-// 	}
-// 	return node.Marks[0]
-// }
+func resolveResizedFlags(node *i3.Node, flagname string) bool {
+	switch flagname {
+	case "plusY":
+		return node.Rect.Y == CONFIG.StatusBarHeight
+	case "minusY":
+		return node.Rect.Height == MONITOR_DIMENSIONS.Height-node.Rect.Y
+	case "plusX":
+		return node.Rect.Width == MONITOR_DIMENSIONS.Width-node.Rect.X
+	case "minusX":
+		return node.Rect.X == 0
+	}
+	return false
+}
 
-// func WindowConfigConstructor(node *i3.Node) WindowConfig {
-// 	previousResizeValuesMap := getPreviousResizeValues(node)
-// 	plusY, _ := previousResizeValuesMap["plusY"]
-// 	minusY, _ := previousResizeValuesMap["minusY"]
-// 	plusX, _ := previousResizeValuesMap["plusX"]
-// 	minusX, _ := previousResizeValuesMap["minusX"]
+func getNodeMark(node *i3.Node) string {
+	if len(node.Marks) == 0 {
+		return ""
+	}
+	return node.Marks[0]
+}
 
-// 	// TODO: is the node does not contain a mark, just use a container id <17-11-23, modernpacifist> //
-// 	nodeMark := getNodeMark(node)
-// 	if nodeMark == "" {
-// 		nodeMark = strconv.FormatInt(node.Window, 10)
-// 	}
+func WindowConfigConstructor(node *i3.Node) WindowConfig {
+	previousResizeValuesMap := getPreviousResizeValues(node)
+	plusY, _ := previousResizeValuesMap["plusY"]
+	minusY, _ := previousResizeValuesMap["minusY"]
+	plusX, _ := previousResizeValuesMap["plusX"]
+	minusX, _ := previousResizeValuesMap["minusX"]
 
-// 	return WindowConfig{
-// 		ID:                  node.Window,
-// 		ResizedPlusYFlag:    resolveResizedFlags(node, "plusY"),
-// 		ResizedMinusYFlag:   resolveResizedFlags(node, "minusY"),
-// 		ResizedPlusXFlag:    resolveResizedFlags(node, "plusX"),
-// 		ResizedMinusXFlag:   resolveResizedFlags(node, "minusX"),
-// 		X:                   node.Rect.X,
-// 		Y:                   node.Rect.Y,
-// 		Width:               node.Rect.Width,
-// 		Height:              node.Rect.Height,
-// 		Mark:                nodeMark,
-// 		PreviousPlusYValue:  plusY,
-// 		PreviousMinusYValue: minusY,
-// 		PreviousPlusXValue:  plusX,
-// 		PreviousMinusXValue: minusX,
-// 	}
-// }
+	// TODO: is the node does not contain a mark, just use a container id <17-11-23, modernpacifist> //
+	nodeMark := getNodeMark(node)
+	if nodeMark == "" {
+		nodeMark = strconv.FormatInt(node.Window, 10)
+	}
 
-// func JsonConfigConstructor(configFileLoc string) JsonConfig {
-// 	var jsonConfig JsonConfig
+	return WindowConfig{
+		ID:                  node.Window,
+		ResizedPlusYFlag:    resolveResizedFlags(node, "plusY"),
+		ResizedMinusYFlag:   resolveResizedFlags(node, "minusY"),
+		ResizedPlusXFlag:    resolveResizedFlags(node, "plusX"),
+		ResizedMinusXFlag:   resolveResizedFlags(node, "minusX"),
+		X:                   node.Rect.X,
+		Y:                   node.Rect.Y,
+		Width:               node.Rect.Width,
+		Height:              node.Rect.Height,
+		Mark:                nodeMark,
+		PreviousPlusYValue:  plusY,
+		PreviousMinusYValue: minusY,
+		PreviousPlusXValue:  plusX,
+		PreviousMinusXValue: minusX,
+	}
+}
 
-// 	_, err := os.Stat(configFileLoc)
-// 	if os.IsNotExist(err) == true {
-// 		createJsonConfigFile(configFileLoc)
-// 	}
+func JsonConfigConstructor(configFileLoc string) Config {
+	var jsonConfig Config
 
-// 	jsonData, err := os.ReadFile(configFileLoc)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	_, err := os.Stat(configFileLoc)
+	if os.IsNotExist(err) == true {
+		createJsonConfigFile(configFileLoc)
+	}
 
-// 	jsonConfig.Location = configFileLoc
+	jsonData, err := os.ReadFile(configFileLoc)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	err = json.Unmarshal(jsonData, &jsonConfig)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	jsonConfig.Location = configFileLoc
 
-// 	if jsonConfig.Windows == nil {
-// 		jsonConfig.Windows = make(map[string]WindowConfig)
-// 	}
+	err = json.Unmarshal(jsonData, &jsonConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-// 	return jsonConfig
-// }
+	if jsonConfig.Nodes == nil {
+		jsonConfig.Nodes = make(map[string]WindowConfig)
+	}
 
-// func (jc JsonConfig) Update(wc WindowConfig) {
-// 	jc.Windows[wc.Mark] = wc
-// }
+	return jsonConfig
+}
 
-// func createJsonConfigFile(configFileLoc string) {
-// 	var jsonConfig JsonConfig
-// 	// default value
-// 	// jsonConfig.StatusBarHeight = 29
+func (jc Config) Update(wc WindowConfig) {
+	jc.Nodes[wc.Mark] = wc
+}
 
-// 	file, err := os.Create(configFileLoc)
-// 	if err != nil {
-// 		fmt.Println("Error creating file:", err)
-// 		return
-// 	}
-// 	defer file.Close()
+func createJsonConfigFile(configFileLoc string) {
+	var jsonConfig Config
+	// default value
+	// jsonConfig.StatusBarHeight = 29
 
-// 	encoder := json.NewEncoder(file)
-// 	err = encoder.Encode(jsonConfig)
-// 	if err != nil {
-// 		fmt.Println("Error encoding JSON:", err)
-// 		return
-// 	}
-// }
+	file, err := os.Create(configFileLoc)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
 
-// func (jc JsonConfig) Dump() {
-// 	jsonData, err := json.MarshalIndent(jc, "", "\t")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(jsonConfig)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
+		return
+	}
+}
 
-// 	err = os.WriteFile(jc.Location, jsonData, 0644)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
+func (jc Config) Dump() {
+	jsonData, err := json.MarshalIndent(jc, "", "\t")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.WriteFile(jc.Location, jsonData, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
