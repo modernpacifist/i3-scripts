@@ -11,16 +11,21 @@ import (
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 )
 
+const (
+	NotifySendTimeout = 1.5
+	RoundValue        = 5
+)
+
 func getCurrentVolume() float64 {
 	var out []byte
 	var err error
+	var num float64
 
 	cmd := `amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'`
 	if out, err = exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatal(err)
 	}
 
-	var num float64
 	if num, err = strconv.ParseFloat(strings.TrimSuffix(string(out), "\n"), 64); err != nil {
 		log.Fatal(err)
 	}
@@ -34,19 +39,19 @@ func ToggleVolume() {
 		log.Fatal(err)
 	}
 
-	common.NotifySend(1.5, "VolumeControl: toggled")
+	common.NotifySend(NotifySendTimeout, "VolumeControl: toggled")
 }
 
 func RoundVolume() {
 	currentVolume := getCurrentVolume()
-	roundedVolume := math.Round(currentVolume/5) * 5
+	roundedVolume := math.Round(currentVolume/RoundValue) * RoundValue
 
 	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %.f%%", roundedVolume)
 	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
 		log.Fatal(err)
 	}
 
-	common.NotifySend(1.5, fmt.Sprintf("VolumeControl: rounded to %.f%%", roundedVolume))
+	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: rounded to %.f%%", roundedVolume))
 }
 
 func AdjustVolume(changeValue string, maxVolume float64) {
@@ -58,7 +63,7 @@ func AdjustVolume(changeValue string, maxVolume float64) {
 
 	newVolume := currentVolume + change
 	if newVolume > maxVolume {
-		common.NotifySend(1.5, fmt.Sprintf("VolumeControl: cannot adjust volume above %.f%%", maxVolume))
+		common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: cannot adjust volume above %.f%%", maxVolume))
 		return
 	}
 
@@ -67,5 +72,5 @@ func AdjustVolume(changeValue string, maxVolume float64) {
 		log.Fatalf("%s: pactl is not installed on this system", err)
 	}
 
-	common.NotifySend(1.5, fmt.Sprintf("VolumeControl: %s%%", changeValue))
+	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: %s%%", changeValue))
 }

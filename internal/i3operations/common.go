@@ -135,6 +135,7 @@ func GetFocusedOutput() (res i3.Output, err error) {
 	for _, ws := range o {
 		if ws.Focused {
 			focusedWs = ws
+
 			break
 		}
 	}
