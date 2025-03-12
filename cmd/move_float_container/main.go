@@ -27,11 +27,9 @@ var positionCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(positionCmd)
-}
-
 func main() {
+	rootCmd.AddCommand(positionCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}

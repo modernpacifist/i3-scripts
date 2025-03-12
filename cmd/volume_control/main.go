@@ -55,13 +55,11 @@ var adjustCmd = &cobra.Command{
 	},
 }
 
-func init() {
+func main() {
 	rootCmd.AddCommand(toggleCmd)
 	rootCmd.AddCommand(roundCmd)
 	rootCmd.AddCommand(adjustCmd)
-}
 
-func main() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}

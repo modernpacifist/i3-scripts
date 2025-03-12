@@ -39,11 +39,9 @@ var cycleCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(cycleCmd)
-}
-
 func main() {
+	rootCmd.AddCommand(cycleCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 	}
