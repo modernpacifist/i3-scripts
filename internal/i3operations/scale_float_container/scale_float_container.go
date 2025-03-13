@@ -141,6 +141,12 @@ func resolveResizedFlags(node i3.Node, output i3.Output, flagname string) bool {
 	return false
 }
 
+type CombinedEntity struct {
+	Node i3.Node
+	Output i3.Output
+	Config config.Config
+}
+
 func NodeConfigConstructor(node i3.Node, output i3.Output, c config.Config) config.NodeConfig {
 	nodeID := node.Window
 
