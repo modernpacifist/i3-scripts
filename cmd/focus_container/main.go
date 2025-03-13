@@ -6,4 +6,7 @@ func main() {
 	// if its focused and the mark is called again then hide it 
 
 	// this will remove the need to press call this functionality twice
+
+	// if user is focused on tiling container then just hide the floating container
+	// chosen by the mark
 }
