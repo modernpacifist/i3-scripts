@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	scaleFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/margin_resize"
+	marginResize "github.com/modernpacifist/i3-scripts-go/internal/i3operations/margin_resize"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ var (
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			direction := args[0]
-			if err := scaleFloatContainer.Execute(direction); err != nil {
+			if err := marginResize.Execute(direction); err != nil {
 				return err
 			}
 			return nil

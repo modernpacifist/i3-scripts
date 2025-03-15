@@ -19,70 +19,108 @@ const (
 	DirectionLeft   = "left"
 )
 
-func increaseHeightToTop(value int64) error {
-	cmd := fmt.Sprintf("resize grow height %d px, move container up %d px", value, value)
-
-	if err := common.RunI3Command(cmd); err != nil {
-		return err
-	}
-
-	return nil
+// ResizeStrategy defines the interface for different resize operations
+type ResizeStrategy interface {
+	Resize(value int64) error
+	NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64
 }
 
-func increaseHeightToBottom(value int64) error {
-	cmd := fmt.Sprintf("resize grow height %d px", value)
-	if err := common.RunI3Command(cmd); err != nil {
-		return err
-	}
+// TopResizeStrategy implements ResizeStrategy for top direction
+type TopResizeStrategy struct{}
 
-	return nil
+func (s *TopResizeStrategy) Resize(value int64) error {
+	return common.RunI3Command(fmt.Sprintf("resize grow height %d px, move container up %d px", value, value))
 }
 
-func increaseWidthToLeft(value int64) error {
-	cmd := fmt.Sprintf("resize grow width %d px, move container left %d px", value, value)
-	if err := common.RunI3Command(cmd); err != nil {
-		return err
+func (s *TopResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
+	if currentValue == 0 && pastNode.Node.Rect.Y+pastNode.Node.Rect.Height == output.Rect.Height {
+		return -(output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight)
 	}
-
-	return nil
+	if currentValue == 0 {
+		return -(output.Rect.Height - pastNode.Node.Rect.Height - pastNode.Node.Rect.Y - defaultStatusBarHeight)
+	}
+	return currentValue
 }
 
-func increaseWidthToRight(value int64) error {
-	cmd := fmt.Sprintf("resize grow width %d px", value)
-	if err := common.RunI3Command(cmd); err != nil {
-		return err
-	}
+type BottomResizeStrategy struct{}
 
-	return nil
+func (s *BottomResizeStrategy) Resize(value int64) error {
+	return common.RunI3Command(fmt.Sprintf("resize grow height %d px", value))
+}
+
+func (s *BottomResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
+	if currentValue == 0 && pastNode.Node.Rect.Y+pastNode.Node.Rect.Height == output.Rect.Height {
+		return -(output.Rect.Height - pastNode.Node.Rect.Height)
+	}
+	if currentValue == 0 {
+		return -(output.Rect.Height - pastNode.Node.Rect.Height - pastNode.Node.Rect.Y)
+	}
+	return currentValue
+}
+
+type RightResizeStrategy struct{}
+
+func (s *RightResizeStrategy) Resize(value int64) error {
+	return common.RunI3Command(fmt.Sprintf("resize grow width %d px", value))
+}
+
+func (s *RightResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
+	if currentValue == 0 && pastNode.Node.Rect.Width == output.Rect.Width {
+		return -(output.Rect.Width - pastNode.Node.Rect.Width)
+	}
+	if currentValue == 0 {
+		return -(output.Rect.Width - pastNode.Node.Rect.Width - (pastNode.Node.Rect.X - output.Rect.X))
+	}
+	return currentValue
+}
+
+type LeftResizeStrategy struct{}
+
+func (s *LeftResizeStrategy) Resize(value int64) error {
+	return common.RunI3Command(fmt.Sprintf("resize grow width %d px, move container left %d px", value, value))
+}
+
+func (s *LeftResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
+	if currentValue == 0 && pastNode.Node.Rect.Width == output.Rect.Width {
+		return -(output.Rect.Width - pastNode.Node.Rect.Width)
+	}
+	if currentValue == 0 {
+		return -(pastNode.Node.Rect.Width)
+	}
+	return currentValue
+}
+
+type ResizeContext struct {
+	strategy ResizeStrategy
+}
+
+func NewResizeContext(direction string) (*ResizeContext, error) {
+	var strategy ResizeStrategy
+	switch direction {
+	case DirectionTop:
+		strategy = &TopResizeStrategy{}
+	case DirectionBottom:
+		strategy = &BottomResizeStrategy{}
+	case DirectionRight:
+		strategy = &RightResizeStrategy{}
+	case DirectionLeft:
+		strategy = &LeftResizeStrategy{}
+	default:
+		return nil, errors.New("invalid direction")
+	}
+	return &ResizeContext{strategy: strategy}, nil
 }
 
 func getScreenMargins(output i3.Output, node i3.Node) (int64, int64, int64, int64) {
 	outputRect := output.Rect
 	nodeRect := node.Rect
 
-	distanceLeft := nodeRect.X - outputRect.X
-	distanceRight := outputRect.X + outputRect.Width - (nodeRect.X + nodeRect.Width)
 	distanceTop := nodeRect.Y - defaultStatusBarHeight
 	distanceBottom := outputRect.Y + outputRect.Height - (nodeRect.Y + nodeRect.Height)
+	distanceRight := outputRect.X + outputRect.Width - (nodeRect.X + nodeRect.Width)
+	distanceLeft := nodeRect.X - outputRect.X
 
-	return distanceLeft, distanceRight, distanceTop, distanceBottom
-}
-
-func normalizeResizeValue(direction string, resizeValue int64, output i3.Output, pastNode config.NodeConfig) int64 {
-	if resizeValue == 0 {
-		switch direction {
-		case DirectionTop:
-			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
-		case DirectionBottom:
-			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
-		case DirectionRight:
-			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
-		case DirectionLeft:
-			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
-		}
-		return -resizeValue
-	}
-	return resizeValue
+	return distanceTop, distanceBottom, distanceRight, distanceLeft
 }
 
 func Execute(arg string) error {
@@ -129,25 +167,24 @@ func Execute(arg string) error {
 		return err
 	}
 
-	distanceLeft, distanceRight, distanceTop, distanceBottom := getScreenMargins(focusedOutput, focusedNode)
+	distanceTop, distanceBottom, distanceRight, distanceLeft := getScreenMargins(focusedOutput, focusedNode)
+
+	resizeContext, err := NewResizeContext(arg)
+	if err != nil {
+		return err
+	}
 
 	var resizeValue int64
 	switch arg {
 	case DirectionTop:
-		resizeValue = normalizeResizeValue(DirectionTop, distanceTop, focusedOutput, pastNodeConfig)
-		increaseHeightToTop(resizeValue)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceTop)
 	case DirectionBottom:
-		resizeValue = normalizeResizeValue(DirectionBottom, distanceBottom, focusedOutput, pastNodeConfig)
-		increaseHeightToBottom(resizeValue)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceBottom)
 	case DirectionRight:
-		resizeValue = normalizeResizeValue(DirectionRight, distanceRight, focusedOutput, pastNodeConfig)
-		increaseWidthToRight(resizeValue)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceRight)
 	case DirectionLeft:
-		resizeValue = normalizeResizeValue(DirectionLeft, distanceLeft, focusedOutput, pastNodeConfig)
-		increaseWidthToLeft(resizeValue)
-	default:
-		return errors.New("invalid argument")
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceLeft)
 	}
 
-	return nil
+	return resizeContext.strategy.Resize(resizeValue)
 }
