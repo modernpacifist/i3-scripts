@@ -1,6 +1,7 @@
 package scale_float_container
 
 import (
+	"errors"
 	"fmt"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
@@ -11,13 +12,8 @@ const (
 	shit_StatusBarHeight = 35
 )
 
-type CombinedEntity struct {
-	Node   i3.Node
-	Output i3.Output
-}
-
-func resizePlusX(value uint) error {
-	cmd := fmt.Sprintf("resize grow width %d px", value)
+func increaseHeightToTop(value int64) error {
+	cmd := fmt.Sprintf("resize grow height %d px, move container up %d px", value, value)
 	if err := common.RunI3Command(cmd); err != nil {
 		return err
 	}
@@ -25,16 +21,7 @@ func resizePlusX(value uint) error {
 	return nil
 }
 
-func resizeMinusX(value uint) error {
-	cmd := fmt.Sprintf("resize shrink width %d px", value)
-	if err := common.RunI3Command(cmd); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func resizePlusY(value uint) error {
+func increaseHeightToBottom(value int64) error {
 	cmd := fmt.Sprintf("resize grow height %d px", value)
 	if err := common.RunI3Command(cmd); err != nil {
 		return err
@@ -43,17 +30,17 @@ func resizePlusY(value uint) error {
 	return nil
 }
 
-// func resizePlusY(value uint) error {
-// 	cmd := fmt.Sprintf("resize grow height %d px", value)
-// 	if err := common.RunI3Command(cmd); err != nil {
-// 		return err
-// 	}
+func increaseWidthToLeft(value int64) error {
+	cmd := fmt.Sprintf("resize grow width %d px, move container left %d px", value, value)
+	if err := common.RunI3Command(cmd); err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
-func resizeMinusY(value uint) error {
-	cmd := fmt.Sprintf("resize shrink height %d px", value)
+func increaseWidthToRight(value int64) error {
+	cmd := fmt.Sprintf("resize grow width %d px", value)
 	if err := common.RunI3Command(cmd); err != nil {
 		return err
 	}
@@ -86,8 +73,7 @@ func Execute(arg string) error {
 	}
 
 	if focusedNode.Floating != "user_on" && focusedNode.Floating != "auto_on" {
-		fmt.Printf("\nNode is not floating\n")
-		return nil
+		return errors.New("node is not floating")
 	}
 
 	fmt.Printf("\nNode Rect: %+v\n", focusedNode.Rect)
@@ -99,34 +85,16 @@ func Execute(arg string) error {
 	fmt.Printf("\nDistance to top edge: %d\n", distanceTop)
 	fmt.Printf("\nDistance to bottom edge: %d\n\n", distanceBottom)
 
-	// dummyResizeValue := 100
-	// if err := resizeMinusY(uint(dummyResizeValue)); err != nil {
-	// 	return err
-	// }
-
-	// focusedWindow := config.WindowConfigConstructor(focusedNode)
-	// switch arg {
-	// case "w":
-	// 	focusedWindow.resizePlusY()
-	// case "s":
-	// 	focusedWindow.resizeMinusY()
-	// case "d":
-	// 	focusedWindow.resizePlusX()
-	// case "a":
-	// 	focusedWindow.resizeMinusX()
-	// // this flag for debug purposes, remove later
-	// case "f":
-	// // TODO: reset the size of the floating window to its default <29-10-23, modernpacifist> //
-	// case "r":
-	// 	focusedWindow.resetGeometry()
-	// }
-	// // TODO: this also must be in switch<15-11-23, modernpacifist> //
-	// if *widen != 0 {
-	// 	focusedWindow.resizeHorizontally(*widen)
-	// }
-	// if err := configInstance.Dump(); err != nil {
-	// 	return err
-	// }
+	switch arg {
+	case "w":
+		increaseHeightToTop(distanceTop)
+	case "s":
+		increaseHeightToBottom(distanceBottom)
+	case "d":
+		increaseWidthToRight(distanceRight)
+	case "a":
+		increaseWidthToLeft(distanceLeft)
+	}
 
 	return nil
 }
