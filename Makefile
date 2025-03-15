@@ -46,6 +46,9 @@ swap_workspaces:
 volume_control:
 	go build -o ./bin/VolumeControl ./cmd/volume_control/main.go
 
+resize_float_container:
+	go build -o ./bin/ResizeFloatContainer ./cmd/resize_float_container/main.go
+
 build:
 	make back_and_forth_containers
 	make keyboard_layout
@@ -58,6 +61,8 @@ build:
 	make move_float_container
 	make manage_float_container
 	make rename_workspace
+	make margin_resize
+	make resize_float_container
 	make scale_float_window
 	make sticky_toggle
 	make swap_workspaces
