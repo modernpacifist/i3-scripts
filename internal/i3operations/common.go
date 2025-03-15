@@ -205,6 +205,14 @@ func GetWorkspaceByIndex(index int64) (i3.Workspace, error) {
 	return i3.Workspace{}, errors.New("could not get workspace by specified index")
 }
 
+func RunI3Command(command string) error {
+	if _, err := i3.RunCommand(command); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func RunKillCommand() error {
 	if _, err := i3.RunCommand("kill"); err != nil {
 		return err
