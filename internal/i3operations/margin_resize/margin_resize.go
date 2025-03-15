@@ -66,9 +66,9 @@ func normalizeResizeValue(direction string, resizeValue int64, output i3.Output,
 	if resizeValue == 0 {
 		switch direction {
 		case "top":
-			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height
+			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
 		case "bottom":
-			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height
+			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
 		case "right":
 			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
 		case "left":
