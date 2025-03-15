@@ -62,9 +62,19 @@ func getScreenMargins(output i3.Output, node i3.Node) (int64, int64, int64, int6
 	return distanceLeft, distanceRight, distanceTop, distanceBottom
 }
 
-func normalizeResizeValue(resizeValue int64, pastNode config.NodeConfig, focusedNode i3.Node) int64 {
-	if resizeValue == 0 && pastNode.Node.Rect.Height > 0 {
-		resizeValue = pastNode.Node.Rect.Height - focusedNode.Rect.Height
+func normalizeResizeValue(direction string, resizeValue int64, output i3.Output, pastNode config.NodeConfig) int64 {
+	if resizeValue == 0 {
+		switch direction {
+		case "top":
+			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height
+		case "bottom":
+			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height
+		case "right":
+			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
+		case "left":
+			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
+		}
+		return -resizeValue
 	}
 	return resizeValue
 }
@@ -95,12 +105,22 @@ func Execute(arg string) error {
 		return err
 	}
 
-	pastNode, exists := conf.Nodes[focusedNodeConfigIdentifier]
+	// load past config into memory
+	pastNodeConfig, exists := conf.Nodes[focusedNodeConfigIdentifier]
 	if !exists {
 		conf.Nodes[focusedNodeConfigIdentifier] = config.NodeConfig{
 			Node: focusedNode,
 		}
-		pastNode = conf.Nodes[focusedNodeConfigIdentifier]
+		pastNodeConfig = conf.Nodes[focusedNodeConfigIdentifier]
+	}
+
+	// instantly update config file with new data
+	conf.Nodes[focusedNodeConfigIdentifier] = config.NodeConfig{
+		Node: focusedNode,
+	}
+
+	if err := conf.Dump(); err != nil {
+		return err
 	}
 
 	distanceLeft, distanceRight, distanceTop, distanceBottom := getScreenMargins(focusedOutput, focusedNode)
@@ -108,23 +128,19 @@ func Execute(arg string) error {
 	var resizeValue int64
 	switch arg {
 	case "top":
-		resizeValue = normalizeResizeValue(distanceTop, pastNode, focusedNode)
+		resizeValue = normalizeResizeValue("top", distanceTop, focusedOutput, pastNodeConfig)
 		increaseHeightToTop(resizeValue)
 	case "bottom":
-		resizeValue = normalizeResizeValue(distanceBottom, pastNode, focusedNode)
+		resizeValue = normalizeResizeValue("bottom", distanceBottom, focusedOutput, pastNodeConfig)
 		increaseHeightToBottom(resizeValue)
 	case "right":
-		resizeValue = normalizeResizeValue(distanceRight, pastNode, focusedNode)
+		resizeValue = normalizeResizeValue("right", distanceRight, focusedOutput, pastNodeConfig)
 		increaseWidthToRight(resizeValue)
 	case "left":
-		resizeValue = normalizeResizeValue(distanceLeft, pastNode, focusedNode)
+		resizeValue = normalizeResizeValue("left", distanceLeft, focusedOutput, pastNodeConfig)
 		increaseWidthToLeft(resizeValue)
 	default:
 		return errors.New("invalid argument")
-	}
-
-	if err := conf.Dump(); err != nil {
-		return err
 	}
 
 	return nil

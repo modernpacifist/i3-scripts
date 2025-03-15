@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	configFilename string      = "~/.ScaleFloatWindowTest.json"
+	configFilename string      = "~/.ScaleFloatWindow.json"
 	defaultPerms   os.FileMode = 0644
 )
 
