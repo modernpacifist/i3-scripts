@@ -11,6 +11,12 @@ import (
 
 const (
 	defaultStatusBarHeight = 35
+
+	// Direction constants
+	DirectionTop    = "top"
+	DirectionBottom = "bottom"
+	DirectionRight  = "right"
+	DirectionLeft   = "left"
 )
 
 func increaseHeightToTop(value int64) error {
@@ -65,13 +71,13 @@ func getScreenMargins(output i3.Output, node i3.Node) (int64, int64, int64, int6
 func normalizeResizeValue(direction string, resizeValue int64, output i3.Output, pastNode config.NodeConfig) int64 {
 	if resizeValue == 0 {
 		switch direction {
-		case "top":
+		case DirectionTop:
 			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
-		case "bottom":
+		case DirectionBottom:
 			resizeValue = output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight
-		case "right":
+		case DirectionRight:
 			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
-		case "left":
+		case DirectionLeft:
 			resizeValue = output.Rect.Width - pastNode.Node.Rect.Width
 		}
 		return -resizeValue
@@ -127,17 +133,17 @@ func Execute(arg string) error {
 
 	var resizeValue int64
 	switch arg {
-	case "top":
-		resizeValue = normalizeResizeValue("top", distanceTop, focusedOutput, pastNodeConfig)
+	case DirectionTop:
+		resizeValue = normalizeResizeValue(DirectionTop, distanceTop, focusedOutput, pastNodeConfig)
 		increaseHeightToTop(resizeValue)
-	case "bottom":
-		resizeValue = normalizeResizeValue("bottom", distanceBottom, focusedOutput, pastNodeConfig)
+	case DirectionBottom:
+		resizeValue = normalizeResizeValue(DirectionBottom, distanceBottom, focusedOutput, pastNodeConfig)
 		increaseHeightToBottom(resizeValue)
-	case "right":
-		resizeValue = normalizeResizeValue("right", distanceRight, focusedOutput, pastNodeConfig)
+	case DirectionRight:
+		resizeValue = normalizeResizeValue(DirectionRight, distanceRight, focusedOutput, pastNodeConfig)
 		increaseWidthToRight(resizeValue)
-	case "left":
-		resizeValue = normalizeResizeValue("left", distanceLeft, focusedOutput, pastNodeConfig)
+	case DirectionLeft:
+		resizeValue = normalizeResizeValue(DirectionLeft, distanceLeft, focusedOutput, pastNodeConfig)
 		increaseWidthToLeft(resizeValue)
 	default:
 		return errors.New("invalid argument")
