@@ -34,8 +34,8 @@ manage_float_container:
 rename_workspace:
 	go build -o ./bin/RenameWorkspace ./cmd/rename_workspace/main.go
 
-scale_float_window:
-	go build -o ./bin/ScaleFloatWindow ./cmd/scale_float_window/main.go
+margin_resize:
+	go build -o ./bin/MarginResize ./cmd/margin_resize/main.go
 
 sticky_toggle:
 	go build -o ./bin/StickyToggle ./cmd/sticky_toggle/main.go

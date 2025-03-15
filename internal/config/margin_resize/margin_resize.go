@@ -1,4 +1,4 @@
-package scale_float_container
+package margin_resize
 
 import (
 	"encoding/json"
@@ -13,27 +13,28 @@ import (
 )
 
 const (
-	// configFilename string      = "~/.ScaleFloatWindow.json_bak"
-	configFilename string      = "~/.ScaleFloatWindow.json"
+	configFilename string      = "~/.ScaleFloatWindowTest.json"
 	defaultPerms   os.FileMode = 0644
 )
 
-type Config struct {
-	Path   string                `json:"-"`
-	Output i3.Output             `json:"-"`
-	Nodes  map[int64]NodeConfig `json:"nodes"`
+type NodeConfig struct {
+	i3.Node
 }
 
-func Create(output i3.Output) (Config, error) {
+type Config struct {
+	Path  string                `json:"-"`
+	Nodes map[string]NodeConfig `json:"nodes"`
+}
+
+func Create() (Config, error) {
 	absolutePath, err := common.ExpandHomeDir(configFilename)
 	if err != nil {
 		return Config{}, fmt.Errorf("resolving absolute path: %w", err)
 	}
 
 	config := Config{
-		Path:   absolutePath,
-		Output: output,
-		Nodes:  make(map[int64]NodeConfig),
+		Path:  absolutePath,
+		Nodes: make(map[string]NodeConfig),
 	}
 
 	if _, err := os.Stat(absolutePath); errors.Is(err, os.ErrNotExist) {
@@ -83,21 +84,4 @@ func (conf *Config) Load() error {
 		return fmt.Errorf("unmarshaling JSON: %w", err)
 	}
 	return nil
-}
-
-type NodeConfig struct {
-	ID                  int64  `json:"id"`
-	ResizedPlusYFlag    bool   `json:"resizedPlusYFlag"`
-	ResizedMinusYFlag   bool   `json:"resizedMinusYFlag"`
-	ResizedPlusXFlag    bool   `json:"resizedPlusXFlag"`
-	ResizedMinusXFlag   bool   `json:"resizedMinusXFlag"`
-	X                   int64  `json:"x"`
-	Y                   int64  `json:"y"`
-	Width               int64  `json:"width"`
-	Height              int64  `json:"height"`
-	Marks               string `json:"mark"`
-	PreviousPlusYValue  int64  `json:"previousPlusYValue"`
-	PreviousMinusYValue int64  `json:"previousMinusYValue"`
-	PreviousPlusXValue  int64  `json:"previousPlusXValue"`
-	PreviousMinusXValue int64  `json:"previousMinusXValue"`
 }
