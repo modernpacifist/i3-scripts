@@ -1,0 +1,11 @@
+linters:
+  enable-all: true
+  disable-all: false
+  disable:
+    - canonicalheader
+    - containedctx
+    - copyloopvar
+    - depguard
+
+run:
+  tests: false

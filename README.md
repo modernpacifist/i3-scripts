@@ -4,3 +4,4 @@ A work-in-progress golang version of [i3-scripts](https://github.com/modernpacif
 # Dependencies
 Debian 12:
 - VolumeControl: pulseaudio (install: `apt install pulseaudio`)
+- VolumeControl: pactl (install: `apt install pulseaudio-utils`)
