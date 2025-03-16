@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	"go.i3wm.org/i3/v4"
+	"slices"
 )
 
 func GetI3Tree() (i3.Tree, error) {
@@ -167,6 +168,23 @@ func GetNodeMarks(node i3.Node) []string {
 		return []string{}
 	}
 	return node.Marks
+}
+
+func GetNodeByMark(mark string) (i3.Node, error) {
+	i3Tree, err := GetI3Tree()
+	if err != nil {
+		return i3.Node{}, err
+	}
+
+	node := i3Tree.Root.FindChild(func(n *i3.Node) bool {
+		return slices.Contains(n.Marks, mark)
+	})
+
+	if node == nil {
+		return i3.Node{}, errors.New("could not get node by mark")
+	}
+
+	return *node, nil
 }
 
 // TODO: make function accept error level

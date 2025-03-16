@@ -33,7 +33,7 @@ func (s *TopResizeStrategy) Resize(value int64) error {
 }
 
 func (s *TopResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
-	if currentValue == 0 && pastNode.Node.Rect.Y+pastNode.Node.Rect.Height == output.Rect.Height {
+	if currentValue == 0 {
 		return -(output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight)
 	}
 	if currentValue == 0 {
