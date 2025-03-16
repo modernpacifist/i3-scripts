@@ -37,6 +37,9 @@ rename_workspace:
 margin_resize:
 	go build -o ./bin/MarginResize ./cmd/margin_resize/main.go
 
+resize_float_container:
+	go build -o ./bin/ResizeFloatContainer ./cmd/resize_float_container/main.go
+
 sticky_toggle:
 	go build -o ./bin/StickyToggle ./cmd/sticky_toggle/main.go
 
@@ -45,9 +48,6 @@ swap_workspaces:
 
 volume_control:
 	go build -o ./bin/VolumeControl ./cmd/volume_control/main.go
-
-resize_float_container:
-	go build -o ./bin/ResizeFloatContainer ./cmd/resize_float_container/main.go
 
 build:
 	make back_and_forth_containers
@@ -63,7 +63,6 @@ build:
 	make rename_workspace
 	make margin_resize
 	make resize_float_container
-	make scale_float_window
 	make sticky_toggle
 	make swap_workspaces
 	make volume_control

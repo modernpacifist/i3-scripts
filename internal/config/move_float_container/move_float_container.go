@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	configFilename  string      = "~/.MoveFloatContainer.json"
-	defaultPerms    os.FileMode = 0644
+	configFilename string      = "~/.MoveFloatContainer.json"
+	defaultPerms   os.FileMode = 0644
 )
 
 type Config struct {

@@ -38,10 +38,10 @@ func cycle(layoutsArray []string) {
 	length := len(layoutsArray)
 	if initIndex == length-1 && initIndex != -1 {
 		setKeyboardLayout(layoutsArray[0])
-		i3operations.NotifySend(0.5, "Kb layout: " + layoutsArray[0])
+		i3operations.NotifySend(0.5, "Kb layout: "+layoutsArray[0])
 	} else {
 		setKeyboardLayout(layoutsArray[(initIndex+1)%length])
-		i3operations.NotifySend(0.5, "Kb layout: " + layoutsArray[(initIndex+1)%length])
+		i3operations.NotifySend(0.5, "Kb layout: "+layoutsArray[(initIndex+1)%length])
 	}
 }
 
