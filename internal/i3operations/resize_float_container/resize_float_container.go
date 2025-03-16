@@ -17,6 +17,8 @@ func Execute(mode string, value int64) error {
 		return common.RunI3Command(fmt.Sprintf("resize grow width %d px, move container left %d px", value, value))
 	case "k":
 		return common.RunI3Command(fmt.Sprintf("resize grow height %d px, move container up %d px", value, value))
+	case "w":
+		return common.RunI3Command(fmt.Sprintf("resize grow width %d px, move container left %d px", value, value/2))
 	default:
 		return errors.New("invalid argument")
 	}

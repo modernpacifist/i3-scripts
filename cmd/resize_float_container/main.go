@@ -17,16 +17,16 @@ var rootCmd = &cobra.Command{
 }
 
 var resizeCmd = &cobra.Command{
-	Use:                "resize [h/j/k/l] [value]",
+	Use:                "resize [h/j/k/l/w] [value]",
 	Short:              "Resize floating window using vim-style directions",
-	Long:               `Resize floating window using h (left), j (down), k (up), l (right) followed by a value (+/-N)`,
+	Long:               `Resize floating window using h (left), j (down), k (up), l (right), w (widen), or w (shrink height) followed by a value (+/-N)`,
 	DisableFlagParsing: true,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 2 {
 			return fmt.Errorf("requires exactly 2 arguments: direction (h/j/k/l) and value (+/-N)")
 		}
-		if !regexp.MustCompile(`^[hjkl]$`).MatchString(args[0]) {
-			return fmt.Errorf("invalid direction: use h (left), j (down), k (up), or l (right)")
+		if !regexp.MustCompile(`^[hjklw]$`).MatchString(args[0]) {
+			return fmt.Errorf("invalid direction: use h (left), j (down), k (up), l (right), or w (widen)")
 		}
 		if !regexp.MustCompile(`^[-+]\d+$`).MatchString(args[1]) {
 			return fmt.Errorf("invalid value format: use +N or -N where N is a number")
