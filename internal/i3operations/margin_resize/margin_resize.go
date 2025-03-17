@@ -22,7 +22,7 @@ const (
 // ResizeStrategy defines the interface for different resize operations
 type ResizeStrategy interface {
 	Resize(value int64) error
-	NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64
+	NormalizeValue(output i3.Output, nodeConf config.NodeConfig) int64
 }
 
 // TopResizeStrategy implements ResizeStrategy for top direction
@@ -32,14 +32,12 @@ func (s *TopResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow height %d px, move container up %d px", value, value))
 }
 
-func (s *TopResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
-	if currentValue == 0 {
-		return -(output.Rect.Height - pastNode.Node.Rect.Height - defaultStatusBarHeight)
+func (s *TopResizeStrategy) NormalizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
+	// if val == 0 && nodeConf.Node.Rect.Y > output.Rect.Y {
+	if nodeConf.Node.Rect.Y-defaultStatusBarHeight >= output.Rect.Y {
+		return nodeConf.Node.Rect.Y - defaultStatusBarHeight
 	}
-	if currentValue == 0 {
-		return -(output.Rect.Height - pastNode.Node.Rect.Height - pastNode.Node.Rect.Y - defaultStatusBarHeight)
-	}
-	return currentValue
+	return -(nodeConf.Node.Rect.Y - defaultStatusBarHeight)
 }
 
 type BottomResizeStrategy struct{}
@@ -48,14 +46,11 @@ func (s *BottomResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow height %d px", value))
 }
 
-func (s *BottomResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
-	if currentValue == 0 && pastNode.Node.Rect.Y+pastNode.Node.Rect.Height == output.Rect.Height {
-		return -(output.Rect.Height - pastNode.Node.Rect.Height)
+func (s *BottomResizeStrategy) NormalizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
+	if nodeConf.Node.Rect.Y+nodeConf.Node.Rect.Height == output.Rect.Height {
+		return -(output.Rect.Height - nodeConf.Node.Rect.Height)
 	}
-	if currentValue == 0 {
-		return -(output.Rect.Height - pastNode.Node.Rect.Height - pastNode.Node.Rect.Y)
-	}
-	return currentValue
+	return -(nodeConf.Node.Rect.Y + nodeConf.Node.Rect.Height - output.Rect.Height)
 }
 
 type RightResizeStrategy struct{}
@@ -64,14 +59,11 @@ func (s *RightResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow width %d px", value))
 }
 
-func (s *RightResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
-	if currentValue == 0 && pastNode.Node.Rect.Width == output.Rect.Width {
-		return -(output.Rect.Width - pastNode.Node.Rect.Width)
+func (s *RightResizeStrategy) NormalizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
+	if nodeConf.Node.Rect.X+nodeConf.Node.Rect.Width == output.Rect.Width {
+		return -(output.Rect.Width - nodeConf.Node.Rect.Width)
 	}
-	if currentValue == 0 {
-		return -(output.Rect.Width - pastNode.Node.Rect.Width - (pastNode.Node.Rect.X - output.Rect.X))
-	}
-	return currentValue
+	return -(nodeConf.Node.Rect.X + nodeConf.Node.Rect.Width - output.Rect.Width)
 }
 
 type LeftResizeStrategy struct{}
@@ -80,14 +72,11 @@ func (s *LeftResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow width %d px, move container left %d px", value, value))
 }
 
-func (s *LeftResizeStrategy) NormalizeValue(output i3.Output, pastNode config.NodeConfig, currentValue int64) int64 {
-	if currentValue == 0 && pastNode.Node.Rect.Width == output.Rect.Width {
-		return -(output.Rect.Width - pastNode.Node.Rect.Width)
+func (s *LeftResizeStrategy) NormalizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
+	if nodeConf.Node.Rect.X == output.Rect.X {
+		return -(output.Rect.Width - nodeConf.Node.Rect.Width)
 	}
-	if currentValue == 0 {
-		return -(pastNode.Node.Rect.Width)
-	}
-	return currentValue
+	return -(nodeConf.Node.Rect.X - output.Rect.X)
 }
 
 type ResizeContext struct {
@@ -150,12 +139,12 @@ func Execute(arg string) error {
 	}
 
 	// load past config into memory
-	pastNodeConfig, exists := conf.Nodes[focusedNodeConfigIdentifier]
+	loadedNodeConf, exists := conf.Nodes[focusedNodeConfigIdentifier]
 	if !exists {
 		conf.Nodes[focusedNodeConfigIdentifier] = config.NodeConfig{
 			Node: focusedNode,
 		}
-		pastNodeConfig = conf.Nodes[focusedNodeConfigIdentifier]
+		loadedNodeConf = conf.Nodes[focusedNodeConfigIdentifier]
 	}
 
 	// instantly update config file with new data
@@ -163,11 +152,20 @@ func Execute(arg string) error {
 		Node: focusedNode,
 	}
 
+	distanceToTop, distanceToBottom, distanceToRight, distanceToLeft := getScreenMargins(focusedOutput, focusedNode)
+
+	nodeConf := conf.Nodes[focusedNodeConfigIdentifier]
+
+	nodeConf.DistanceToTop = distanceToTop
+	nodeConf.DistanceToBottom = distanceToBottom
+	nodeConf.DistanceToRight = distanceToRight
+	nodeConf.DistanceToLeft = distanceToLeft
+
+	conf.Nodes[focusedNodeConfigIdentifier] = nodeConf
+
 	if err := conf.Dump(); err != nil {
 		return err
 	}
-
-	distanceTop, distanceBottom, distanceRight, distanceLeft := getScreenMargins(focusedOutput, focusedNode)
 
 	resizeContext, err := NewResizeContext(arg)
 	if err != nil {
@@ -177,13 +175,13 @@ func Execute(arg string) error {
 	var resizeValue int64
 	switch arg {
 	case DirectionTop:
-		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceTop)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, loadedNodeConf)
 	case DirectionBottom:
-		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceBottom)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, loadedNodeConf)
 	case DirectionRight:
-		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceRight)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, loadedNodeConf)
 	case DirectionLeft:
-		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, pastNodeConfig, distanceLeft)
+		resizeValue = resizeContext.strategy.NormalizeValue(focusedOutput, loadedNodeConf)
 	}
 
 	return resizeContext.strategy.Resize(resizeValue)
