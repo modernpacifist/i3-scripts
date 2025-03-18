@@ -149,61 +149,44 @@ func Execute(resize_direction string) error {
 
 	distanceToTop, distanceToBottom, distanceToRight, distanceToLeft := getScreenMargins(focusedOutput, focusedNode)
 
-	// fmt.Println("distanceToTop")
-	// fmt.Println(distanceToTop)
-
 	currentNodeConf := config.NodeConfig{
 		Node:             focusedNode,
-		DistanceToTop:    distanceToTop,
-		DistanceToBottom: distanceToBottom,
-		DistanceToRight:  distanceToRight,
-		DistanceToLeft:   distanceToLeft,
+		DistanceToTop:    loadedNodeConf.DistanceToTop,
+		DistanceToBottom: loadedNodeConf.DistanceToBottom,
+		DistanceToRight:  loadedNodeConf.DistanceToRight,
+		DistanceToLeft:   loadedNodeConf.DistanceToLeft,
 	}
 
 	var resizeValue int64
 	switch resize_direction {
 	case DirectionTop:
-		if focusedNode.Rect.Y == defaultStatusBarHeight {
+		if focusedNode.Rect.Y <= defaultStatusBarHeight {
 			resizeValue = -loadedNodeConf.DistanceToTop
 		} else {
 			resizeValue = distanceToTop
 		}
-
+		currentNodeConf.DistanceToTop = distanceToTop
 	case DirectionBottom:
-		if focusedNode.Rect.Y+focusedNode.Rect.Height-defaultStatusBarHeight == focusedOutput.Rect.Height-defaultStatusBarHeight {
+		if focusedNode.Rect.Y+focusedNode.Rect.Height-defaultStatusBarHeight >= focusedOutput.Rect.Height-defaultStatusBarHeight {
 			resizeValue = -loadedNodeConf.DistanceToBottom
 		} else {
 			resizeValue = distanceToBottom
 		}
-
+		currentNodeConf.DistanceToBottom = distanceToBottom
 	case DirectionRight:
-		if focusedOutput.Rect.X + focusedNode.Rect.Width >= focusedOutput.Rect.Width {
+		if focusedOutput.Rect.X+focusedNode.Rect.Width >= focusedOutput.Rect.Width {
 			resizeValue = -loadedNodeConf.DistanceToRight
 		} else {
 			resizeValue = distanceToRight
 		}
-
+		currentNodeConf.DistanceToRight = distanceToRight
 	case DirectionLeft:
 		if focusedNode.Rect.X <= focusedOutput.Rect.Width {
 			resizeValue = -loadedNodeConf.DistanceToLeft
 		} else {
 			resizeValue = distanceToLeft
 		}
-	}
-
-	// fmt.Println(resizeValue)
-	// do not override distances to margins if resizeValue is 0
-	if resizeValue == 0 {
-		switch resize_direction {
-		case DirectionTop:
-			resizeValue = loadedNodeConf.DistanceToTop
-		case DirectionBottom:
-			resizeValue = loadedNodeConf.DistanceToBottom
-		case DirectionRight:
-			resizeValue = loadedNodeConf.DistanceToRight
-		case DirectionLeft:
-			resizeValue = loadedNodeConf.DistanceToLeft
-		}
+		currentNodeConf.DistanceToLeft = distanceToLeft
 	}
 
 	conf.Nodes[focusedNodeConfigIdentifier] = currentNodeConf
@@ -212,8 +195,6 @@ func Execute(resize_direction string) error {
 	if err != nil {
 		return err
 	}
-
-	// resizeValue := resizeContext.strategy.calculateResizeValue(focusedOutput, loadedNodeConf)
 
 	if err := resizeContext.strategy.Resize(resizeValue); err != nil {
 		return err
