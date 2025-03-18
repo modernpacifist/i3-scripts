@@ -74,7 +74,7 @@ func getScreenMargins(output i3.Output, node i3.Node) (int64, int64, int64, int6
 
 	distanceToTop := nodeRect.Y - defaultStatusBarHeight
 	distanceToBottom := outputRect.Y + outputRect.Height - (nodeRect.Y + nodeRect.Height)
-	distanceToRight := outputRect.Width - nodeRect.Width
+	distanceToRight := outputRect.Width - (nodeRect.X - outputRect.X + nodeRect.Width)
 	distanceToLeft := nodeRect.X - outputRect.X
 
 	return distanceToTop, distanceToBottom, distanceToRight, distanceToLeft
@@ -90,7 +90,6 @@ func Execute(resize_direction string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v\n", focusedNode.Rect)
 
 	// double check this later
 	if focusedNode.Floating != "user_on" && focusedNode.Floating != "auto_on" {
@@ -107,7 +106,6 @@ func Execute(resize_direction string) error {
 		return err
 	}
 
-	// load past config into memory
 	loadedNodeConf, exists := conf.Nodes[focusedNodeConfigIdentifier]
 	if !exists {
 		conf.Nodes[focusedNodeConfigIdentifier] = config.NodeConfig{
