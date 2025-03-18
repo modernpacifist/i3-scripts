@@ -13,12 +13,17 @@ import (
 )
 
 const (
-	configFilename string      = "~/.ScaleFloatWindow.json"
+	configFilename string      = "~/.MarginResize.json"
 	defaultPerms   os.FileMode = 0644
 )
 
 type NodeConfig struct {
 	i3.Node
+
+	DistanceToTop    int64 `json:"distance_to_top"`
+	DistanceToBottom int64 `json:"distance_to_bottom"`
+	DistanceToRight  int64 `json:"distance_to_right"`
+	DistanceToLeft   int64 `json:"distance_to_left"`
 }
 
 type Config struct {
