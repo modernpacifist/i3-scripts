@@ -12,17 +12,14 @@ import (
 const (
 	defaultStatusBarHeight = 35
 
-	// Direction constants
 	DirectionTop    = "top"
 	DirectionBottom = "bottom"
 	DirectionRight  = "right"
 	DirectionLeft   = "left"
 )
 
-// ResizeStrategy defines the interface for different resize operations
 type ResizeStrategy interface {
 	Resize(value int64) error
-	// calculateResizeValue(output i3.Output, nodeConf config.NodeConfig) int64
 }
 
 // TopResizeStrategy implements ResizeStrategy for top direction
@@ -32,26 +29,11 @@ func (s *TopResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow height %d px, move container up %d px", value, value))
 }
 
-// func (s *TopResizeStrategy) calculateResizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
-// 	// if val == 0 && nodeConf.Node.Rect.Y > output.Rect.Y {
-// 	if nodeConf.Node.Rect.Y-defaultStatusBarHeight >= output.Rect.Y {
-// 		return nodeConf.Node.Rect.Y - defaultStatusBarHeight
-// 	}
-// 	return -(nodeConf.Node.Rect.Y - defaultStatusBarHeight)
-// }
-
 type BottomResizeStrategy struct{}
 
 func (s *BottomResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow height %d px", value))
 }
-
-// func (s *BottomResizeStrategy) calculateResizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
-// 	if nodeConf.Node.Rect.Y+nodeConf.Node.Rect.Height == output.Rect.Height {
-// 		return -(output.Rect.Height - nodeConf.Node.Rect.Height)
-// 	}
-// 	return -(nodeConf.Node.Rect.Y + nodeConf.Node.Rect.Height - output.Rect.Height)
-// }
 
 type RightResizeStrategy struct{}
 
@@ -59,25 +41,11 @@ func (s *RightResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow width %d px", value))
 }
 
-// func (s *RightResizeStrategy) calculateResizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
-// 	if nodeConf.Node.Rect.X+nodeConf.Node.Rect.Width == output.Rect.Width {
-// 		return -(output.Rect.Width - nodeConf.Node.Rect.Width)
-// 	}
-// 	return -(nodeConf.Node.Rect.X + nodeConf.Node.Rect.Width - output.Rect.Width)
-// }
-
 type LeftResizeStrategy struct{}
 
 func (s *LeftResizeStrategy) Resize(value int64) error {
 	return common.RunI3Command(fmt.Sprintf("resize grow width %d px, move container left %d px", value, value))
 }
-
-// func (s *LeftResizeStrategy) calculateResizeValue(output i3.Output, nodeConf config.NodeConfig) int64 {
-// 	if nodeConf.Node.Rect.X == output.Rect.X {
-// 		return -(output.Rect.Width - nodeConf.Node.Rect.Width)
-// 	}
-// 	return -(nodeConf.Node.Rect.X - output.Rect.X)
-// }
 
 type ResizeContext struct {
 	strategy ResizeStrategy
@@ -175,7 +143,7 @@ func Execute(resize_direction string) error {
 		}
 		currentNodeConf.DistanceToBottom = distanceToBottom
 	case DirectionRight:
-		if focusedNode.Rect.Width >= focusedOutput.Rect.Width {
+		if focusedOutput.Rect.X + focusedNode.Rect.Width >= focusedOutput.Rect.Width {
 			resizeValue = -loadedNodeConf.DistanceToRight
 		} else {
 			resizeValue = distanceToRight
