@@ -104,12 +104,12 @@ func getScreenMargins(output i3.Output, node i3.Node) (int64, int64, int64, int6
 	outputRect := output.Rect
 	nodeRect := node.Rect
 
-	distanceTop := nodeRect.Y - defaultStatusBarHeight
-	distanceBottom := outputRect.Y + outputRect.Height - (nodeRect.Y + nodeRect.Height)
-	distanceRight := outputRect.X + outputRect.Width - (nodeRect.X + nodeRect.Width)
-	distanceLeft := nodeRect.X - outputRect.X
+	distanceToTop := nodeRect.Y - defaultStatusBarHeight
+	distanceToBottom := outputRect.Y + outputRect.Height - (nodeRect.Y + nodeRect.Height)
+	distanceToRight := outputRect.Width - nodeRect.Width
+	distanceToLeft := nodeRect.X - outputRect.X
 
-	return distanceTop, distanceBottom, distanceRight, distanceLeft
+	return distanceToTop, distanceToBottom, distanceToRight, distanceToLeft
 }
 
 func Execute(resize_direction string) error {
@@ -122,6 +122,7 @@ func Execute(resize_direction string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("%+v\n", focusedNode.Rect)
 
 	// double check this later
 	if focusedNode.Floating != "user_on" && focusedNode.Floating != "auto_on" {
@@ -150,11 +151,11 @@ func Execute(resize_direction string) error {
 	distanceToTop, distanceToBottom, distanceToRight, distanceToLeft := getScreenMargins(focusedOutput, focusedNode)
 
 	currentNodeConf := config.NodeConfig{
-		Node:             focusedNode,
 		DistanceToTop:    loadedNodeConf.DistanceToTop,
 		DistanceToBottom: loadedNodeConf.DistanceToBottom,
 		DistanceToRight:  loadedNodeConf.DistanceToRight,
 		DistanceToLeft:   loadedNodeConf.DistanceToLeft,
+		Node:             focusedNode,
 	}
 
 	var resizeValue int64
@@ -174,7 +175,7 @@ func Execute(resize_direction string) error {
 		}
 		currentNodeConf.DistanceToBottom = distanceToBottom
 	case DirectionRight:
-		if focusedOutput.Rect.X+focusedNode.Rect.Width >= focusedOutput.Rect.Width {
+		if focusedNode.Rect.Width >= focusedOutput.Rect.Width {
 			resizeValue = -loadedNodeConf.DistanceToRight
 		} else {
 			resizeValue = distanceToRight
