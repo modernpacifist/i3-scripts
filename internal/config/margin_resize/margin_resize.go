@@ -19,10 +19,7 @@ const (
 
 type NodeConfig struct {
 	i3.Node
-	ResizedToTop     bool  `json:"resized_to_top"`
-	ResizedToBottom  bool  `json:"resized_to_bottom"`
-	ResizedToRight   bool  `json:"resized_to_right"`
-	ResizedToLeft    bool  `json:"resized_to_left"`
+
 	DistanceToTop    int64 `json:"distance_to_top"`
 	DistanceToBottom int64 `json:"distance_to_bottom"`
 	DistanceToRight  int64 `json:"distance_to_right"`
