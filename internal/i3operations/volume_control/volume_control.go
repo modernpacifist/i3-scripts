@@ -5,8 +5,8 @@ import (
 	"log"
 	"math"
 	"os/exec"
+	"regexp"
 	"strconv"
-	"strings"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 )
@@ -16,26 +16,58 @@ const (
 	RoundValue        = 5
 )
 
-func getCurrentVolume() float64 {
-	var out []byte
-	var err error
-	var num float64
+// Optimized volume parsing using regex instead of complex shell pipeline
+var volumeRegex = regexp.MustCompile(`(\d+)%`)
 
-	cmd := `amixer -D pulse sget Master | grep 'Left:' | awk -F'[][]' '{ print $2 }' | tr -d '%'`
-	if out, err = exec.Command("bash", "-c", cmd).Output(); err != nil {
-		log.Fatal(err)
+func getCurrentVolume() (float64, error) {
+	// Simplified command using pactl instead of complex amixer pipeline
+	cmd := exec.Command("pactl", "get-sink-volume", "@DEFAULT_SINK@")
+	output, err := cmd.Output()
+	if err != nil {
+		// Fallback to amixer if pactl fails
+		return getCurrentVolumeAmixer()
 	}
 
-	if num, err = strconv.ParseFloat(strings.TrimSuffix(string(out), "\n"), 64); err != nil {
-		log.Fatal(err)
+	// Parse volume percentage directly from pactl output
+	matches := volumeRegex.FindStringSubmatch(string(output))
+	if len(matches) < 2 {
+		return getCurrentVolumeAmixer() // Fallback
 	}
 
-	return num
+	volume, err := strconv.ParseFloat(matches[1], 64)
+	if err != nil {
+		return getCurrentVolumeAmixer() // Fallback
+	}
+
+	return volume, nil
+}
+
+// Fallback method using amixer (optimized)
+func getCurrentVolumeAmixer() (float64, error) {
+	cmd := exec.Command("amixer", "-D", "pulse", "sget", "Master")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, fmt.Errorf("failed to get volume: %w", err)
+	}
+
+	// Use regex to extract volume percentage
+	matches := volumeRegex.FindStringSubmatch(string(output))
+	if len(matches) < 2 {
+		return 0, fmt.Errorf("could not parse volume from amixer output")
+	}
+
+	volume, err := strconv.ParseFloat(matches[1], 64)
+	if err != nil {
+		return 0, fmt.Errorf("could not convert volume to float: %w", err)
+	}
+
+	return volume, nil
 }
 
 func ToggleVolume() {
-	cmd := `pactl set-sink-mute @DEFAULT_SINK@ toggle`
-	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
+	// Use pactl directly instead of bash wrapper
+	cmd := exec.Command("pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle")
+	if err := cmd.Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -43,19 +75,28 @@ func ToggleVolume() {
 }
 
 func RoundVolume() {
-	currentVolume := getCurrentVolume()
-	roundedVolume := math.Round(currentVolume/RoundValue) * RoundValue
-
-	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %.f%%", roundedVolume)
-	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
+	currentVolume, err := getCurrentVolume()
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: rounded to %.f%%", roundedVolume))
+	roundedVolume := math.Round(currentVolume/RoundValue) * RoundValue
+
+	// Use pactl directly
+	cmd := exec.Command("pactl", "set-sink-volume", "@DEFAULT_SINK@", fmt.Sprintf("%.0f%%", roundedVolume))
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: rounded to %.0f%%", roundedVolume))
 }
 
 func AdjustVolume(changeValue string, maxVolume float64) {
-	currentVolume := getCurrentVolume()
+	currentVolume, err := getCurrentVolume()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	change, err := strconv.ParseFloat(changeValue, 64)
 	if err != nil {
 		log.Fatal(err)
@@ -63,14 +104,20 @@ func AdjustVolume(changeValue string, maxVolume float64) {
 
 	newVolume := currentVolume + change
 	if newVolume > maxVolume {
-		common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: cannot adjust volume above %.f%%", maxVolume))
+		common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: cannot adjust volume above %.0f%%", maxVolume))
 		return
 	}
 
-	cmd := fmt.Sprintf("pactl set-sink-volume @DEFAULT_SINK@ %s%%", changeValue)
-	if _, err := exec.Command("bash", "-c", cmd).Output(); err != nil {
-		log.Fatalf("%s: pactl is not installed on this system", err)
+	// Ensure volume doesn't go below 0
+	if newVolume < 0 {
+		newVolume = 0
 	}
 
-	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: %s%%", changeValue))
+	// Use pactl directly with absolute volume instead of relative change
+	cmd := exec.Command("pactl", "set-sink-volume", "@DEFAULT_SINK@", fmt.Sprintf("%.0f%%", newVolume))
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("pactl command failed: %v (pactl may not be installed)", err)
+	}
+
+	common.NotifySend(NotifySendTimeout, fmt.Sprintf("VolumeControl: %s%% (now %.0f%%)", changeValue, newVolume))
 }
