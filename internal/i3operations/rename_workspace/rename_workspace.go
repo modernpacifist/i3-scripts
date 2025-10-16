@@ -8,7 +8,7 @@ import (
 	"go.i3wm.org/i3/v4"
 )
 
-func getWorkspaceNameFromUser() (string, error) {
+func promptUserWorkspaceName() (string, error) {
 	var promptMessage string = "Rename workspace to: "
 
 	for {
@@ -38,7 +38,7 @@ func Execute() error {
 	wsIndex := focusedWorkspace.Num
 	currentWsName := focusedWorkspace.Name
 
-	newName, err := getWorkspaceNameFromUser()
+	newName, err := promptUserWorkspaceName()
 	if err != nil {
 		return err
 	}

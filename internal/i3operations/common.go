@@ -255,3 +255,7 @@ func GetBarConfig() (i3.BarConfig, error) {
 
 	return reply, nil
 }
+
+func GetCurrentExistingMarks() ([]string, error) {
+	return i3.GetMarks()
+}

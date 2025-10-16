@@ -3,6 +3,7 @@ package manage_float_container
 import (
 	"errors"
 	"fmt"
+	"slices"
 
 	config "github.com/modernpacifist/i3-scripts-go/internal/config/manage_float_container"
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
@@ -23,6 +24,27 @@ func showContainer(conParams config.NodeConfig) error {
 	return common.RunI3Command(cmd)
 }
 
+func promptUserConfirmation(message string) (bool, error) {
+	var promptMessage string = message
+
+	for {
+		userInput, err := common.Runi3Input(promptMessage, 1)
+		if err != nil || userInput == "" {
+			return false, err
+		}
+
+		if userInput == "y" {
+			return true, nil
+		}
+
+		if userInput == "n" {
+			return false, nil
+		}
+
+		promptMessage = "Invalid input. Please enter 'y' or 'n': "
+	}
+}
+
 func Execute(restoreFlag string, showFlag string, updateFlag string, saveFlag bool) error {
 	conf, err := config.Create()
 	if err != nil {
@@ -30,12 +52,31 @@ func Execute(restoreFlag string, showFlag string, updateFlag string, saveFlag bo
 	}
 
 	if restoreFlag != "" {
+		focusedNode, err := common.GetFocusedNode()
+		if err != nil {
+			return err
+		}
+
+		if slices.Contains(focusedNode.Marks, restoreFlag) {
+			return nil
+		}
+
+		existingMarks, err := common.GetCurrentExistingMarks()
+		if err != nil {
+			return err
+		}
+
+		if slices.Contains(existingMarks, restoreFlag) {
+			message := fmt.Sprintf("Mark '%s' already exists. Do you want to replace it? (y/n):", restoreFlag)
+			confirmed, err := promptUserConfirmation(message)
+			if err != nil || !confirmed {
+				common.NotifySend(1.0, "Restore cancelled")
+				return nil
+			}
+		}
+
 		containerParameters, exists := conf.Nodes[restoreFlag]
 		if !exists {
-			focusedNode, err := common.GetFocusedNode()
-			if err != nil {
-				return err
-			}
 			containerParameters = config.NodeConfigConstructor(focusedNode)
 
 			containerParameters.Width = 2000
