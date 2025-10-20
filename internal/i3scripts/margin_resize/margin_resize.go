@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	config "github.com/modernpacifist/i3-scripts-go/internal/config/margin_resize"
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 	"go.i3wm.org/i3/v4"
 )
 

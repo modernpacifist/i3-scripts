@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	diagonalResize "github.com/modernpacifist/i3-scripts-go/internal/i3operations/diagonal_resize"
+	diagonalResize "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/diagonal_resize"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	changeMonitorBrightness "github.com/modernpacifist/i3-scripts-go/internal/i3operations/change_monitor_brightness"
+	changeMonitorBrightness "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/change_monitor_brightness"
 )
 
 var rootCmd = &cobra.Command{

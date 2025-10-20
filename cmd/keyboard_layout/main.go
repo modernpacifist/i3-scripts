@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	keyboardLayout "github.com/modernpacifist/i3-scripts-go/internal/i3operations/keyboard_layout"
+	keyboardLayout "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/keyboard_layout"
 )
 
 var rootCmd = &cobra.Command{

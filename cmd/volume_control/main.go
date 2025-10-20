@@ -4,7 +4,7 @@ import (
 	"log"
 	"regexp"
 
-	volumeControl "github.com/modernpacifist/i3-scripts-go/internal/i3operations/volume_control"
+	volumeControl "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/volume_control"
 	"github.com/spf13/cobra"
 )
 

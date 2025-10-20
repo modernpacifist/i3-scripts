@@ -252,7 +252,7 @@ make clean
 
 ### Internal Libraries (`internal/`)
 
-#### `internal/i3operations/common.go`
+#### `internal/i3scripts/common.go`
 Common utilities for i3 operations including:
 - Tree and workspace retrieval functions
 - Node and output management
@@ -265,10 +265,10 @@ Configuration management utilities for various scripts.
 
 ### Public Libraries (`pkg/`)
 
-#### `pkg/i3operations/i3operations.go`
+#### `pkg/i3scripts/i3scripts.go`
 Public API for i3 operations with similar functionality to internal version but with different error handling approaches.
 
-#### `pkg/i3operations/optimized.go`
+#### `pkg/i3scripts/optimized.go`
 Performance-optimized versions of common i3 operations.
 
 ## Performance Analysis

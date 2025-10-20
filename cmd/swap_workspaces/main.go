@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	swapWorkspaces "github.com/modernpacifist/i3-scripts-go/internal/i3operations/swap_workspaces"
+	swapWorkspaces "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/swap_workspaces"
 )
 
 func main() {

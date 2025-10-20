@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	changeWorkspaceIndex "github.com/modernpacifist/i3-scripts-go/internal/i3operations/change_workspace_index"
+	changeWorkspaceIndex "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/change_workspace_index"
 	"github.com/spf13/cobra"
 )
 

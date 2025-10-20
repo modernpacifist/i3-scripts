@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	marginResize "github.com/modernpacifist/i3-scripts-go/internal/i3operations/margin_resize"
+	marginResize "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/margin_resize"
 	"github.com/spf13/cobra"
 )
 

@@ -1,4 +1,4 @@
-package i3operations
+package i3scripts
 
 import (
 	"errors"

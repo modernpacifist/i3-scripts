@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	manageFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/manage_float_container"
+	manageFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/manage_float_container"
 
 	"github.com/spf13/cobra"
 )

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	"github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 	"go.i3wm.org/i3/v4"
 )
 
@@ -13,7 +13,7 @@ func getMarkFromUser() (mark string) {
 	var promptMessage string = `Mark container (press "f" to mark with function keys): `
 
 	for {
-		userInput, err := i3operations.Runi3Input(promptMessage, 1)
+		userInput, err := i3scripts.Runi3Input(promptMessage, 1)
 		if err != nil {
 			return ""
 		}

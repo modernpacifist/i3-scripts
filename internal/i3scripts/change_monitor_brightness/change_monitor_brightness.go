@@ -11,7 +11,7 @@ import (
 	"unicode"
 
 	config "github.com/modernpacifist/i3-scripts-go/internal/config/change_monitor_brightness"
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 )
 
 const (

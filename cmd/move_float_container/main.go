@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	moveFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/move_float_container"
+	moveFloatContainer "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/move_float_container"
 	"github.com/spf13/cobra"
 )
 

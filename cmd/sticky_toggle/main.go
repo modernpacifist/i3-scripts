@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	stickyToggle "github.com/modernpacifist/i3-scripts-go/internal/i3operations/sticky_toggle"
+	stickyToggle "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/sticky_toggle"
 )
 
 func main() {
