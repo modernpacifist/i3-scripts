@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	killContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/kill_container"
+	killContainer "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/kill_container"
 )
 
 func main() {

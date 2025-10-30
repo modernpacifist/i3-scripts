@@ -1,10 +1,10 @@
-package i3operations
+package i3scripts
 
 import (
 	"fmt"
 	"os/exec"
 
-	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	"github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 	"go.i3wm.org/i3/v4"
 )
 
@@ -143,13 +143,13 @@ func moveNodeToPosition(nodeId int64, position Position) error {
 
 // story: possibility to move to different output based on the flag like output [DP-1/HDMI-1]
 func Execute(arg uint8) error {
-	focusedOutput, err := i3operations.GetFocusedOutput()
+	focusedOutput, err := i3scripts.GetFocusedOutput()
 	if err != nil {
 		return err
 	}
 	focusedOutputGeometry := outputGeometryConstructor(focusedOutput)
 
-	focusedNode, err := i3operations.GetFocusedNode()
+	focusedNode, err := i3scripts.GetFocusedNode()
 	if err != nil {
 		return err
 	}

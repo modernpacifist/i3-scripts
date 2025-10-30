@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 )
 
 const (

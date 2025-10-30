@@ -8,7 +8,7 @@ import (
 
 	"go.i3wm.org/i3/v4"
 
-	"github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	"github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/config"
 )
@@ -80,6 +80,6 @@ type NodeConfig struct {
 func NodeConfigConstructor(node i3.Node) NodeConfig {
 	return NodeConfig{
 		Node:  node,
-		Marks: i3operations.GetNodeMarks(node),
+		Marks: i3scripts.GetNodeMarks(node),
 	}
 }

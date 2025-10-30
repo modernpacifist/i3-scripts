@@ -6,7 +6,7 @@ import (
 	"slices"
 
 	config "github.com/modernpacifist/i3-scripts-go/internal/config/manage_float_container"
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 )
 
 const (

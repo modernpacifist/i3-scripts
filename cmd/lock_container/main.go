@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	lockContainer "github.com/modernpacifist/i3-scripts-go/internal/i3operations/lock_container"
+	lockContainer "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/lock_container"
 )
 
 func main() {

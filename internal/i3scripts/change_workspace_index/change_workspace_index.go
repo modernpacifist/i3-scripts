@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 	"go.i3wm.org/i3/v4"
 )
 

@@ -10,7 +10,7 @@ import (
 	"go.i3wm.org/i3/v4"
 
 	common "github.com/modernpacifist/i3-scripts-go/internal/config"
-	i3operations "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	i3scripts "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 )
 
 const (
@@ -35,7 +35,7 @@ func NodeConfigConstructor(node i3.Node) NodeConfig {
 		Y:      node.Rect.Y,
 		Width:  node.Rect.Width,
 		Height: node.Rect.Height,
-		Marks:  i3operations.GetNodeMarks(node),
+		Marks:  i3scripts.GetNodeMarks(node),
 	}
 }
 

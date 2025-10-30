@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	resizeFloat "github.com/modernpacifist/i3-scripts-go/internal/i3operations/resize_float_container"
+	resizeFloat "github.com/modernpacifist/i3-scripts-go/internal/i3scripts/resize_float_container"
 	"github.com/spf13/cobra"
 )
 

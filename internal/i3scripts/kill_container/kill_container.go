@@ -9,7 +9,7 @@ import (
 	"os/user"
 	"strings"
 
-	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
+	common "github.com/modernpacifist/i3-scripts-go/internal/i3scripts"
 )
 
 var jsonWhitelistPath string
