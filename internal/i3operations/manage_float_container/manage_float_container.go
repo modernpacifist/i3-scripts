@@ -9,6 +9,11 @@ import (
 	common "github.com/modernpacifist/i3-scripts-go/internal/i3operations"
 )
 
+const (
+	DEFAULT_CONTAINER_WIDTH  int64 = 2000
+	DEFAULT_CONTAINER_HEIGHT int64 = 1000
+)
+
 func createFloatingContainer(conParams config.NodeConfig, mark string) error {
 	cmd := fmt.Sprintf("mark \"%s\", move scratchpad, [con_mark=\"^%s$\"] scratchpad show, move absolute position %d %d, resize set %d %d", mark, mark, conParams.X, conParams.Y, conParams.Width, conParams.Height)
 	return common.RunI3Command(cmd)
@@ -79,8 +84,8 @@ func Execute(restoreFlag string, showFlag string, updateFlag string, saveFlag bo
 		if !exists {
 			containerParameters = config.NodeConfigConstructor(focusedNode)
 
-			containerParameters.Width = 2000
-			containerParameters.Height = 1000
+			containerParameters.Width = DEFAULT_CONTAINER_WIDTH
+			containerParameters.Height = DEFAULT_CONTAINER_HEIGHT
 			containerParameters.Marks = []string{restoreFlag}
 
 			createFloatingContainerDefault(containerParameters, restoreFlag)
