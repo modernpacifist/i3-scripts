@@ -141,14 +141,14 @@ func Execute(resize_direction string) error {
 		}
 		currentNodeConf.DistanceToBottom = distanceToBottom
 	case DirectionRight:
-		if focusedOutput.Rect.X + focusedNode.Rect.Width >= focusedOutput.Rect.Width {
+		if focusedNode.Rect.X+focusedNode.Rect.Width >= focusedOutput.Rect.X+focusedOutput.Rect.Width {
 			resizeValue = -loadedNodeConf.DistanceToRight
 		} else {
 			resizeValue = distanceToRight
 		}
 		currentNodeConf.DistanceToRight = distanceToRight
 	case DirectionLeft:
-		if focusedNode.Rect.X <= focusedOutput.Rect.Width {
+		if focusedNode.Rect.X <= focusedOutput.Rect.X {
 			resizeValue = -loadedNodeConf.DistanceToLeft
 		} else {
 			resizeValue = distanceToLeft
